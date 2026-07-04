@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { 
   Building2, 
   CheckSquare, 
@@ -27,6 +27,126 @@ import {
   Info
 } from 'lucide-react';
 import { PlatformTheme, AppUser } from './types';
+
+
+type ThemeDesignTokens = {
+  name: string;
+  mainBg: string;
+  sidebarBg: string;
+  headerBg: string;
+  panelBg: string;
+  softPanelBg: string;
+  text: string;
+  bg: string;
+  bgHover: string;
+  border: string;
+  strongBorder: string;
+  glow: string;
+  icon: string;
+  gradientButton: string;
+  activeMenu: string;
+  selectRing: string;
+  cssVars: CSSProperties;
+};
+
+const themeTokens: Record<PlatformTheme, ThemeDesignTokens> = {
+  vision_2030: {
+    name: 'سمة رؤية ٢٠٣٠',
+    mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.16),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,184,166,0.09),transparent_36%),linear-gradient(135deg,#06110d_0%,#090a12_48%,#050608_100%)]',
+    sidebarBg: 'bg-emerald-950/10 backdrop-blur-2xl',
+    headerBg: 'bg-black/25 backdrop-blur-2xl',
+    panelBg: 'bg-white/[0.045] backdrop-blur-xl',
+    softPanelBg: 'bg-emerald-500/[0.055] backdrop-blur-xl',
+    text: 'text-emerald-400',
+    bg: 'bg-emerald-600',
+    bgHover: 'hover:bg-emerald-500',
+    border: 'border-emerald-500/20',
+    strongBorder: 'border-emerald-400/45',
+    glow: 'shadow-emerald-500/20',
+    icon: 'text-emerald-400',
+    gradientButton: 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400',
+    activeMenu: 'bg-gradient-to-l from-emerald-500/95 to-teal-500/85 text-white border border-emerald-300/25 shadow-lg shadow-emerald-500/20',
+    selectRing: 'focus-within:border-emerald-400/50 focus-within:ring-2 focus-within:ring-emerald-400/10',
+    cssVars: {
+      '--theme-accent': '#10b981',
+      '--theme-accent-soft': 'rgba(16,185,129,.14)',
+      '--theme-card': 'rgba(16,185,129,.055)',
+      '--theme-border': 'rgba(16,185,129,.22)',
+    } as CSSProperties,
+  },
+  golden_luxury: {
+    name: 'سمة الفخامة الذهبية',
+    mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(217,119,6,0.10),transparent_36%),linear-gradient(135deg,#160f05_0%,#090a12_48%,#050608_100%)]',
+    sidebarBg: 'bg-amber-950/10 backdrop-blur-2xl',
+    headerBg: 'bg-black/25 backdrop-blur-2xl',
+    panelBg: 'bg-white/[0.045] backdrop-blur-xl',
+    softPanelBg: 'bg-amber-500/[0.06] backdrop-blur-xl',
+    text: 'text-amber-400',
+    bg: 'bg-amber-600',
+    bgHover: 'hover:bg-amber-500',
+    border: 'border-amber-500/20',
+    strongBorder: 'border-amber-400/45',
+    glow: 'shadow-amber-500/20',
+    icon: 'text-amber-400',
+    gradientButton: 'bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400',
+    activeMenu: 'bg-gradient-to-l from-amber-500/95 to-orange-500/85 text-white border border-amber-300/25 shadow-lg shadow-amber-500/20',
+    selectRing: 'focus-within:border-amber-400/50 focus-within:ring-2 focus-within:ring-amber-400/10',
+    cssVars: {
+      '--theme-accent': '#f59e0b',
+      '--theme-accent-soft': 'rgba(245,158,11,.15)',
+      '--theme-card': 'rgba(245,158,11,.06)',
+      '--theme-border': 'rgba(245,158,11,.24)',
+    } as CSSProperties,
+  },
+  midnight_navy: {
+    name: 'سمة كحلي الليل',
+    mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(14,165,233,0.10),transparent_36%),linear-gradient(135deg,#061021_0%,#090a12_48%,#050608_100%)]',
+    sidebarBg: 'bg-blue-950/10 backdrop-blur-2xl',
+    headerBg: 'bg-black/25 backdrop-blur-2xl',
+    panelBg: 'bg-white/[0.045] backdrop-blur-xl',
+    softPanelBg: 'bg-blue-500/[0.06] backdrop-blur-xl',
+    text: 'text-blue-400',
+    bg: 'bg-blue-600',
+    bgHover: 'hover:bg-blue-500',
+    border: 'border-blue-500/20',
+    strongBorder: 'border-blue-400/45',
+    glow: 'shadow-blue-500/20',
+    icon: 'text-blue-400',
+    gradientButton: 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400',
+    activeMenu: 'bg-gradient-to-l from-blue-500/95 to-cyan-500/85 text-white border border-blue-300/25 shadow-lg shadow-blue-500/20',
+    selectRing: 'focus-within:border-blue-400/50 focus-within:ring-2 focus-within:ring-blue-400/10',
+    cssVars: {
+      '--theme-accent': '#3b82f6',
+      '--theme-accent-soft': 'rgba(59,130,246,.15)',
+      '--theme-card': 'rgba(59,130,246,.06)',
+      '--theme-border': 'rgba(59,130,246,.24)',
+    } as CSSProperties,
+  },
+  spring: {
+    name: 'سمة ربيع أراك',
+    mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(132,204,22,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(101,163,13,0.10),transparent_36%),linear-gradient(135deg,#101a05_0%,#090a12_48%,#050608_100%)]',
+    sidebarBg: 'bg-lime-950/10 backdrop-blur-2xl',
+    headerBg: 'bg-black/25 backdrop-blur-2xl',
+    panelBg: 'bg-white/[0.045] backdrop-blur-xl',
+    softPanelBg: 'bg-lime-500/[0.06] backdrop-blur-xl',
+    text: 'text-lime-400',
+    bg: 'bg-lime-600',
+    bgHover: 'hover:bg-lime-500',
+    border: 'border-lime-500/20',
+    strongBorder: 'border-lime-400/45',
+    glow: 'shadow-lime-500/20',
+    icon: 'text-lime-400',
+    gradientButton: 'bg-gradient-to-r from-lime-600 to-green-500 hover:from-lime-500 hover:to-green-400',
+    activeMenu: 'bg-gradient-to-l from-lime-500/95 to-green-500/85 text-slate-950 border border-lime-200/25 shadow-lg shadow-lime-500/20',
+    selectRing: 'focus-within:border-lime-400/50 focus-within:ring-2 focus-within:ring-lime-400/10',
+    cssVars: {
+      '--theme-accent': '#84cc16',
+      '--theme-accent-soft': 'rgba(132,204,22,.15)',
+      '--theme-card': 'rgba(132,204,22,.06)',
+      '--theme-border': 'rgba(132,204,22,.24)',
+    } as CSSProperties,
+  },
+};
 
 // Importing views
 import ProjectsView from './components/ProjectsView';
@@ -64,6 +184,7 @@ export default function App() {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [time, setTime] = useState('');
+  const currentTheme = themeTokens[theme];
 
   // Authentication & Security State Layer
   const [currentUser, setCurrentUser] = useState<AppUser | null>(() => {
@@ -165,32 +286,11 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const getThemeTextClass = () => {
-    switch (theme) {
-      case 'vision_2030': return 'text-emerald-400';
-      case 'golden_luxury': return 'text-amber-400';
-      case 'midnight_navy': return 'text-blue-400';
-      case 'spring': return 'text-lime-400';
-    }
-  };
-
-  const getThemeBgClass = () => {
-    switch (theme) {
-      case 'vision_2030': return 'bg-emerald-600';
-      case 'golden_luxury': return 'bg-amber-600';
-      case 'midnight_navy': return 'bg-blue-600';
-      case 'spring': return 'bg-lime-600';
-    }
-  };
-
-  const getThemeBorderClass = () => {
-    switch (theme) {
-      case 'vision_2030': return 'border-emerald-500/20';
-      case 'golden_luxury': return 'border-amber-500/20';
-      case 'midnight_navy': return 'border-blue-500/20';
-      case 'spring': return 'border-lime-500/20';
-    }
-  };
+  const getThemeTextClass = () => currentTheme.text;
+  const getThemeBgClass = () => currentTheme.bg;
+  const getThemeBorderClass = () => currentTheme.border;
+  const getThemeGradientButtonClass = () => currentTheme.gradientButton;
+  const getThemePanelClass = () => `${currentTheme.panelBg} border border-white/10 ${currentTheme.border}`;
 
   const handleNotificationRead = (id: string) => {
     setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
@@ -312,28 +412,33 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#090a12] text-slate-100 flex flex-row-reverse font-sans overflow-x-hidden antialiased">
+    <div
+      dir="rtl"
+      style={currentTheme.cssVars}
+      data-theme={theme}
+      className={`min-h-screen ${currentTheme.mainBg} text-slate-100 flex flex-row-reverse font-sans overflow-x-hidden antialiased selection:bg-[var(--theme-accent-soft)]`}
+    >
       
       {/* Sidebar on the Right (Arabic layout standard) */}
-      <aside className="w-80 bg-[#0e101f] border-l border-slate-800/80 flex flex-col justify-between flex-shrink-0 z-30 h-screen sticky top-0">
+      <aside className={`w-80 ${currentTheme.sidebarBg} border-l border-white/10 ${currentTheme.border} flex flex-col justify-between flex-shrink-0 z-30 h-screen sticky top-0 shadow-2xl shadow-black/30`}>
         <div className="flex flex-col h-full overflow-y-auto pr-2">
           
           {/* Top Logo and Title matches Page 1 exactly */}
-          <div className="p-6 border-b border-slate-800/80 flex items-center gap-3 justify-end">
+          <div className={`p-6 border-b border-white/10 ${currentTheme.border} flex items-center gap-3 justify-end`}>
             <div className="text-right">
               <h1 className="text-lg font-black text-white tracking-tight">CEO DIGITAL OFFICE</h1>
               <span className={`text-[10px] font-bold block ${getThemeTextClass()}`}>مكتب الرئيس التنفيذي </span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/10">
+            <div className={`w-10 h-10 rounded-xl ${getThemeGradientButtonClass()} flex items-center justify-center shadow-lg ${currentTheme.glow}`}>
               <Layers className="w-5 h-5 text-slate-950 font-black" />
             </div>
           </div>
  
           {/* Quick Active CEO Status Tracker */}
-          <div className="m-4 p-4 rounded-xl bg-[#14172c] border border-slate-800 flex justify-between items-center text-right">
+          <div className={`m-4 p-4 rounded-xl ${getThemePanelClass()} flex justify-between items-center text-right shadow-lg shadow-black/15`}>
             <div className="flex flex-col">
               <span className="text-[10px] text-slate-500">التوقيت المحلي للمكتب</span>
-              <span className="text-xs font-mono font-bold text-amber-500">{time || '12:00:00'}</span>
+              <span className={`text-xs font-mono font-bold ${currentTheme.text}`}>{time || '12:00:00'}</span>
             </div>
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-slate-400 font-semibold">المستخدم النشط</span>
@@ -359,8 +464,8 @@ export default function App() {
                         onClick={() => setActiveView(item.id)}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all cursor-pointer group ${
                           isActive 
-                            ? `${getThemeBgClass()} text-white font-black shadow-lg shadow-amber-500/5` 
-                            : 'text-slate-400 hover:text-slate-100 hover:bg-[#15172a]'
+                            ? `${currentTheme.activeMenu} font-black` 
+                            : 'text-slate-400 hover:text-slate-100 hover:bg-white/10 hover:backdrop-blur-xl'
                         }`}
                       >
                         <ChevronLeft className={`w-3 h-3 transition-transform ${isActive ? 'translate-x-0' : 'opacity-0 group-hover:opacity-100 -translate-x-1'}`} />
@@ -379,7 +484,7 @@ export default function App() {
         </div>
  
         {/* Bottom copyright & logout */}
-        <div className="p-4 border-t border-slate-800/60 bg-[#0c0d1a]">
+        <div className={`p-4 border-t border-white/10 ${currentTheme.headerBg}`}>
           <div className="flex items-center justify-between text-[11px] text-slate-500">
             <button 
               onClick={() => {
@@ -400,14 +505,14 @@ export default function App() {
       <main className="flex-1 min-h-screen flex flex-col overflow-x-hidden">
         
         {/* Top Sticky Header */}
-        <header className="h-16 bg-[#0c0d1b] border-b border-slate-800/80 px-8 flex items-center justify-between sticky top-0 z-20">
+        <header className={`h-16 ${currentTheme.headerBg} border-b border-white/10 ${currentTheme.border} px-8 flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-black/20`}>
           
           {/* Right Header: Fast Search and System indicators */}
           <div className="flex items-center gap-4">
             
             {/* Quick Vision Switcher */}
-            <div className="flex items-center gap-1.5 bg-[#121422] border border-slate-800 rounded-xl px-3 py-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+            <div className={`flex items-center gap-1.5 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} ${currentTheme.selectRing} rounded-xl px-3 py-1.5 transition-all`}>
+              <Sparkles className={`w-3.5 h-3.5 ${currentTheme.icon} animate-pulse`} />
               <select 
                 value={theme}
                 onChange={(e) => setTheme(e.target.value as PlatformTheme)}
@@ -438,11 +543,11 @@ export default function App() {
                 }}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all border cursor-pointer ${
                   ceoAdminMode 
-                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/40 shadow shadow-amber-500/5' 
-                    : 'bg-[#121422] text-slate-400 border-slate-800 hover:text-slate-200'
+                    ? `${currentTheme.softPanelBg} ${currentTheme.text} ${currentTheme.strongBorder} shadow ${currentTheme.glow}` 
+                    : `${currentTheme.panelBg} text-slate-400 border-white/10 hover:text-slate-200 hover:bg-white/10`
                 }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${ceoAdminMode ? 'bg-amber-400 animate-pulse' : 'bg-slate-500'}`}></span>
+                <span className={`w-1.5 h-1.5 rounded-full ${ceoAdminMode ? `${currentTheme.bg} animate-pulse` : 'bg-slate-500'}`}></span>
                 <span>{ceoAdminMode ? 'تفعيل دور الآدمن: نشط' : 'تفعيل دور الآدمن'}</span>
               </button>
             )}
@@ -450,7 +555,7 @@ export default function App() {
             {/* Quick help button */}
             <button 
               onClick={() => alert('نظام المساعد التنفيذي متصل بقاعدة البيانات وعقود وميزانيات المجموعة لرصد الأداء واتخاذ القرار.')}
-              className="p-2 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl transition-all cursor-pointer"
+              className="p-2 hover:bg-white/10 text-slate-400 hover:text-slate-200 rounded-xl transition-all cursor-pointer"
               title="معلومات النظام"
             >
               <HelpCircle className="w-4.5 h-4.5" />
@@ -468,7 +573,7 @@ export default function App() {
                   setShowNotificationDropdown(!showNotificationDropdown);
                   setShowProfileDropdown(false);
                 }}
-                className="p-2 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl transition-all relative cursor-pointer"
+                className="p-2 hover:bg-white/10 text-slate-400 hover:text-slate-200 rounded-xl transition-all relative cursor-pointer"
               >
                 <Bell className="w-4.5 h-4.5" />
                 {notifications.some(n => !n.read) && (
@@ -477,11 +582,11 @@ export default function App() {
               </button>
  
               {showNotificationDropdown && (
-                <div className="absolute left-0 mt-3 w-80 bg-[#121422] border border-slate-800 rounded-2xl shadow-2xl z-40 overflow-hidden text-right">
-                  <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#16182c]">
+                <div className={`absolute left-0 mt-3 w-80 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-2xl shadow-2xl shadow-black/40 z-40 overflow-hidden text-right`}>
+                  <div className={`p-4 border-b border-white/10 flex justify-between items-center ${currentTheme.softPanelBg}`}>
                     <button 
                       onClick={() => setNotifications(notifications.map(n => ({...n, read: true})))}
-                      className="text-[10px] text-amber-400 font-bold hover:underline"
+                      className={`text-[10px] ${currentTheme.text} font-bold hover:underline`}
                     >
                       تحديد كمقرؤ الكل
                     </button>
@@ -492,7 +597,7 @@ export default function App() {
                       <div 
                         key={n.id} 
                         onClick={() => handleNotificationRead(n.id)}
-                        className={`p-4 hover:bg-slate-800/40 cursor-pointer transition-colors ${!n.read ? 'bg-amber-500/5' : ''}`}
+                        className={`p-4 hover:bg-white/10 cursor-pointer transition-colors ${!n.read ? currentTheme.softPanelBg : ''}`}
                       >
                         <p className="text-xs text-slate-200 font-medium leading-relaxed">{n.title}</p>
                         <div className="flex justify-between items-center mt-2 text-[9px] text-slate-500">
@@ -518,7 +623,7 @@ export default function App() {
                   setShowProfileDropdown(!showProfileDropdown);
                   setShowNotificationDropdown(false);
                 }}
-                className="flex items-center gap-2.5 p-1.5 hover:bg-slate-800/80 rounded-xl transition-all cursor-pointer"
+                className="flex items-center gap-2.5 p-1.5 hover:bg-white/10 rounded-xl transition-all cursor-pointer"
               >
                 <div className="text-right hidden sm:block">
                   <span className="text-xs font-black text-white block">{currentUser.name}</span>
@@ -530,15 +635,15 @@ export default function App() {
               </button>
  
               {showProfileDropdown && (
-                <div className="absolute left-0 mt-3 w-56 bg-[#121422] border border-slate-800 rounded-xl shadow-2xl z-40 overflow-hidden text-right">
-                  <div className="p-4 border-b border-slate-800 bg-[#16182c]">
+                <div className={`absolute left-0 mt-3 w-56 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl shadow-2xl shadow-black/40 z-40 overflow-hidden text-right`}>
+                  <div className={`p-4 border-b border-white/10 ${currentTheme.softPanelBg}`}>
                     <span className="text-xs font-bold text-slate-300 block">{currentUser.name}</span>
                     <span className="text-[10px] text-slate-500 font-sans">{currentUser.title}</span>
                   </div>
                   <div className="p-2 space-y-1">
                     <button 
                       onClick={() => alert(`رتبة حسابك: ${currentUser.title} ومسجل بنجاح.`)}
-                      className="w-full text-right hover:bg-slate-800 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white"
+                      className="w-full text-right hover:bg-white/10 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white"
                     >
                       إعدادات الحساب والأمان
                     </button>
@@ -562,7 +667,7 @@ export default function App() {
         </header>
  
         {/* View content container */}
-        <div className="p-8 flex-1 max-w-7xl mx-auto w-full">
+        <div className="p-8 flex-1 max-w-[1700px] mx-auto w-full">
           {renderActiveView()}
         </div>
  
