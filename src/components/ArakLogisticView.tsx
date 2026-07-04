@@ -37,7 +37,7 @@ export default function ArakLogisticView({ theme }: ArakLogisticViewProps) {
       cargoName: 'شحنة حديد التسليح الكبرى رقم 104',
       vesselOrTruck: 'سفينة أراك المجد (ARAK GLORY)',
       origin: 'ميناء الدمام، المملكة العربية السعودية',
-      destination: 'ميناء الإسكندرية، جمهورية مصر العربية',
+      destination: 'ميناء جدة الإسلامي جمهورية مصر العربية',
       status: 'في عرض البحر',
       eta: '2026-06-20'
     },
@@ -79,7 +79,7 @@ export default function ArakLogisticView({ theme }: ArakLogisticViewProps) {
       cargoName: newCargo,
       vesselOrTruck: newVessel || 'ناقلة أراك اللوجستية',
       origin: 'ميناء جدة الإسلامي، السعودية',
-      destination: newDestination || 'ميناء الإسكندرية، مصر',
+      destination: newDestination || 'ميناء جدة الإسلامي، السعودية',
       status: 'قيد التحميل',
       eta: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     };
@@ -128,10 +128,10 @@ export default function ArakLogisticView({ theme }: ArakLogisticViewProps) {
             قطاعات النقل والشحن
           </span>
           <h2 className="text-3xl font-extrabold text-white">
-            لوحة أراك لوجستيك للشحن والملاحة
+            لوحة أراك لوجستيك للشحن وسلاسل التوريد
           </h2>
           <span className="text-xs text-slate-400">
-            تتبع الشحنات البحرية، القوافل البرية، وإدارة عقود الإعفاء الجمركي المعتمدة لفرع جدة والموانئ الإقليمية
+            تتبع الشحنات البحرية، الشاحنات البرية، وإدارة عقود الإعفاء الجمركي المعتمدة لفرع جدة والموانئ الإقليمية
           </span>
         </div>
 

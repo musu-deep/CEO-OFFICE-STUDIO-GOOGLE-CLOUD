@@ -61,7 +61,6 @@ export default function Sidebar({
     { id: 'settings', label: 'الإعدادات والسمات', icon: Settings },
   ];
 
-  // Colors based on selected theme
   const getThemeBadgeColor = () => {
     switch (theme) {
       case 'vision_2030':
@@ -80,26 +79,40 @@ export default function Sidebar({
       
       {/* Brand Logo Card */}
       <div className="p-5 border-b border-slate-800/80 bg-[#121522]">
-        <div className="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-800/60 shadow-lg relative overflow-hidden group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/10 to-emerald-500/10 rounded-xl blur opacity-30 group-hover:opacity-100 transition duration-1000"></div>
-          
-          {/* Circular Logo exactly matching screenshots */}
-          <div className="w-12 h-12 rounded-full bg-black/40 flex items-center justify-center relative flex-shrink-0 border border-slate-700/50">
-            <div className="absolute inset-1 rounded-full border-2 border-dashed border-emerald-500 animate-[spin_20s_linear_infinite]"></div>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-emerald-400 flex items-center justify-center font-bold text-black text-sm relative">
-              A
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-lime-500 border border-black"></div>
+        <div className="relative overflow-hidden rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800 shadow-xl group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/10 via-transparent to-amber-500/10 blur opacity-40 group-hover:opacity-100 transition duration-1000"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.12),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(245,158,11,0.10),transparent_35%)]"></div>
+
+          <div className="relative flex items-center gap-4 p-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg ring-1 ring-white/20 flex-shrink-0">
+              <img
+                src="/images/araak-logo.png"
+                alt="Araak Development Logo"
+                className="max-h-12 max-w-12 object-contain"
+                draggable={false}
+              />
+            </div>
+
+            <div className="flex flex-col text-right leading-tight min-w-0">
+              <h1 className="text-[15px] font-extrabold text-white truncate">
+                مجموعة أراك للتنمية
+              </h1>
+              <span className="mt-1 text-xs font-semibold text-amber-400 tracking-wide font-sans">
+                ARAAK DEVELOPMENT GROUP
+              </span>
+              <span className="mt-2 text-[11px] text-slate-400 leading-snug">
+                نحو توطين القيم لتمكين التنمية
+              </span>
             </div>
           </div>
-          
-          <div className="flex flex-col text-right">
-            <h1 className="text-sm font-bold text-slate-100 tracking-tight leading-none">مجموعة أراك للتنمية</h1>
-            <span className="text-xs font-semibold text-amber-500/90 tracking-wide font-sans mt-0.5">Araak Group</span>
-            <span className="text-[10px] text-slate-400 leading-none mt-1">مستقبل التنمية | Development Future</span>
-          </div>
         </div>
-        <div className="text-center mt-3">
-          <span className="text-[10px] font-sans tracking-widest text-slate-500 font-bold uppercase block">Executive Platform</span>
+
+        <div className="mt-3 flex items-center justify-center">
+          <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1">
+            <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-emerald-300">
+              EXECUTIVE OFFICE PLATFORM
+            </span>
+          </div>
         </div>
       </div>
 
@@ -109,7 +122,6 @@ export default function Sidebar({
           const IconComponent = item.icon;
           const isActive = activeTab === item.id;
           
-          // Style active tab based on selected theme
           let activeStyles = "";
           if (isActive) {
             switch (theme) {
