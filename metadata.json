@@ -1,0 +1,6 @@
+{
+  "name": "CEO Digital Office",
+  "description": "منصة مكتب الرئيس التنفيذي الرقمي لمجموعة أراك للتنمية - Araak Group Executive Platform",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
