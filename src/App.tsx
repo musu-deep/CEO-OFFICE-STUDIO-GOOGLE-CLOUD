@@ -51,7 +51,7 @@ type ThemeDesignTokens = {
 
 const themeTokens: Record<PlatformTheme, ThemeDesignTokens> = {
   vision_2030: {
-    name: 'سمة رؤية ٢٠٣٠',
+    name: 'سمة رؤية اراك ٢٠٣٠',
     mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.16),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,184,166,0.09),transparent_36%),linear-gradient(135deg,#06110d_0%,#090a12_48%,#050608_100%)]',
     sidebarBg: 'bg-emerald-950/10 backdrop-blur-2xl',
     headerBg: 'bg-black/25 backdrop-blur-2xl',
@@ -75,7 +75,7 @@ const themeTokens: Record<PlatformTheme, ThemeDesignTokens> = {
     } as CSSProperties,
   },
   golden_luxury: {
-    name: 'سمة الفخامة الذهبية',
+    name: 'سمة فخامة اراك',
     mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(217,119,6,0.10),transparent_36%),linear-gradient(135deg,#160f05_0%,#090a12_48%,#050608_100%)]',
     sidebarBg: 'bg-amber-950/10 backdrop-blur-2xl',
     headerBg: 'bg-black/25 backdrop-blur-2xl',
@@ -99,7 +99,7 @@ const themeTokens: Record<PlatformTheme, ThemeDesignTokens> = {
     } as CSSProperties,
   },
   midnight_navy: {
-    name: 'سمة كحلي الليل',
+    name: 'سمة ليل اراك',
     mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(14,165,233,0.10),transparent_36%),linear-gradient(135deg,#061021_0%,#090a12_48%,#050608_100%)]',
     sidebarBg: 'bg-blue-950/10 backdrop-blur-2xl',
     headerBg: 'bg-black/25 backdrop-blur-2xl',
@@ -299,9 +299,9 @@ export default function App() {
   // Sidebar Menu Items grouped and filtered dynamically
   const rawMenuGroups = [
     {
-      title: 'اتخاذ القرارات والذكاء الاصطناعي',
+      title: 'اللائحة الرئيسية',
       items: [
-        { id: 'reports', name: 'التقارير والتحليلات الجغرافية', icon: BarChart3 },
+        { id: 'reports', name: 'التقارير والتحليلات ', icon: BarChart3 },
         { id: 'ai-advisor', name: 'المستشار الاستراتيجي الذكي', icon: Brain },
         { id: 'voice-assistant', name: 'الوكيل الصوتي التنفيذي', icon: Mic },
       ]
@@ -324,7 +324,7 @@ export default function App() {
       ]
     },
     {
-      title: 'الرقابة والالتزامات والوثائق',
+      title: 'الرقابة القانونية والوثائق',
       items: [
         { id: 'governance', name: 'الرقابة والتفتيش والمتابعة', icon: ShieldAlert },
         { id: 'legal', name: 'الشؤون القانونية', icon: Scale },
@@ -336,7 +336,7 @@ export default function App() {
       ]
     },
     {
-      title: 'القطاعات الخارجية وسلاسل الإمداد',
+      title: 'القطاعات وسلاسل الإمداد',
       items: [
         { id: 'egypt', name: 'فرع اراك التنمية بجمهورية مصر', icon: Globe },
         { id: 'logistic', name: 'اراك لوجستيك ', icon: Map },
