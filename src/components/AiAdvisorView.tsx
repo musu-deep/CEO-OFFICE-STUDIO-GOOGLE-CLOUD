@@ -120,7 +120,7 @@ export default function AiAdvisorView({ theme }: AiAdvisorViewProps) {
           المستشار الاستراتيجي الذكي
         </h2>
         <span className="text-xs text-slate-400">
-          ذكاء اصطناعي سيادي آمن متصل بقاعدة المعرفة وعقود وميزانيات المجموعة لمساعدتكم فوراً وبسرية تامة
+          ذكاء اصطناعي محلي آمن متصل بقاعدة البيانات وعقود وميزانيات المجموعة للمساعدة الفورية
         </span>
       </div>
 
@@ -200,7 +200,7 @@ export default function AiAdvisorView({ theme }: AiAdvisorViewProps) {
               <span>أدلة وبادئات دلالية سريعة</span>
             </h4>
             <p className="text-[10px] text-slate-400 leading-relaxed">
-              انقر على أي من الأسئلة الجاهزة المبرمجة مسبقاً لاستقصاء وتحليل بيانات المجموعة في ثوانٍ معدودة:
+              انقر على أي من الأسئلة المقترحة لاستقصاء وتحليل بيانات المجموعة في ثوانٍ معدودة:
             </p>
 
             <div className="space-y-2.5">
@@ -220,7 +220,7 @@ export default function AiAdvisorView({ theme }: AiAdvisorViewProps) {
           <div className={`p-5 rounded-2xl border ${getThemeBgClass()} space-y-3`}>
             <span className="text-xs font-black text-slate-200 flex items-center gap-1 justify-end">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>خصوصية سيادية كاملة</span>
+              <span>خصوصية محلية كاملة</span>
             </span>
             <p className="text-[10px] text-slate-400 leading-relaxed">
               تتم معالجة كافة الاستفسارات دلالياً وداخلياً بنسبة 100% دون مشاركتها مع أي جهات خارجية. البيانات مشفرة وآمنة تماماً.
