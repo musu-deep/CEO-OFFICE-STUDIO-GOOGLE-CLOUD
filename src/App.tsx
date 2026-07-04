@@ -210,24 +210,24 @@ export default function App() {
       title: 'الإدارة التنفيذية للمكتب',
       items: [
         { id: 'projects', name: 'المشاريع والقطاعات التنموية', icon: Building2 },
-        { id: 'tasks', name: 'التكليفات والمهام النشطة', icon: CheckSquare },
-        { id: 'secretariat', name: 'السكرتارية والاتصالات والمذكرات', icon: FolderClosed },
-        { id: 'messages', name: 'القرارات والتوجيهات التنفيذية', icon: MessageSquare },
+        { id: 'tasks', name: 'التكاليف والمهام النشطة', icon: CheckSquare },
+        { id: 'secretariat', name: 'السكرتارية التنفيذية ', icon: FolderClosed },
+        { id: 'messages', name: 'القرارات والتوجيهات ', icon: MessageSquare },
       ]
     },
     {
       title: 'اللقاءات والمحاضر',
       items: [
         { id: 'calendar', name: 'التقويم واللقاءات السنوية', icon: Calendar },
-        { id: 'meetings', name: 'اجتماعات حية وفيديو كونفرنس', icon: Video },
+        { id: 'meetings', name: 'اجتماعات حية وفيديو مباشر', icon: Video },
         { id: 'meeting-requests', name: 'طلبات اللقاء والزيارات الخارجية', icon: UserCheck },
       ]
     },
     {
       title: 'الرقابة والالتزامات والوثائق',
       items: [
-        { id: 'governance', name: 'الرقابة والتفتيش والامتثال', icon: ShieldAlert },
-        { id: 'legal', name: 'الشؤون القانونية والمحاضر الموثقة', icon: Scale },
+        { id: 'governance', name: 'الرقابة والتفتيش والمتابعة', icon: ShieldAlert },
+        { id: 'legal', name: 'الشؤون القانونية', icon: Scale },
         { id: 'documents', name: 'مركز الوثائق وقاعدة المعرفة', icon: FileText },
         // Only visible to Admin or CEO (when admin mode is active)
         ...(currentUser?.role === 'admin' || (currentUser?.role === 'ceo' && ceoAdminMode) ? [
@@ -236,10 +236,10 @@ export default function App() {
       ]
     },
     {
-      title: 'القطاعات الخارجية والملاحة',
+      title: 'القطاعات الخارجية وسلاسل الإمداد',
       items: [
-        { id: 'egypt', name: 'فرع أراك التنمية بجمهورية مصر', icon: Globe },
-        { id: 'logistic', name: 'أراك لوجستيك للشحن والموانئ', icon: Map },
+        { id: 'egypt', name: 'فرع اراك التنمية بجمهورية مصر', icon: Globe },
+        { id: 'logistic', name: 'اراك لوجستيك ', icon: Map },
       ]
     }
   ];
@@ -322,7 +322,7 @@ export default function App() {
           <div className="p-6 border-b border-slate-800/80 flex items-center gap-3 justify-end">
             <div className="text-right">
               <h1 className="text-lg font-black text-white tracking-tight">CEO DIGITAL OFFICE</h1>
-              <span className={`text-[10px] font-bold block ${getThemeTextClass()}`}>مكتب الرئيس التنفيذي الذكي</span>
+              <span className={`text-[10px] font-bold block ${getThemeTextClass()}`}>مكتب الرئيس التنفيذي </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/10">
               <Layers className="w-5 h-5 text-slate-950 font-black" />
@@ -391,7 +391,7 @@ export default function App() {
             >
               <LogOut className="w-3.5 h-3.5" /> تسجيل خروج
             </button>
-            <span>© ٢٠٢٦ مجموعة أراك للتنمية</span>
+            <span>© ٢٠٢٦ مجموعة اراك للتنمية</span>
           </div>
         </div>
       </aside>
@@ -443,13 +443,13 @@ export default function App() {
                 }`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${ceoAdminMode ? 'bg-amber-400 animate-pulse' : 'bg-slate-500'}`}></span>
-                <span>{ceoAdminMode ? 'تقمص دور الآدمن: نشط' : 'تقمص دور الآدمن'}</span>
+                <span>{ceoAdminMode ? 'تفعيل دور الآدمن: نشط' : 'تفعيل دور الآدمن'}</span>
               </button>
             )}
  
             {/* Quick help button */}
             <button 
-              onClick={() => alert('نظام المساعد التنفيذي متصل بقاعدة المعرفة وعقود وميزانيات المجموعة لرصد الأداء واتخاذ القرار.')}
+              onClick={() => alert('نظام المساعد التنفيذي متصل بقاعدة البيانات وعقود وميزانيات المجموعة لرصد الأداء واتخاذ القرار.')}
               className="p-2 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl transition-all cursor-pointer"
               title="معلومات النظام"
             >
@@ -483,7 +483,7 @@ export default function App() {
                       onClick={() => setNotifications(notifications.map(n => ({...n, read: true})))}
                       className="text-[10px] text-amber-400 font-bold hover:underline"
                     >
-                      تحديد كقرؤ الكل
+                      تحديد كمقرؤ الكل
                     </button>
                     <span className="text-xs font-black text-slate-200">الإشعارات والتنبيهات الأمنية</span>
                   </div>
@@ -540,7 +540,7 @@ export default function App() {
                       onClick={() => alert(`رتبة حسابك: ${currentUser.title} ومسجل بنجاح.`)}
                       className="w-full text-right hover:bg-slate-800 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white"
                     >
-                      إعدادات الحساب والأمن
+                      إعدادات الحساب والأمان
                     </button>
                     <button 
                       onClick={() => {
