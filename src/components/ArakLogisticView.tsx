@@ -37,15 +37,15 @@ export default function ArakLogisticView({ theme }: ArakLogisticViewProps) {
       cargoName: 'شحنة حديد التسليح الكبرى رقم 104',
       vesselOrTruck: 'سفينة أراك المجد (ARAK GLORY)',
       origin: 'ميناء الدمام، المملكة العربية السعودية',
-      destination: 'ميناء جدة الإسلامي جمهورية مصر العربية',
+      destination: 'ميناء قوان زو  جمهورية الصين',
       status: 'في عرض البحر',
       eta: '2026-06-20'
     },
     {
       id: 'sh-2',
       type: 'برية',
-      cargoName: 'إمدادات فنية ومعدات الحفر الفدرالية',
-      vesselOrTruck: 'قافلة أراك البرية الرابعة (12 شاحنة)',
+      cargoName: 'إمدادات فنية ومعدات الحفر للغربية',
+      vesselOrTruck: 'دفعة اراك لوجستيك  (12 شاحنة)',
       origin: 'مستودعات المجموعة بجدة',
       destination: 'موقع الإنشاءات الإقليمي بالرياض',
       status: 'مكتمل التسليم',
@@ -199,7 +199,7 @@ export default function ArakLogisticView({ theme }: ArakLogisticViewProps) {
           {/* Port Alex */}
           <div className="absolute top-1/3 right-1/4 text-right">
             <span className="w-2.5 h-2.5 bg-blue-500 rounded-full block border-2 border-slate-950"></span>
-            <span className="text-[9px] text-slate-400 block mt-1 font-sans">ميناء الإسكندرية (مصر)</span>
+            <span className="text-[9px] text-slate-400 block mt-1 font-sans">ميناء قوانزو (الصين)</span>
           </div>
 
           {/* Active Vessel Indicator */}
