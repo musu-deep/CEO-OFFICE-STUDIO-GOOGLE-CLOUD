@@ -34,8 +34,8 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
   const [projects, setProjects] = useState<EgyptProject[]>([
     {
       id: 'eg-p1',
-      name: 'مشروع مجمع الإسكندرية السكني الاستباقي للرعاية والتنمية',
-      location: 'ساحل الإسكندرية، مصر',
+      name: 'مشروع الشراكة مع مجمع طلاب المنح بالجامعات ',
+      location: 'القاهرة، مصر',
       budget: '25,000,000 جنيه',
       spent: '19,500,000 جنيه',
       progress: 78,
@@ -45,7 +45,7 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
     },
     {
       id: 'eg-p2',
-      name: 'شبكة البنية التحتية المتكاملة والمرافق الخدمية بمصر',
+      name: 'حاضنة الأعمال والابتكار ',
       location: 'القاهرة الكبرى، مصر',
       budget: '12,000,000 جنيه',
       spent: '10,200,000 جنيه',
@@ -57,7 +57,7 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
     {
       id: 'eg-p3',
       name: 'ترخيص وتجهيز مقر أراك الإداري والاستثماري الجديد بالقاهرة',
-      location: 'التجمع الخامس، القاهرة، مصر',
+      location: 'مدينة نصر، القاهرة، مصر',
       budget: '8,000,000 جنيه',
       spent: '5,300,000 جنيه',
       progress: 65,
@@ -133,10 +133,10 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
             قطاعات الاستثمار الخارجية
           </span>
           <h2 className="text-3xl font-extrabold text-white">
-            فرع أراك التنمية بجمهورية مصر العربية
+            فرع اراك التنمية بجمهورية مصر العربية
           </h2>
           <span className="text-xs text-slate-400">
-            متابعة المشروعات القائمة، وتتبع ميزانية مصر الـ 45M جنيه، ورصد مستجدات نزاع الإسكندرية السكني الاستباقي
+            متابعة المشروعات القائمة، وتتبع ميزانية مصر الـ 45M جنيه، ورصد مستجدات مشروعات المجموعة
           </span>
         </div>
 
@@ -179,9 +179,9 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
             </span>
             <span className="text-xs text-slate-500 font-sans">آخر تحديث: منذ يومين</span>
           </div>
-          <h3 className="text-base font-extrabold text-slate-100">مستجدات نزاع مجمع الإسكندرية مع مقاولي الباطن</h3>
+          <h3 className="text-base font-extrabold text-slate-100">مستجدات عقد تنفيذ مشروع التدريب</h3>
           <p className="text-xs text-slate-400 leading-relaxed max-w-4xl">
-            يواجه المشروع تأخيراً طفيفاً وتباينات مالية بقيمة 120,000 جنيه في فواتير مقاولي البنية التحتية. يوصى المستشار القانوني بتوقيع تسوية ودية فورية برعاية هيئة المجتمعات العمرانية المصرية لتفادي تجميد البناء.
+            يواجه المشروع تأخيراً طفيفاً وتباينات مالية بقيمة 120,000 جنيه في فواتير مقاولي البنية التحتية. يوصى المستشار القانوني بتوقيع تسوية ودية  لتفادي تجميد العقد.
           </p>
         </div>
         <button 
@@ -244,7 +244,7 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
               <div className="border-t border-slate-800/60 pt-3 mt-4 flex items-center justify-between text-[11px] text-slate-500">
                 <div className="flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5" />
-                  <span>{p.teamCount} مهندساً وعاملاً</span>
+                  <span>{p.teamCount} فريق بالمشروع</span>
                 </div>
 
                 {isWarning && (
