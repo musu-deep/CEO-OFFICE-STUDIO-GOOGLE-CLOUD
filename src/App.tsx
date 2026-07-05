@@ -475,37 +475,40 @@ export default function App() {
   return (
     <div
       dir="rtl"
-      style={currentTheme.cssVars}
+      style={{
+        ...currentTheme.cssVars,
+        fontFamily: '"IBM Plex Sans Arabic", "Tajawal", "Cairo", "Noto Sans Arabic", "Segoe UI", Arial, sans-serif'
+      }}
       data-theme={theme}
-      className={`min-h-screen ${currentTheme.mainBg} text-slate-100 flex flex-row-reverse font-sans overflow-x-hidden antialiased selection:bg-[var(--theme-accent-soft)]`}
+      className={`min-h-screen ${currentTheme.mainBg} text-slate-100 flex overflow-x-hidden antialiased selection:bg-[var(--theme-accent-soft)]`}
     >
       
       {/* Sidebar on the Right (Arabic layout standard) */}
-      <aside className={`w-80 ${currentTheme.sidebarBg} border-l border-white/10 ${currentTheme.border} flex flex-col justify-between flex-shrink-0 z-30 h-screen sticky top-0 shadow-2xl shadow-black/30`}>
-        <div className="flex flex-col h-full overflow-y-auto pr-2">
+      <aside className={`w-[22rem] ${currentTheme.sidebarBg} border-l border-white/10 ${currentTheme.border} flex flex-col justify-between flex-shrink-0 z-30 h-screen sticky top-0 shadow-2xl shadow-black/30`}>
+        <div className="flex flex-col h-full overflow-y-auto px-2">
           
           {/* Araak Group official logo */}
           <div className={`p-5 border-b border-white/10 ${currentTheme.border} flex flex-col items-center gap-3`}>
             <img
               src="/araak-main-logo.png"
               alt="Araak Group"
-              className="w-full max-w-[230px] h-auto object-contain drop-shadow-[0_0_18px_rgba(132,204,22,0.16)]"
+              className="w-full max-w-[250px] h-auto object-contain drop-shadow-[0_0_18px_rgba(132,204,22,0.16)]"
             />
             <div className="text-center">
-              <h1 className="text-sm font-black text-white tracking-tight">CEO DIGITAL OFFICE</h1>
-              <span className={`text-[10px] font-bold block ${getThemeTextClass()}`}>مكتب الرئيس التنفيذي</span>
+              <h1 className="text-base font-black text-white tracking-tight">CEO DIGITAL OFFICE</h1>
+              <span className={`text-xs font-bold block ${getThemeTextClass()}`}>مكتب الرئيس التنفيذي</span>
             </div>
           </div>
  
           {/* Quick Active CEO Status Tracker */}
           <div className={`m-4 p-4 rounded-xl ${getThemePanelClass()} flex justify-between items-center text-right shadow-lg shadow-black/15`}>
             <div className="flex flex-col">
-              <span className="text-[10px] text-slate-500">التوقيت المحلي للمكتب</span>
-              <span className={`text-xs font-mono font-bold ${currentTheme.text}`}>{time || '12:00:00'}</span>
+              <span className="text-xs text-slate-500">التوقيت المحلي للمكتب</span>
+              <span className={`text-sm font-mono font-bold ${currentTheme.text}`}>{time || '12:00:00'}</span>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[10px] text-slate-400 font-semibold">المستخدم النشط</span>
-              <span className="text-xs font-extrabold text-white">{currentUser.name}</span>
+              <span className="text-sm text-slate-400 font-semibold">المستخدم النشط</span>
+              <span className="text-sm font-extrabold text-white">{currentUser.name}</span>
             </div>
           </div>
  
@@ -513,7 +516,7 @@ export default function App() {
           <nav className="p-4 space-y-6">
             {menuGroups.map((group, gIdx) => (
               <div key={gIdx} className="space-y-1.5">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block px-3 text-right">
+                <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider block px-3 text-right">
                   {group.title}
                 </span>
  
@@ -525,16 +528,16 @@ export default function App() {
                       <button
                         key={item.id}
                         onClick={() => setActiveView(item.id)}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all cursor-pointer group ${
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all cursor-pointer group ${
                           isActive 
                             ? `${currentTheme.activeMenu} font-black` 
                             : 'text-slate-400 hover:text-slate-100 hover:bg-white/10 hover:backdrop-blur-xl'
                         }`}
                       >
-                        <ChevronLeft className={`w-3 h-3 transition-transform ${isActive ? 'translate-x-0' : 'opacity-0 group-hover:opacity-100 -translate-x-1'}`} />
+                        <ChevronLeft className={`w-3.5 h-3.5 transition-transform ${isActive ? 'translate-x-0' : 'opacity-0 group-hover:opacity-100 -translate-x-1'}`} />
                         <div className="flex items-center gap-2.5">
                           <span>{item.name}</span>
-                          <IconComponent className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                          <IconComponent className={`w-4.5 h-4.5 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}`} />
                         </div>
                       </button>
                     );
@@ -548,7 +551,7 @@ export default function App() {
  
         {/* Bottom copyright & logout */}
         <div className={`p-4 border-t border-white/10 ${currentTheme.headerBg}`}>
-          <div className="flex items-center justify-between text-[11px] text-slate-500">
+          <div className="flex items-center justify-between text-xs text-slate-500">
             <button 
               onClick={() => {
                 setCurrentUser(null);
@@ -568,7 +571,7 @@ export default function App() {
       <main className="flex-1 min-h-screen flex flex-col overflow-x-hidden">
         
         {/* Top Sticky Header */}
-        <header className={`h-16 ${currentTheme.headerBg} border-b border-white/10 ${currentTheme.border} px-8 flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-black/20`}>
+        <header className={`h-[72px] ${currentTheme.headerBg} border-b border-white/10 ${currentTheme.border} px-8 flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-black/20`}>
           
           {/* Right Header: Fast Search and System indicators */}
           <div className="flex items-center gap-4">
@@ -576,11 +579,11 @@ export default function App() {
             {/* Global Command Bar Trigger */}
             <button
               onClick={() => setShowCommandBar(true)}
-              className={`${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl px-3 py-1.5 min-w-[260px] flex items-center justify-between gap-3 text-xs text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-all`}
+              className={`${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl px-3 py-1.5 min-w-[300px] flex items-center justify-between gap-3 text-sm text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-all`}
               title="Ctrl + K"
             >
               <span className="flex items-center gap-2"><Search className="w-3.5 h-3.5" /> ماذا تريد أن تنجز؟</span>
-              <span className="font-sans text-[10px] border border-white/10 rounded-md px-1.5 py-0.5 text-slate-500">Ctrl K</span>
+              <span className="text-xs border border-white/10 rounded-md px-1.5 py-0.5 text-slate-500">Ctrl K</span>
             </button>
 
             {/* Quick Vision Switcher */}
@@ -589,7 +592,7 @@ export default function App() {
               <select 
                 value={theme}
                 onChange={(e) => setTheme(e.target.value as PlatformTheme)}
-                className="bg-transparent text-xs text-slate-300 focus:outline-none cursor-pointer font-bold text-right"
+                className="bg-transparent text-sm text-slate-300 focus:outline-none cursor-pointer font-bold text-right"
               >
                 <option value="vision_2030">سمة رؤية ٢٠٣٠ (الأخضر السيادي)</option>
                 <option value="golden_luxury">سمة الفخامة الذهبية (الملكي)</option>
@@ -614,7 +617,7 @@ export default function App() {
                   };
                   setNotifications(prev => [newAlert, ...prev]);
                 }}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all border cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-black transition-all border cursor-pointer ${
                   ceoAdminMode 
                     ? `${currentTheme.softPanelBg} ${currentTheme.text} ${currentTheme.strongBorder} shadow ${currentTheme.glow}` 
                     : `${currentTheme.panelBg} text-slate-400 border-white/10 hover:text-slate-200 hover:bg-white/10`
@@ -699,10 +702,10 @@ export default function App() {
                 className="flex items-center gap-2.5 p-1.5 hover:bg-white/10 rounded-xl transition-all cursor-pointer"
               >
                 <div className="text-right hidden sm:block">
-                  <span className="text-xs font-black text-white block">{currentUser.name}</span>
-                  <span className="text-[9px] text-slate-500 block font-sans">{currentUser.email}</span>
+                  <span className="text-sm font-black text-white block">{currentUser.name}</span>
+                  <span className="text-[11px] text-slate-500 block">{currentUser.email}</span>
                 </div>
-                <div className={`w-8 h-8 rounded-lg ${currentUser.color || 'bg-amber-600'} text-slate-950 flex items-center justify-center font-black text-sm shadow`}>
+                <div className={`w-9 h-9 rounded-lg ${currentUser.color || 'bg-amber-600'} text-slate-950 flex items-center justify-center font-black text-base shadow`}>
                   {currentUser.avatar}
                 </div>
               </button>
@@ -710,13 +713,13 @@ export default function App() {
               {showProfileDropdown && (
                 <div className={`absolute left-0 mt-3 w-56 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl shadow-2xl shadow-black/40 z-40 overflow-hidden text-right`}>
                   <div className={`p-4 border-b border-white/10 ${currentTheme.softPanelBg}`}>
-                    <span className="text-xs font-bold text-slate-300 block">{currentUser.name}</span>
-                    <span className="text-[10px] text-slate-500 font-sans">{currentUser.title}</span>
+                    <span className="text-sm font-bold text-slate-300 block">{currentUser.name}</span>
+                    <span className="text-xs text-slate-500">{currentUser.title}</span>
                   </div>
                   <div className="p-2 space-y-1">
                     <button 
                       onClick={() => alert(`رتبة حسابك: ${currentUser.title} ومسجل بنجاح.`)}
-                      className="w-full text-right hover:bg-white/10 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white"
+                      className="w-full text-right hover:bg-white/10 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white"
                     >
                       إعدادات الحساب والأمان
                     </button>
@@ -747,9 +750,9 @@ export default function App() {
               <div className="relative grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
                 <div className="xl:col-span-7 space-y-5">
                   <div>
-                    <span className={`text-xs font-black ${currentTheme.text}`}>Executive Mission Control</span>
-                    <h2 className="text-3xl md:text-4xl font-black text-white mt-2">صباح الخير {currentUser.name}</h2>
-                    <p className="text-slate-400 text-sm mt-2">اليوم لديك موجز تنفيذي سريع قبل الدخول في التفاصيل.</p>
+                    <span className={`text-sm font-black ${currentTheme.text}`}>Executive Mission Control</span>
+                    <h2 className="text-4xl md:text-5xl font-black text-white mt-2">صباح الخير {currentUser.name}</h2>
+                    <p className="text-slate-400 text-base mt-3">اليوم لديك موجز تنفيذي سريع قبل الدخول في التفاصيل.</p>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                     {[
@@ -760,8 +763,8 @@ export default function App() {
                       ['تكليفات مفتوحة', executiveSummary.delegatedTasks, 'tasks'],
                     ].map(([label, value, target]) => (
                       <button key={String(label)} onClick={() => setActiveView(String(target))} className="rounded-2xl bg-black/25 border border-white/10 p-4 text-right hover:bg-white/10 transition-all">
-                        <span className="block text-2xl font-black text-white font-sans">{String(value)}</span>
-                        <span className="block text-[11px] text-slate-400 mt-1 leading-relaxed">{String(label)}</span>
+                        <span className="block text-3xl font-black text-white">{String(value)}</span>
+                        <span className="block text-sm text-slate-400 mt-1 leading-relaxed">{String(label)}</span>
                       </button>
                     ))}
                   </div>
@@ -769,7 +772,7 @@ export default function App() {
 
                 <div className="xl:col-span-5 rounded-2xl bg-black/25 border border-white/10 p-5">
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`text-xs font-black ${currentTheme.text}`}>التايم لاين التنفيذي</span>
+                    <span className={`text-sm font-black ${currentTheme.text}`}>التايم لاين التنفيذي</span>
                     <Clock3 className="w-4 h-4 text-slate-500" />
                   </div>
                   <div className="space-y-3">
@@ -777,13 +780,13 @@ export default function App() {
                       const TimelineIcon = item.icon;
                       return (
                         <div key={idx} className="flex items-start gap-3 text-right">
-                          <span className="font-sans text-[11px] text-slate-500 mt-1">{item.time}</span>
-                          <div className={`w-8 h-8 rounded-xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center flex-shrink-0`}>
+                          <span className="font-sans text-xs text-slate-500 mt-1">{item.time}</span>
+                          <div className={`w-9 h-9 rounded-xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center flex-shrink-0`}>
                             <TimelineIcon className={`w-4 h-4 ${currentTheme.text}`} />
                           </div>
                           <div className="flex-1">
-                            <p className="text-xs font-bold text-slate-100">{item.title}</p>
-                            <p className="text-[10px] text-slate-500 mt-0.5">{item.type}</p>
+                            <p className="text-sm font-bold text-slate-100 leading-relaxed">{item.title}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{item.type}</p>
                           </div>
                         </div>
                       );
@@ -796,7 +799,7 @@ export default function App() {
         )}
 
         {/* View content container */}
-        <div className={`${activeView === 'dashboard' ? 'p-8 pt-6' : 'p-8'} flex-1 max-w-[1700px] mx-auto w-full`}>
+        <div className={`${activeView === 'dashboard' ? 'p-8 pt-7' : 'p-8'} flex-1 max-w-[1700px] mx-auto w-full`}>
           {renderActiveView()}
         </div>
 
@@ -810,7 +813,7 @@ export default function App() {
                   value={commandQuery}
                   onChange={(e) => setCommandQuery(e.target.value)}
                   placeholder="اكتب أمراً... افتح المشاريع، لخص التقارير، أنشئ تكليفاً"
-                  className="flex-1 bg-transparent outline-none text-sm text-white placeholder:text-slate-500 text-right"
+                  className="flex-1 bg-transparent outline-none text-base text-white placeholder:text-slate-500 text-right"
                 />
                 <span className="text-[10px] text-slate-500 border border-white/10 rounded-lg px-2 py-1">ESC</span>
               </div>
@@ -825,8 +828,8 @@ export default function App() {
                     >
                       <Zap className="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition-all" />
                       <div className="flex-1">
-                        <p className="text-sm font-black text-white">{action.label}</p>
-                        <p className="text-[11px] text-slate-500 mt-1">{action.description}</p>
+                        <p className="text-base font-black text-white">{action.label}</p>
+                        <p className="text-xs text-slate-500 mt-1">{action.description}</p>
                       </div>
                       <div className={`w-10 h-10 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center`}>
                         <ActionIcon className={`w-4 h-4 ${currentTheme.text}`} />
