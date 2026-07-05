@@ -1,4 +1,4 @@
-import { useState, useEffect, type CSSProperties } from 'react';
+﻿import { useState, useEffect, type CSSProperties } from 'react';
 import { 
   Building2, 
   CheckSquare, 
@@ -31,7 +31,13 @@ import {
   AlertTriangle,
   CheckCircle2,
   Bot,
-  Zap
+  Zap,
+  Crown,
+  MapPin,
+  Monitor,
+  Activity,
+  UserRound,
+  ShieldCheck
 } from 'lucide-react';
 import { PlatformTheme, AppUser } from './types';
 
@@ -194,6 +200,7 @@ export default function App() {
   const [showCommandBar, setShowCommandBar] = useState(false);
   const [commandQuery, setCommandQuery] = useState('');
   const [time, setTime] = useState('');
+  const [sessionSeconds, setSessionSeconds] = useState(0);
   const currentTheme = themeTokens[theme];
 
   // Authentication & Security State Layer
@@ -290,6 +297,7 @@ export default function App() {
     const updateTime = () => {
       const now = new Date();
       setTime(now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      setSessionSeconds(prev => prev + 1);
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
@@ -323,6 +331,36 @@ export default function App() {
     { time: '09:15', title: 'تكليف نائب التنمية بمتابعة المشاريع المتأخرة', type: 'تفويض', icon: ArrowUpRight },
     { time: '10:40', title: 'تنبيه مخاطرة على بند المصروف الفعلي المعتمد', type: 'تنبيه', icon: AlertTriangle },
     { time: '11:20', title: 'الوكيل التنفيذي لخص محضر اجتماع السكرتارية', type: 'ذكاء تنفيذي', icon: Bot },
+  ];
+
+  const safeCurrentUser: AppUser = currentUser || {
+    id: 'guest',
+    name: 'ضيف المنصة',
+    email: 'guest@ceo-office.local',
+    role: 'guest',
+    title: 'مستخدم تنفيذي',
+    avatar: 'ض',
+    status: 'نشط',
+    allowedViews: [],
+    color: 'bg-slate-600',
+    password: ''
+  } as AppUser;
+
+
+  const formatSessionDuration = (totalSeconds: number) => {
+    const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+    const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  const userProfileDetails = [
+    { label: 'الإدارة', value: 'مكتب الرئيس التنفيذي', icon: Building2 },
+    { label: 'المنصب', value: safeCurrentUser.title || 'الرئيس التنفيذي', icon: Crown },
+    { label: 'نوع الحساب', value: safeCurrentUser.role === 'admin' ? 'مدير النظام' : safeCurrentUser.role === 'ceo' ? 'الرئيس التنفيذي' : 'مستخدم تنفيذي', icon: ShieldCheck },
+    { label: 'تاريخ تسجيل الدخول', value: new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }), icon: Calendar },
+    { label: 'زمن الجلسة', value: formatSessionDuration(sessionSeconds), icon: Clock3 },
+    { label: 'آخر نشاط', value: 'متصل الآن', icon: Activity },
   ];
 
   const commandActions = [
@@ -718,9 +756,16 @@ export default function App() {
                   <span className="text-sm font-black text-white block">{currentUser.name}</span>
                   <span className="text-[11px] text-slate-500 block">{currentUser.email}</span>
                 </div>
-                <div className={`w-9 h-9 rounded-lg ${currentUser.color || 'bg-amber-600'} text-slate-950 flex items-center justify-center font-black text-base shadow`}>
-                  {currentUser.avatar}
-                </div>
+<div className="w-12 h-12 rounded-full overflow-hidden border border-white/15 shadow-lg">
+    <img
+        src="/user-avatar.png"
+        alt={currentUser.name}
+        className="w-full h-full object-cover"
+    />
+  <span className="text-white font-black text-sm">
+    {currentUser.name?.charAt(0) || 'ع'}
+  </span>
+</div>
               </button>
  
               {showProfileDropdown && (
@@ -758,55 +803,148 @@ export default function App() {
         {/* Executive morning brief shown after login */}
         {activeView === 'dashboard' && (
           <section className="px-8 pt-8 max-w-[1700px] mx-auto w-full">
-            <div className={`relative overflow-hidden rounded-3xl ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} p-6 shadow-2xl shadow-black/25`}>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_35%)] pointer-events-none" />
-              <div className="relative grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
-                <div className="xl:col-span-7 space-y-5">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+              {/* Luxury Passport Profile Card */}
+              <div className={`xl:col-span-7 relative overflow-hidden rounded-[2rem] ${currentTheme.panelBg} border border-white/10 ${currentTheme.strongBorder} p-6 shadow-2xl shadow-black/30`}>
+                <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.10),transparent_28%),radial-gradient(circle_at_88%_72%,var(--theme-accent-soft),transparent_34%)]" />
+                <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[var(--theme-accent-soft)] blur-3xl opacity-70" />
+                <div className="relative flex items-start justify-between gap-4 mb-6">
                   <div>
-                    <span className={`text-sm font-black ${currentTheme.text}`}>Executive Mission Control</span>
-                    <h2 className="text-4xl md:text-5xl font-black text-white mt-2">صباح الخير {currentUser.name}</h2>
-                    <p className="text-slate-400 text-base mt-3">اليوم لديك موجز تنفيذي سريع قبل الدخول في التفاصيل.</p>
+                    <span className={`inline-flex items-center gap-2 text-xs font-black ${currentTheme.text} bg-black/25 border border-white/10 rounded-full px-4 py-2`}>
+                      <span className={`${currentTheme.bg} w-2 h-2 rounded-full animate-pulse`} />
+                      بطاقة المستخدم التنفيذية
+                    </span>
+                    <h2 className="text-4xl md:text-5xl font-black text-white mt-4 leading-tight">{currentUser.name}</h2>
+                    <p className="text-slate-400 mt-2 text-lg font-bold">{currentUser.title}</p>
                   </div>
-                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                    {[
-                      ['قرارات تنتظر الاعتماد', executiveSummary.decisions, 'messages'],
-                      ['مشروع متأخر يحتاج تدخل', executiveSummary.delayedProjects, 'projects'],
-                      ['اجتماعات قادمة', executiveSummary.meetings, 'calendar'],
-                      ['مخاطرة مالية', executiveSummary.financialRisks, 'reports'],
-                      ['تكليفات مفتوحة', executiveSummary.delegatedTasks, 'tasks'],
-                    ].map(([label, value, target]) => (
-                      <button key={String(label)} onClick={() => setActiveView(String(target))} className="rounded-2xl bg-black/25 border border-white/10 p-4 text-right hover:bg-white/10 transition-all">
-                        <span className="block text-3xl font-black text-white">{String(value)}</span>
-                        <span className="block text-sm text-slate-400 mt-1 leading-relaxed">{String(label)}</span>
-                      </button>
-                    ))}
+                  <div className="hidden lg:flex flex-col items-end gap-2 text-left">
+                    <span className="text-xs text-slate-500 font-bold">التوقيت المحلي</span>
+                    <span className={`font-mono text-2xl font-black ${currentTheme.text}`}>{time || '00:00:00'}</span>
                   </div>
                 </div>
 
-                <div className="xl:col-span-5 rounded-2xl bg-black/25 border border-white/10 p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`text-sm font-black ${currentTheme.text}`}>التايم لاين التنفيذي</span>
-                    <Clock3 className="w-4 h-4 text-slate-500" />
+                <div className="relative grid grid-cols-1 lg:grid-cols-[230px_1fr] gap-6 items-stretch">
+                  <div className="relative rounded-[1.7rem] border border-white/15 bg-black/35 p-3 shadow-2xl shadow-black/30">
+                    <div className={`absolute inset-0 rounded-[1.7rem] border ${currentTheme.strongBorder} opacity-60`} />
+                    <img
+                      src="/user-avatar.png"
+                      alt={currentUser.name}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      className="relative h-[300px] w-full rounded-[1.35rem] object-cover object-center border border-white/10 shadow-xl"
+                    />
+                    <div className={`absolute bottom-6 right-6 left-6 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 backdrop-blur-xl p-3`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] text-slate-400 font-bold">حالة الدخول</p>
+                          <p className="text-sm text-white font-black">نشط وآمن</p>
+                        </div>
+                        <ShieldCheck className={`w-6 h-6 ${currentTheme.text}`} />
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-3">
-                    {executiveTimeline.map((item, idx) => {
-                      const TimelineIcon = item.icon;
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {userProfileDetails.map((item) => {
+                      const DetailIcon = item.icon;
                       return (
-                        <div key={idx} className="flex items-start gap-3 text-right">
-                          <span className="font-sans text-xs text-slate-500 mt-1">{item.time}</span>
-                          <div className={`w-9 h-9 rounded-xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center flex-shrink-0`}>
-                            <TimelineIcon className={`w-4 h-4 ${currentTheme.text}`} />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-bold text-slate-100 leading-relaxed">{item.title}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">{item.type}</p>
+                        <div key={item.label} className="rounded-2xl bg-black/25 border border-white/10 p-4 hover:bg-white/[0.07] transition-all">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className={`w-10 h-10 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center`}>
+                              <DetailIcon className={`w-4.5 h-4.5 ${currentTheme.text}`} />
+                            </div>
+                            <div className="text-right">
+                              <p className="text-[11px] text-slate-500 font-bold">{item.label}</p>
+                              <p className="text-sm text-slate-100 font-black mt-1 leading-relaxed">{item.value}</p>
+                            </div>
                           </div>
                         </div>
                       );
                     })}
+
+                    <div className="sm:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
+                      <div className="rounded-2xl bg-black/25 border border-white/10 p-4 flex items-center justify-between gap-3">
+                        <MapPin className={`w-5 h-5 ${currentTheme.text}`} />
+                        <div className="text-right">
+                          <p className="text-[11px] text-slate-500 font-bold">موقع الجلسة</p>
+                          <p className="text-sm text-slate-200 font-black">مكتب الرئيس التنفيذي</p>
+                        </div>
+                      </div>
+                      <div className="rounded-2xl bg-black/25 border border-white/10 p-4 flex items-center justify-between gap-3">
+                        <Monitor className={`w-5 h-5 ${currentTheme.text}`} />
+                        <div className="text-right">
+                          <p className="text-[11px] text-slate-500 font-bold">الجهاز</p>
+                          <p className="text-sm text-slate-200 font-black">جلسة متصفح آمنة</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Executive Timeline */}
+              <div className={`xl:col-span-5 relative overflow-hidden rounded-[2rem] ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} p-6 shadow-2xl shadow-black/25`}>
+                <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_0%,var(--theme-accent-soft),transparent_32%)]" />
+                <div className="relative flex items-center justify-between mb-6">
+                  <div>
+                    <span className={`text-xs font-black ${currentTheme.text}`}>Executive Timeline</span>
+                    <h3 className="text-2xl font-black text-white mt-1">التايم لاين التنفيذي</h3>
+                  </div>
+                  <div className={`w-12 h-12 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center`}>
+                    <Clock3 className={`w-5 h-5 ${currentTheme.text}`} />
+                  </div>
+                </div>
+
+                <div className="relative pr-6 space-y-4">
+                  <div className="absolute right-[1.15rem] top-2 bottom-2 w-px bg-gradient-to-b from-transparent via-[var(--theme-accent)] to-transparent opacity-50" />
+                  {executiveTimeline.map((item, idx) => {
+                    const TimelineIcon = item.icon;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => idx === 0 ? setActiveView('messages') : idx === 1 ? setActiveView('tasks') : idx === 2 ? setActiveView('reports') : setActiveView('ai-advisor')}
+                        className="relative w-full grid grid-cols-[54px_1fr] gap-4 rounded-2xl bg-black/20 border border-white/10 p-4 text-right hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all group"
+                      >
+                        <div className={`relative z-10 w-12 h-12 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center shadow-lg ${currentTheme.glow}`}>
+                          <TimelineIcon className={`w-5 h-5 ${currentTheme.text}`} />
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between gap-3 mb-1">
+                            <span className="font-sans text-xs text-slate-500">{item.time}</span>
+                            <span className={`text-[10px] font-black ${currentTheme.text} bg-black/25 border border-white/10 rounded-full px-2 py-0.5`}>{item.type}</span>
+                          </div>
+                          <p className="text-sm md:text-base font-black text-slate-100 leading-relaxed group-hover:text-white">{item.title}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Executive KPI Strip */}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
+              {[
+                ['قرارات تنتظر الاعتماد', executiveSummary.decisions, 'messages', CheckCircle2],
+                ['مشروع متأخر يحتاج تدخل', executiveSummary.delayedProjects, 'projects', AlertTriangle],
+                ['اجتماعات قادمة', executiveSummary.meetings, 'calendar', Calendar],
+                ['مخاطرة مالية', executiveSummary.financialRisks, 'reports', TrendingUp],
+                ['تكليفات مفتوحة', executiveSummary.delegatedTasks, 'tasks', CheckSquare],
+              ].map(([label, value, target, Icon]) => {
+                const KpiIcon = Icon as typeof CheckCircle2;
+                return (
+                  <button key={String(label)} onClick={() => setActiveView(String(target))} className={`rounded-3xl ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} p-5 text-right hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all shadow-xl shadow-black/15`}>
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <span className="block text-3xl font-black text-white">{String(value)}</span>
+                        <span className="block text-sm text-slate-400 mt-1 leading-relaxed">{String(label)}</span>
+                      </div>
+                      <div className={`w-12 h-12 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center`}>
+                        <KpiIcon className={`w-5 h-5 ${currentTheme.text}`} />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </section>
         )}

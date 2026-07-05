@@ -1,4 +1,4 @@
-import { Project, Task, Meeting, MeetingRequest, TeamMember, DocumentItem, Commission, AlertNotification, AppUser } from '../types';
+﻿import { Project, Task, Meeting, MeetingRequest, TeamMember, DocumentItem, Commission, AlertNotification, AppUser } from '../types';
 
 export const initialProjects: Project[] = [
   {
@@ -43,7 +43,7 @@ export const initialProjects: Project[] = [
     priority: 'عالية',
     status: 'نشط',
     budget: 32000000,
-    manager: 'المهندس أحمد صالح'
+    manager: 'مدير قطاع الصناعة'
   },
   {
     id: 'p5',
@@ -407,11 +407,11 @@ export const initialNotifications: AlertNotification[] = [
 export const initialAppUsers: AppUser[] = [
   {
     id: 'u1',
-    name: 'المهندس فهد الحربي',
+    name: 'مسؤول التقنية',
     email: 'admin@arak.com',
     role: 'admin',
-    title: 'الآدمن العام للنظام الفني للمنصة',
-    avatar: 'ف',
+    title: 'مدير النظام والمنصة',
+    avatar: 'م',
     status: 'نشط',
     allowedViews: ['reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users'],
     color: 'bg-purple-500',
@@ -443,35 +443,35 @@ export const initialAppUsers: AppUser[] = [
   },
   {
     id: 'u4',
-    name: 'نائب الرئيس للتنمية العامة',
+    name: 'نائب الرئيس للتنمية',
     email: 'development@arak.com',
     role: 'vp',
     title: 'نائب الرئيس التنفيذي لقطاع التنمية العامة',
-    avatar: 'ت',
+    avatar: 'ن',
     status: 'نشط',
-    allowedViews: ['reports', 'projects', 'tasks', 'calendar', 'documents'],
+    allowedViews: ['reports', 'projects', 'tasks', 'calendar', 'documents', 'meetings', 'meeting-requests'],
     color: 'bg-emerald-500',
     password: 'dev'
   },
   {
     id: 'u5',
-    name: 'أ. عبدالكريم معمار',
+    name: 'د. مصطفى حنفي',
     email: 'vp.invest@arak.com',
     role: 'head',
     title: 'مدير فرع أراك للتنمية بجمهورية مصر العربية',
-    avatar: 'ع',
+    avatar: 'د',
     status: 'نشط',
-    allowedViews: ['egypt', 'tasks', 'documents'],
+    allowedViews: ['projects', 'egypt'],
     color: 'bg-rose-500',
     password: 'egypt'
   },
   {
     id: 'u6',
-    name: 'مدير قطاع أراك لوجستيك',
+    name: 'محمود عوض مالك',
     email: 'logistic@arak.com',
     role: 'head',
-    title: 'مدير عام شركة أراك لوجستيك الملاحية - جدة',
-    avatar: 'ل',
+    title: 'مسؤول اراك لوجستيك',
+    avatar: 'م',
     status: 'نشط',
     allowedViews: ['logistic', 'tasks', 'documents'],
     color: 'bg-sky-500',
@@ -479,11 +479,11 @@ export const initialAppUsers: AppUser[] = [
   },
   {
     id: 'u7',
-    name: 'المهندس أحمد صالح',
+    name: 'م. عبد الرحمن الحسام',
     email: 'steel@arak.com',
     role: 'head',
-    title: 'مدير عام قطاع الحديد والصلب والصناعات',
-    avatar: 'أ',
+    title: 'مدير اراك الوطنية',
+    avatar: 'م',
     status: 'نشط',
     allowedViews: ['projects', 'tasks', 'documents'],
     color: 'bg-indigo-500',
@@ -491,15 +491,14 @@ export const initialAppUsers: AppUser[] = [
   },
   {
     id: 'u8',
-    name: 'الشيخ خالد العبيكان',
+    name: 'مهندس عبد الله العتيبي',
     email: 'board@arak.com',
     role: 'board_member',
-    title: 'عضو مجلس إدارة - الرصد الاستراتيجي',
-    avatar: 'خ',
+    title: 'إدارة عليا - المتابعة التنفيذية',
+    avatar: 'م',
     status: 'نشط',
-    allowedViews: ['reports', 'projects', 'calendar', 'documents'],
+    allowedViews: ['meeting-requests', 'messages', 'tasks', 'projects'],
     color: 'bg-teal-500',
     password: 'board'
   }
 ];
-
