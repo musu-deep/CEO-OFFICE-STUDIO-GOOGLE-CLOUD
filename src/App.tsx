@@ -24,7 +24,14 @@ import {
   TrendingUp,
   HelpCircle,
   LogOut,
-  Info
+  Info,
+  Search,
+  Command,
+  Clock3,
+  AlertTriangle,
+  CheckCircle2,
+  Bot,
+  Zap
 } from 'lucide-react';
 import { PlatformTheme, AppUser } from './types';
 
@@ -161,6 +168,7 @@ import GovernanceView from './components/GovernanceView';
 import LegalView from './components/LegalView';
 import AiAdvisorView from './components/AiAdvisorView';
 import VoiceAssistantView from './components/VoiceAssistantView';
+import DashboardView from './components/DashboardView';
 import ReportsView from './components/ReportsView';
 import ArakEgyptView from './components/ArakEgyptView';
 import ArakLogisticView from './components/ArakLogisticView';
@@ -179,10 +187,12 @@ import {
 
 export default function App() {
   const [theme, setTheme] = useState<PlatformTheme>('vision_2030');
-  const [activeView, setActiveView] = useState<string>('reports');
+  const [activeView, setActiveView] = useState<string>('dashboard');
   const [notifications, setNotifications] = useState(initialNotifications);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showCommandBar, setShowCommandBar] = useState(false);
+  const [commandQuery, setCommandQuery] = useState('');
   const [time, setTime] = useState('');
   const currentTheme = themeTokens[theme];
 
@@ -286,6 +296,55 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setShowCommandBar(true);
+      }
+      if (event.key === 'Escape') {
+        setShowCommandBar(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const executiveSummary = {
+    decisions: 4,
+    delayedProjects: projects.filter(p => p.status === 'معلق' || p.progress < 45).length || 1,
+    meetings: meetings.filter(m => m.status === 'مجدول').length || 2,
+    financialRisks: 1,
+    delegatedTasks: tasks.filter(t => t.status !== 'مكتمل').length || 7,
+  };
+
+  const executiveTimeline = [
+    { time: '08:12', title: 'اعتماد تقرير الأداء المالي والتشغيلي', type: 'تم الاعتماد', icon: CheckCircle2 },
+    { time: '09:15', title: 'تكليف نائب التنمية بمتابعة المشاريع المتأخرة', type: 'تفويض', icon: ArrowUpRight },
+    { time: '10:40', title: 'تنبيه مخاطرة على بند المصروف الفعلي المعتمد', type: 'تنبيه', icon: AlertTriangle },
+    { time: '11:20', title: 'الوكيل التنفيذي لخص محضر اجتماع السكرتارية', type: 'ذكاء تنفيذي', icon: Bot },
+  ];
+
+  const commandActions = [
+    { label: 'افتح مركز القيادة', description: 'الانتقال إلى الصفحة التنفيذية الأولى', target: 'dashboard', icon: Command },
+    { label: 'اعرض التقارير والتحليلات', description: 'الموازنات والإنفاق ومؤشرات الأداء', target: 'reports', icon: BarChart3 },
+    { label: 'أنشئ تكليفاً جديداً', description: 'فتح صفحة التكاليف والمهام النشطة', target: 'tasks', icon: CheckSquare },
+    { label: 'اعرض المشاريع المتأخرة', description: 'متابعة القطاعات والمشاريع الحرجة', target: 'projects', icon: Building2 },
+    { label: 'افتح مركز القرارات', description: 'القرارات والتوجيهات التنفيذية', target: 'messages', icon: MessageSquare },
+    { label: 'راجع اجتماعات اليوم', description: 'التقويم والاجتماعات الحية', target: 'calendar', icon: Calendar },
+    { label: 'اسأل المستشار الذكي', description: 'تحليل، توصية، ومساندة قرار', target: 'ai-advisor', icon: Brain },
+  ];
+
+  const filteredCommandActions = commandActions.filter(action =>
+    `${action.label} ${action.description}`.toLowerCase().includes(commandQuery.trim().toLowerCase())
+  );
+
+  const runCommand = (target: string) => {
+    setActiveView(target);
+    setShowCommandBar(false);
+    setCommandQuery('');
+  };
+
   const getThemeTextClass = () => currentTheme.text;
   const getThemeBgClass = () => currentTheme.bg;
   const getThemeBorderClass = () => currentTheme.border;
@@ -301,6 +360,7 @@ export default function App() {
     {
       title: 'اتخاذ القرارات والذكاء الاصطناعي',
       items: [
+        { id: 'dashboard', name: 'مركز القيادة التنفيذي', icon: Layers },
         { id: 'reports', name: 'التقارير والتحليلات الجغرافية', icon: BarChart3 },
         { id: 'ai-advisor', name: 'المستشار الاستراتيجي الذكي', icon: Brain },
         { id: 'voice-assistant', name: 'الوكيل الصوتي التنفيذي', icon: Mic },
@@ -358,7 +418,7 @@ export default function App() {
   useEffect(() => {
     if (!currentUser) return;
     const allAllowedViewIds = currentUser.role === 'ceo' || currentUser.role === 'admin'
-      ? ['reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
+      ? ['dashboard', 'reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
       : currentUser.allowedViews;
       
     if (!allAllowedViewIds.includes(activeView)) {
@@ -370,6 +430,7 @@ export default function App() {
 
   const renderActiveView = () => {
     switch (activeView) {
+      case 'dashboard': return <DashboardView projects={projects} tasks={tasks} theme={theme} onNavigate={setActiveView} />;
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
@@ -397,7 +458,7 @@ export default function App() {
             ceoAdminMode={ceoAdminMode}
           />
         );
-      default: return <ReportsView theme={theme} />;
+      default: return <DashboardView projects={projects} tasks={tasks} theme={theme} onNavigate={setActiveView} />;
     }
   };
 
@@ -423,14 +484,16 @@ export default function App() {
       <aside className={`w-80 ${currentTheme.sidebarBg} border-l border-white/10 ${currentTheme.border} flex flex-col justify-between flex-shrink-0 z-30 h-screen sticky top-0 shadow-2xl shadow-black/30`}>
         <div className="flex flex-col h-full overflow-y-auto pr-2">
           
-          {/* Top Logo and Title matches Page 1 exactly */}
-          <div className={`p-6 border-b border-white/10 ${currentTheme.border} flex items-center gap-3 justify-end`}>
-            <div className="text-right">
-              <h1 className="text-lg font-black text-white tracking-tight">CEO DIGITAL OFFICE</h1>
-              <span className={`text-[10px] font-bold block ${getThemeTextClass()}`}>مكتب الرئيس التنفيذي </span>
-            </div>
-            <div className={`w-10 h-10 rounded-xl ${getThemeGradientButtonClass()} flex items-center justify-center shadow-lg ${currentTheme.glow}`}>
-              <Layers className="w-5 h-5 text-slate-950 font-black" />
+          {/* Araak Group official logo */}
+          <div className={`p-5 border-b border-white/10 ${currentTheme.border} flex flex-col items-center gap-3`}>
+            <img
+              src="/araak-main-logo.png"
+              alt="Araak Group"
+              className="w-full max-w-[230px] h-auto object-contain drop-shadow-[0_0_18px_rgba(132,204,22,0.16)]"
+            />
+            <div className="text-center">
+              <h1 className="text-sm font-black text-white tracking-tight">CEO DIGITAL OFFICE</h1>
+              <span className={`text-[10px] font-bold block ${getThemeTextClass()}`}>مكتب الرئيس التنفيذي</span>
             </div>
           </div>
  
@@ -490,7 +553,7 @@ export default function App() {
               onClick={() => {
                 setCurrentUser(null);
                 setCeoAdminMode(false);
-                setActiveView('reports');
+                setActiveView('dashboard');
               }}
               className="text-slate-400 hover:text-rose-400 font-bold transition-all flex items-center gap-1 cursor-pointer"
             >
@@ -510,6 +573,16 @@ export default function App() {
           {/* Right Header: Fast Search and System indicators */}
           <div className="flex items-center gap-4">
             
+            {/* Global Command Bar Trigger */}
+            <button
+              onClick={() => setShowCommandBar(true)}
+              className={`${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl px-3 py-1.5 min-w-[260px] flex items-center justify-between gap-3 text-xs text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-all`}
+              title="Ctrl + K"
+            >
+              <span className="flex items-center gap-2"><Search className="w-3.5 h-3.5" /> ماذا تريد أن تنجز؟</span>
+              <span className="font-sans text-[10px] border border-white/10 rounded-md px-1.5 py-0.5 text-slate-500">Ctrl K</span>
+            </button>
+
             {/* Quick Vision Switcher */}
             <div className={`flex items-center gap-1.5 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} ${currentTheme.selectRing} rounded-xl px-3 py-1.5 transition-all`}>
               <Sparkles className={`w-3.5 h-3.5 ${currentTheme.icon} animate-pulse`} />
@@ -651,7 +724,7 @@ export default function App() {
                       onClick={() => {
                         setCurrentUser(null);
                         setCeoAdminMode(false);
-                        setActiveView('reports');
+                        setActiveView('dashboard');
                       }}
                       className="w-full text-right hover:bg-rose-950/20 px-3 py-2 rounded-lg text-xs text-rose-400 font-bold"
                     >
@@ -666,10 +739,105 @@ export default function App() {
  
         </header>
  
+        {/* Executive morning brief shown after login */}
+        {activeView === 'dashboard' && (
+          <section className="px-8 pt-8 max-w-[1700px] mx-auto w-full">
+            <div className={`relative overflow-hidden rounded-3xl ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} p-6 shadow-2xl shadow-black/25`}>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_35%)] pointer-events-none" />
+              <div className="relative grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+                <div className="xl:col-span-7 space-y-5">
+                  <div>
+                    <span className={`text-xs font-black ${currentTheme.text}`}>Executive Mission Control</span>
+                    <h2 className="text-3xl md:text-4xl font-black text-white mt-2">صباح الخير {currentUser.name}</h2>
+                    <p className="text-slate-400 text-sm mt-2">اليوم لديك موجز تنفيذي سريع قبل الدخول في التفاصيل.</p>
+                  </div>
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                    {[
+                      ['قرارات تنتظر الاعتماد', executiveSummary.decisions, 'messages'],
+                      ['مشروع متأخر يحتاج تدخل', executiveSummary.delayedProjects, 'projects'],
+                      ['اجتماعات قادمة', executiveSummary.meetings, 'calendar'],
+                      ['مخاطرة مالية', executiveSummary.financialRisks, 'reports'],
+                      ['تكليفات مفتوحة', executiveSummary.delegatedTasks, 'tasks'],
+                    ].map(([label, value, target]) => (
+                      <button key={String(label)} onClick={() => setActiveView(String(target))} className="rounded-2xl bg-black/25 border border-white/10 p-4 text-right hover:bg-white/10 transition-all">
+                        <span className="block text-2xl font-black text-white font-sans">{String(value)}</span>
+                        <span className="block text-[11px] text-slate-400 mt-1 leading-relaxed">{String(label)}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="xl:col-span-5 rounded-2xl bg-black/25 border border-white/10 p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={`text-xs font-black ${currentTheme.text}`}>التايم لاين التنفيذي</span>
+                    <Clock3 className="w-4 h-4 text-slate-500" />
+                  </div>
+                  <div className="space-y-3">
+                    {executiveTimeline.map((item, idx) => {
+                      const TimelineIcon = item.icon;
+                      return (
+                        <div key={idx} className="flex items-start gap-3 text-right">
+                          <span className="font-sans text-[11px] text-slate-500 mt-1">{item.time}</span>
+                          <div className={`w-8 h-8 rounded-xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center flex-shrink-0`}>
+                            <TimelineIcon className={`w-4 h-4 ${currentTheme.text}`} />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs font-bold text-slate-100">{item.title}</p>
+                            <p className="text-[10px] text-slate-500 mt-0.5">{item.type}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* View content container */}
-        <div className="p-8 flex-1 max-w-[1700px] mx-auto w-full">
+        <div className={`${activeView === 'dashboard' ? 'p-8 pt-6' : 'p-8'} flex-1 max-w-[1700px] mx-auto w-full`}>
           {renderActiveView()}
         </div>
+
+        {showCommandBar && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-28 px-4" onClick={() => setShowCommandBar(false)}>
+            <div className={`w-full max-w-2xl ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-3xl shadow-2xl shadow-black/50 overflow-hidden`} onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
+                <Command className={`w-5 h-5 ${currentTheme.text}`} />
+                <input
+                  autoFocus
+                  value={commandQuery}
+                  onChange={(e) => setCommandQuery(e.target.value)}
+                  placeholder="اكتب أمراً... افتح المشاريع، لخص التقارير، أنشئ تكليفاً"
+                  className="flex-1 bg-transparent outline-none text-sm text-white placeholder:text-slate-500 text-right"
+                />
+                <span className="text-[10px] text-slate-500 border border-white/10 rounded-lg px-2 py-1">ESC</span>
+              </div>
+              <div className="p-3 max-h-[420px] overflow-y-auto">
+                {(filteredCommandActions.length ? filteredCommandActions : commandActions).map((action) => {
+                  const ActionIcon = action.icon;
+                  return (
+                    <button
+                      key={action.label}
+                      onClick={() => runCommand(action.target)}
+                      className="w-full flex items-center justify-between gap-4 p-3 rounded-2xl hover:bg-white/10 transition-all text-right group"
+                    >
+                      <Zap className="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition-all" />
+                      <div className="flex-1">
+                        <p className="text-sm font-black text-white">{action.label}</p>
+                        <p className="text-[11px] text-slate-500 mt-1">{action.description}</p>
+                      </div>
+                      <div className={`w-10 h-10 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center`}>
+                        <ActionIcon className={`w-4 h-4 ${currentTheme.text}`} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
  
       </main>
  
