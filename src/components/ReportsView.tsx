@@ -23,7 +23,7 @@ export default function ReportsView({ theme }: ReportsViewProps) {
   // Corporate stats
   const sectorData = [
     { name: 'الاستثمار', budget: 150, spent: 110, progress: 85, projects: 5, health: 'ممتاز' },
-    { name: 'التنمية العامة', budget: 200, spent: 165, progress: 92, projects: 8, health: 'ممتاز' },
+    { name: 'قطاع التنمية ', budget: 200, spent: 165, progress: 92, projects: 8, health: 'ممتاز' },
     { name: 'أراك لوجستيك', budget: 90, spent: 55, progress: 68, projects: 4, health: 'مستقر' },
     { name: 'الحديد والصناعة', budget: 350, spent: 290, progress: 78, projects: 6, health: 'حرج فني' },
     { name: 'أراك التنمية (مصر)', budget: 45, spent: 35, progress: 78, projects: 3, health: 'مستقر' }
@@ -70,10 +70,10 @@ export default function ReportsView({ theme }: ReportsViewProps) {
             مركز اتخاذ القرارات والتحليلات
           </span>
           <h2 className="text-3xl font-extrabold text-white">
-            التقارير الإستراتيجية والتحليلات
+            التقارير والتحليلات
           </h2>
           <span className="text-xs text-slate-400">
-            لوحة قيادة تفاعلية مجمعة لمتابعة الإنفاق والميزانيات التقديرية ومستويات الإنجاز الفعلي
+            لوحة قيادة تفاعلية لمتابعة هيكل التكاليف الإنفاق والميزانيات التقديرية ومستويات الإنجاز الفعلي
           </span>
         </div>
 
@@ -143,7 +143,7 @@ export default function ReportsView({ theme }: ReportsViewProps) {
           </h3>
 
           <div className="flex gap-2">
-            {['الكل', 'الاستثمار', 'التنمية العامة', 'أراك لوجستيك', 'الحديد والصناعة'].map((sec) => (
+            {['الكل', 'الاستثمار', 'التنمية ', 'أراك لوجستيك', 'الحديد والصناعة'].map((sec) => (
               <button
                 key={sec}
                 onClick={() => setSelectedSector(sec)}
@@ -241,7 +241,7 @@ export default function ReportsView({ theme }: ReportsViewProps) {
             </div>
 
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              تلتزم قطاعات المجموعة بنسب الإنفاق التنموي المخطط لها لتسريع تحقيق مستهدفات رؤية 2030 التنموية.
+              تلتزم قطاعات المجموعة بنسب الإنفاق الاستماري والتنموي المخطط لها لتسريع تحقيق مستهدفات اراك 2028.
             </p>
           </div>
 
@@ -264,7 +264,7 @@ export default function ReportsView({ theme }: ReportsViewProps) {
                 <th className="py-3 px-5 text-center">الميزانية المقررة</th>
                 <th className="py-3 px-5 text-center">المصروفات</th>
                 <th className="py-3 px-5 text-center">نسبة الإنجاز الفعلي</th>
-                <th className="py-3 px-5 text-center">مؤشر السلامة والصحة</th>
+                <th className="py-3 px-5 text-center">مؤشر سلامة الإجراءات</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50">

@@ -111,7 +111,7 @@ export default function MeetingsView({ meetings, setMeetings, theme }: MeetingsV
             </div>
             <h3 className="text-lg font-bold text-slate-100">{activeCallTitle}</h3>
             <p className="text-xs text-slate-400">
-              أهلاً بك سعادة الرئيس د. علي في منصة أراك المرئية. جاري توصيل الصوت والصورة وتأمين جلسة مجلس الإدارة مع المكاتب الإقليمية بجدة والإسكندرية...
+              أهلاً بك سعادة الرئيس د. علي في منصة أراك المرئية. جاري توصيل الصوت والصورة وتهيئة جلسة إجتماع الإدارة العليا مع المكاتب الإقليمية بين جدة والقاهرة...
             </p>
             
             {/* Simulation visual lines */}
@@ -156,7 +156,7 @@ export default function MeetingsView({ meetings, setMeetings, theme }: MeetingsV
                   <Video className="w-4 h-4 text-emerald-400" />
                   <span>دخول الاجتماع</span>
                 </button>
-                <span className="text-[10px] text-slate-500 font-sans">معرف الغرفة آمن ومحمي</span>
+                <span className="text-[10px] text-slate-500 font-sans">معرف الاجتماع آمن ومحمي</span>
               </div>
 
               {/* Middle meeting details */}

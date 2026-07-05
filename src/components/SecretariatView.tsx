@@ -54,10 +54,10 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
     {
       id: 's-3',
       type: 'memo',
-      title: 'مذكرة مرسلة من مدير فرع مصر بشأن عقود الإسكندرية والمنازعات المعلقة',
+      title: 'مذكرة مرسلة من مدير المشاريع بشأن عقود أبها والمنازعات المعلقة',
       date: '2026-06-15',
       time: '11:00',
-      targetPerson: 'مستشار قانوني مصر',
+      targetPerson: 'مستشار قانوني ',
       details: 'تفاصيل التسوية القانونية المقترحة مع مقاولي البنية التحتية.',
       status: 'معلق'
     }

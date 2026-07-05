@@ -32,7 +32,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
   const [newManager, setNewManager] = useState('');
   const [newPriority, setNewPriority] = useState<'عالية' | 'متوسطة' | 'منخفضة' | 'حرج'>('عالية');
 
-  const sectors = ['الكل', 'الاستثمار', 'التنمية العامة', 'أراك لوجستيك', 'الحديد والصناعة', 'أراك التنمية (مصر)'];
+  const sectors = ['الكل', 'الاستثمار', 'قطاع التنمية', 'أراك لوجستيك', 'الحديد والصناعة', 'أراك التنمية (مصر)'];
 
   const filteredProjects = projects.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
