@@ -75,7 +75,7 @@ const themeTokens: Record<PlatformTheme, ThemeDesignTokens> = {
     } as CSSProperties,
   },
   golden_luxury: {
-    name: 'سمة الفخامة الذهبية',
+    name: 'سمة فخامة اراك',
     mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(217,119,6,0.10),transparent_36%),linear-gradient(135deg,#160f05_0%,#090a12_48%,#050608_100%)]',
     sidebarBg: 'bg-amber-950/10 backdrop-blur-2xl',
     headerBg: 'bg-black/25 backdrop-blur-2xl',
@@ -99,7 +99,7 @@ const themeTokens: Record<PlatformTheme, ThemeDesignTokens> = {
     } as CSSProperties,
   },
   midnight_navy: {
-    name: 'سمة كحلي الليل',
+    name: 'سمة ليل اراك',
     mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(14,165,233,0.10),transparent_36%),linear-gradient(135deg,#061021_0%,#090a12_48%,#050608_100%)]',
     sidebarBg: 'bg-blue-950/10 backdrop-blur-2xl',
     headerBg: 'bg-black/25 backdrop-blur-2xl',
@@ -328,7 +328,7 @@ export default function App() {
       items: [
         { id: 'governance', name: 'الرقابة والتفتيش والمتابعة', icon: ShieldAlert },
         { id: 'legal', name: 'الشؤون القانونية', icon: Scale },
-        { id: 'documents', name: 'مركز الوثائق وقاعدة المعرفة', icon: FileText },
+        { id: 'documents', name: 'مركز الوثائق وقاعدة البيانات', icon: FileText },
         // Only visible to Admin or CEO (when admin mode is active)
         ...(currentUser?.role === 'admin' || (currentUser?.role === 'ceo' && ceoAdminMode) ? [
           { id: 'users', name: 'إدارة المستخدمين والصلاحيات', icon: Settings }
@@ -338,7 +338,7 @@ export default function App() {
     {
       title: 'القطاعات الخارجية وسلاسل الإمداد',
       items: [
-        { id: 'egypt', name: 'فرع اراك التنمية بجمهورية مصر', icon: Globe },
+        { id: 'egypt', name: 'فرع اراك التنمية مصر', icon: Globe },
         { id: 'logistic', name: 'اراك لوجستيك ', icon: Map },
       ]
     }
