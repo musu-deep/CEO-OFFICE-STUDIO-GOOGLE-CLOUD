@@ -495,7 +495,6 @@ export default function App() {
               className="w-full max-w-[250px] h-auto object-contain drop-shadow-[0_0_18px_rgba(132,204,22,0.16)]"
             />
             <div className="text-center">
-              <h1 className="text-base font-black text-white tracking-tight">CEO DIGITAL OFFICE</h1>
               <span className={`text-xs font-bold block ${getThemeTextClass()}`}>مكتب الرئيس التنفيذي</span>
             </div>
           </div>
@@ -512,40 +511,54 @@ export default function App() {
             </div>
           </div>
  
-          {/* Sidebar Menu Items */}
-          <nav className="p-4 space-y-6">
-            {menuGroups.map((group, gIdx) => (
-              <div key={gIdx} className="space-y-1.5">
-                <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider block px-3 text-right">
-                  {group.title}
-                </span>
- 
-                <div className="space-y-1">
-                  {group.items.map((item) => {
-                    const isActive = activeView === item.id;
-                    const IconComponent = item.icon;
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => setActiveView(item.id)}
-                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all cursor-pointer group ${
-                          isActive 
-                            ? `${currentTheme.activeMenu} font-black` 
-                            : 'text-slate-400 hover:text-slate-100 hover:bg-white/10 hover:backdrop-blur-xl'
-                        }`}
-                      >
-                        <ChevronLeft className={`w-3.5 h-3.5 transition-transform ${isActive ? 'translate-x-0' : 'opacity-0 group-hover:opacity-100 -translate-x-1'}`} />
-                        <div className="flex items-center gap-2.5">
-                          <span>{item.name}</span>
-                          <IconComponent className={`w-4.5 h-4.5 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}`} />
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+         {/* Sidebar Menu Items */}
+<nav className="p-4 space-y-6">
+  {menuGroups.map((group, gIdx) => (
+    <div key={gIdx} className="space-y-1.5">
+      <span className="text-[12px] font-black text-slate-500 uppercase tracking-wider block px-3 text-right">
+        {group.title}
+      </span>
+
+      <div className="space-y-1">
+        {group.items.map((item) => {
+          const isActive = activeView === item.id;
+          const IconComponent = item.icon;
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveView(item.id)}
+              className={`w-full flex flex-row-reverse items-center justify-between px-3.5 py-3 rounded-xl text-[15px] transition-all cursor-pointer group ${
+                isActive
+                  ? `${currentTheme.activeMenu} font-black`
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-white/10 hover:backdrop-blur-xl'
+              }`}
+            >
+              <div className="flex flex-row-reverse items-center gap-2.5 flex-1 justify-start">
+                <IconComponent
+                  className={`w-5 h-5 ${
+                    isActive
+                      ? 'text-white'
+                      : 'text-slate-500 group-hover:text-slate-300'
+                  }`}
+                />
+                <span className="flex-1 text-right">{item.name}</span>
               </div>
-            ))}
-          </nav>
+
+              <ChevronLeft
+                className={`w-4 h-4 transition-all ${
+                  isActive
+                    ? 'opacity-100 translate-x-0'
+                    : 'opacity-0 group-hover:opacity-100 -translate-x-1'
+                }`}
+              />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  ))}
+</nav>
  
         </div>
  
