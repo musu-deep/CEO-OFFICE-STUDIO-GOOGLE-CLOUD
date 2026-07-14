@@ -91,7 +91,7 @@ export interface AppUser {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'ceo' | 'vp' | 'head' | 'board_member';
+  role: 'admin' | 'ceo' | 'vp' | 'head' | 'board_member' | 'guest';
   title: string;
   avatar: string;
   status: 'نشط' | 'محجوب';
@@ -99,4 +99,3 @@ export interface AppUser {
   color: string;
   password?: string;
 }
-
