@@ -29,7 +29,33 @@ jobs:
         run: npm ci
 
       - name: TypeScript validation
-        run: npm run lint
+        shell: bash
+        run: |
+          mkdir -p ci-logs
+          set +e
+          npm run lint 2>&1 | tee ci-logs/lint.log
+          echo "${PIPESTATUS[0]}" > ci-logs/lint.exit
+          exit 0
 
       - name: Production build
-        run: npm run build
+        shell: bash
+        run: |
+          set +e
+          npm run build 2>&1 | tee ci-logs/build.log
+          echo "${PIPESTATUS[0]}" > ci-logs/build.exit
+          exit 0
+
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-logs
+          path: ci-logs
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce validation result
+        shell: bash
+        run: |
+          test "$(cat ci-logs/lint.exit)" = "0"
+          test "$(cat ci-logs/build.exit)" = "0"
