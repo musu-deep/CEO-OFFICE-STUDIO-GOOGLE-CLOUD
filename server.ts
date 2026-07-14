@@ -3,14 +3,18 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
+import { createNamaRouter } from './src/server/namaRoutes';
 
 dotenv.config();
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT || 3000);
 
-  app.use(express.json());
+  app.use(express.json({ limit: '2mb' }));
+
+  // ARAAK NAMA AI: supervised content and academy operations.
+  app.use('/api/nama', createNamaRouter());
 
   // API Route for AI Executive Advisor (Chief of Staff AI / Legal AI / Strategic AI)
   app.post('/api/advisor', async (req: Request, res: Response) => {
@@ -40,8 +44,8 @@ async function startServer() {
 موقف الشؤون القانونية حالياً:
 - **القضايا النشطة**: لدينا 14 قضية نشطة، منها 3 قضايا مصنفة كعالية المخاطر، أبرزها النزاع على أرض مجمع الإسكندرية التجاري.
 - **الجلسات القادمة**: هناك 6 جلسات محاكمة قادمة خلال الـ 14 يوماً المقبلة.
-- **العقود قيد المراجعة**: هناك 22 عقداً قيد التدقيق والمطابقة، و7 عقود بانتظار اعتمادكم النهائي للتوقيع.
-- **توصيتي**: عقد جلسة طارئة غداً مع رئيس قطاع المطابقة ومستشار النزاعات العقارية لتأمين مستندات الملكية الملحقة ب لصالح مجمع الإسكندرية لتقديمها في الجلسة المقبلة المقررة بعد 4 أيام.
+- **العقود قيد المراجعة**: لدينا 22 عقداً قيد التدقيق والمطابقة، و7 عقود بانتظار اعتمادكم النهائي للتوقيع.
+- **توصيتي**: عقد جلسة طارئة غداً مع رئيس قطاع المطابقة ومستشار النزاعات العقارية لتأمين مستندات الملكية الملحقة لصالح مجمع الإسكندرية لتقديمها في الجلسة المقبلة المقررة بعد 4 أيام.
 
 هل تريد مني مراجعة مسودة عقد التأسيس المحدث؟`;
       } else {
@@ -178,6 +182,7 @@ async function startServer() {
   // API Route for Voice Command Transcriber & Processor (Whisper + Gemini simulated)
   app.post('/api/voice-transcribe', async (req: Request, res: Response) => {
     const { simulatedAudioDuration } = req.body;
+    void simulatedAudioDuration;
     
     // Simulate real voice command processing
     const apiKey = process.env.GEMINI_API_KEY;
@@ -230,7 +235,7 @@ async function startServer() {
         }
       });
 
-      // Use Gemini to write a funny/smart audio-like dynamic transcription and extract tasks
+      // Use Gemini to write a smart audio-like dynamic transcription and extract tasks
       const response = await ai.models.generateContent({
         model: 'gemini-3.5-flash',
         contents: `الرئيس التنفيذي لمجموعة أراك للتنمية قام بتسجيل صوتي عاجل. 
@@ -280,6 +285,7 @@ async function startServer() {
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`CEO Digital Office Server running on http://localhost:${PORT}`);
+    console.log(`ARAAK NAMA AI API mounted at http://localhost:${PORT}/api/nama`);
   });
 }
 
