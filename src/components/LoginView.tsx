@@ -114,9 +114,13 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok || result.email !== matchedUser.email.toLowerCase() || result.role !== matchedUser.role) {
-        setError(response.status === 429
-          ? 'تم إيقاف المحاولات مؤقتاً. حاول لاحقاً.'
-          : 'بيانات الدخول غير صحيحة أو أن الصلاحية غير متطابقة.');
+        if (response.status === 503 && result.error === 'AUTH_NOT_CONFIGURED') {
+          setError(`إعداد المصادقة غير مكتمل في الخادم (الجلسة: ${result.sessionConfigured ? 'مفعلة' : 'غير مفعلة'}، الحسابات: ${result.configuredUsers ?? 0}).`);
+        } else if (response.status === 429) {
+          setError('تم إيقاف المحاولات مؤقتاً. حاول لاحقاً.');
+        } else {
+          setError('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+        }
         return;
       }
 
