@@ -666,12 +666,12 @@ export default function App() {
               <select 
                 value={theme}
                 onChange={(e) => setTheme(e.target.value as PlatformTheme)}
-                className="bg-transparent text-sm text-slate-300 focus:outline-none cursor-pointer font-bold text-right"
+                className="bg-transparent text-sm text-slate-200 focus:outline-none cursor-pointer font-bold text-right [color-scheme:dark]"
               >
-                <option value="vision_2030">سمة رؤية ٢٠٣٠ (الأخضر السيادي)</option>
-                <option value="golden_luxury">سمة الفخامة الذهبية (الملكي)</option>
-                <option value="midnight_navy">سمة كحلي الليل (الوقار)</option>
-                <option value="spring">سمة ربيع أراك (الحيوي)</option>
+                <option className="bg-[#07110e] text-slate-100" value="vision_2030">سمة رؤية ٢٠٣٠ (الأخضر السيادي)</option>
+                <option className="bg-[#07110e] text-slate-100" value="golden_luxury">سمة الفخامة الذهبية (الملكي)</option>
+                <option className="bg-[#07110e] text-slate-100" value="midnight_navy">سمة كحلي الليل (الوقار)</option>
+                <option className="bg-[#07110e] text-slate-100" value="spring">سمة ربيع أراك (الحيوي)</option>
               </select>
             </div>
 
