@@ -460,6 +460,10 @@ export default function App() {
 
   const menuGroups = rawMenuGroups.map(group => {
     const filteredItems = group.items.filter(item => {
+      // Every authenticated user has a personal executive dashboard.
+      if (item.id === 'dashboard') {
+        return true;
+      }
       if (currentUser?.role === 'admin' || currentUser?.role === 'ceo') {
         return true;
       }
@@ -473,7 +477,7 @@ export default function App() {
     if (!currentUser) return;
     const allAllowedViewIds = currentUser.role === 'ceo' || currentUser.role === 'admin'
       ? ['dashboard', 'reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
-      : currentUser.allowedViews;
+      : ['dashboard', ...currentUser.allowedViews.filter(viewId => viewId !== 'dashboard')];
       
     if (!allAllowedViewIds.includes(activeView)) {
       if (allAllowedViewIds.length > 0) {
@@ -520,7 +524,10 @@ export default function App() {
     return (
       <LoginView 
         users={users} 
-        onLoginSuccess={(user) => setCurrentUser(user)} 
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          setActiveView('dashboard');
+        }} 
         theme={theme} 
       />
     );
