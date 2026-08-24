@@ -179,7 +179,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
         <button
           onClick={() => setActiveTab('الكل')}
           className={`px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${
-            activeTab === 'الكل' ? 'bg-amber-600 text-slate-950' : 'text-slate-400 hover:text-slate-100'
+            activeTab === 'الكل' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-slate-100'
           }`}
         >
           الكل
@@ -187,7 +187,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
         <button
           onClick={() => setActiveTab('agenda')}
           className={`px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${
-            activeTab === 'agenda' ? 'bg-amber-600 text-slate-950' : 'text-slate-400 hover:text-slate-100'
+            activeTab === 'agenda' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-slate-100'
           }`}
         >
           جدول الأعمال
@@ -195,7 +195,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
         <button
           onClick={() => setActiveTab('call')}
           className={`px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${
-            activeTab === 'call' ? 'bg-amber-600 text-slate-950' : 'text-slate-400 hover:text-slate-100'
+            activeTab === 'call' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-slate-100'
           }`}
         >
           الاتصالات
@@ -203,7 +203,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
         <button
           onClick={() => setActiveTab('memo')}
           className={`px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${
-            activeTab === 'memo' ? 'bg-amber-600 text-slate-950' : 'text-slate-400 hover:text-slate-100'
+            activeTab === 'memo' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-slate-100'
           }`}
         >
           المذكرات
@@ -224,7 +224,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
             >
               {/* Vertical side color bar */}
               <div className={`absolute right-0 top-0 bottom-0 w-1.5 ${
-                isAgenda ? 'bg-amber-500' : isCall ? 'bg-blue-500' : 'bg-violet-500'
+                'bg-emerald-600'
               }`}></div>
 
               {/* Actions panel on the left */}
@@ -240,14 +240,14 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
                     </button>
                     <button 
                       onClick={() => handleStatusChange(item.id, 'مؤجل')}
-                      className="text-[10px] bg-amber-950/40 text-amber-400 border border-amber-900/30 px-3 py-1.5 rounded-lg hover:bg-amber-900/30 cursor-pointer"
+                      className="text-[10px] bg-emerald-600 text-white border border-emerald-700 px-3 py-1.5 rounded-lg hover:bg-amber-900/30 cursor-pointer"
                     >
                       <span>تأجيل</span>
                     </button>
                   </>
                 ) : (
                   <span className={`text-[10px] font-bold px-2.5 py-1 rounded ${
-                    item.status === 'مكتمل' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'
+                    item.status === 'مكتمل' ? 'bg-emerald-600 text-white' : 'bg-[#172033] text-white'
                   }`}>
                     {item.status}
                   </span>
@@ -258,9 +258,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
               <div className="space-y-2 flex-1 pr-4 order-1 md:order-2">
                 <div className="flex items-center gap-3 justify-start">
                   <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${
-                    isAgenda ? 'bg-amber-950/40 text-amber-400 border border-amber-900/30' : 
-                    isCall ? 'bg-blue-950/40 text-blue-400 border border-blue-900/30' : 
-                    'bg-violet-950/40 text-violet-400 border border-violet-900/30'
+                    'bg-emerald-100 text-emerald-900 border border-emerald-200'
                   }`}>
                     {isAgenda ? 'جدول أعمال' : isCall ? 'مكالمة هاتفية' : 'مذكرة واردة'}
                   </span>
@@ -291,7 +289,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
             
             <div className="flex justify-between items-center bg-[#121522] px-6 py-4 border-b border-slate-800">
               <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                <FolderClosed className="w-4 h-4 text-amber-500" />
+                <FolderClosed className="w-4 h-4 text-emerald-500" />
                 <span>برمجة مذكرات ومكالمات السكرتارية</span>
               </h3>
               <button 
@@ -325,7 +323,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
                   placeholder="مثال: مراجعة تراخيص المقر الرئيسي" 
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
+                  className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
                 />
               </div>
 
@@ -337,7 +335,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
                     placeholder="مثال: نائب الرئيس - الاستثمار" 
                     value={newPerson}
                     onChange={(e) => setNewPerson(e.target.value)}
-                    className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
+                    className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
                   />
                 </div>
 
@@ -359,7 +357,7 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
                   placeholder="اكتب تفاصيل إضافية لمساعدة الرئيس التنفيذي على المتابعة الفورية السريعة..." 
                   value={newDetails}
                   onChange={(e) => setNewDetails(e.target.value)}
-                  className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none resize-none"
+                  className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none resize-none"
                 />
               </div>
 
