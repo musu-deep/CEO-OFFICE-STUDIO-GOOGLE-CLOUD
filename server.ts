@@ -84,13 +84,21 @@ async function startServer() {
     const attempt = !current || current.resetAt < now ? { count: 0, resetAt: now + 15 * 60_000 } : current;
     if (attempt.count >= 10) return res.status(429).json({ error: 'Too many login attempts' });
 
+    if (!sessionSecret || !Object.keys(authUsers).length) {
+      return res.status(503).json({
+        error: 'AUTH_NOT_CONFIGURED',
+        sessionConfigured: Boolean(sessionSecret),
+        configuredUsers: Object.keys(authUsers).length,
+      });
+    }
+
     const email = String(req.body?.email || '').trim().toLowerCase();
     const password = String(req.body?.password || '');
     const account = authUsers[email];
-    if (!sessionSecret || !account || !password || !safeEqual(password, account.password)) {
+    if (!account || !password || !safeEqual(password, String(account.password || ''))) {
       attempt.count += 1;
       loginAttempts.set(key, attempt);
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
     }
 
     loginAttempts.delete(key);
