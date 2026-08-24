@@ -72,7 +72,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
       case 'vision_2030': return 'text-emerald-400';
       case 'golden_luxury': return 'text-amber-400';
       case 'midnight_navy': return 'text-blue-400';
-      case 'spring': return 'text-lime-400';
+      case 'spring': return 'text-emerald-700';
     }
   };
 
@@ -81,7 +81,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
       case 'vision_2030': return 'bg-emerald-600 hover:bg-emerald-500 text-white';
       case 'golden_luxury': return 'bg-amber-600 hover:bg-amber-500 text-slate-950';
       case 'midnight_navy': return 'bg-blue-600 hover:bg-blue-500 text-white';
-      case 'spring': return 'bg-lime-600 hover:bg-lime-500 text-white';
+      case 'spring': return 'bg-emerald-600 hover:bg-emerald-500 text-white';
     }
   };
 
@@ -121,7 +121,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
             placeholder="ابحث عن مشروع بالاسم أو الوصف..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg py-2.5 pr-10 pl-4 text-xs text-slate-200 focus:outline-none transition-colors"
+            className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg py-2.5 pr-10 pl-4 text-xs text-slate-200 focus:outline-none transition-colors"
           />
           <Search className="w-4 h-4 text-slate-500 absolute top-3.5 right-3.5" />
         </div>
@@ -131,7 +131,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
           <select 
             value={selectedSector}
             onChange={(e) => setSelectedSector(e.target.value)}
-            className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg py-2.5 px-4 text-xs text-slate-400 focus:outline-none transition-colors appearance-none"
+            className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg py-2.5 px-4 text-xs text-slate-400 focus:outline-none transition-colors appearance-none"
           >
             {sectors.map((sec) => (
               <option key={sec} value={sec}>{sec === 'الكل' ? 'كل القطاعات' : sec}</option>
@@ -153,7 +153,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
               className="bg-[#121422] rounded-2xl border border-slate-800/80 p-6 flex flex-col justify-between hover:border-slate-700/80 transition-all duration-300 relative shadow-lg group overflow-hidden"
             >
               {/* Highlight bar */}
-              <div className={`absolute top-0 right-0 left-0 h-1.5 ${isCritical ? 'bg-rose-600' : 'bg-amber-500'}`}></div>
+              <div className={`absolute top-0 right-0 left-0 h-1.5 bg-emerald-600`}></div>
 
               <div>
                 {/* Sector and priority badge */}
@@ -162,14 +162,14 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
                     {p.sector}
                   </span>
                   
-                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${isCritical ? 'bg-rose-950/40 text-rose-400 border border-rose-900/30' : 'bg-amber-950/40 text-amber-400 border border-amber-900/30'}`}>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${isCritical ? 'bg-rose-950/40 text-rose-400 border border-rose-900/30' : 'bg-slate-800/80 text-slate-300 border border-slate-700/40'}`}>
                     {isCritical ? 'حرج' : 'تنبيه'}
                   </span>
                 </div>
 
                 {/* Title and Description */}
                 <div className="space-y-1">
-                  <h3 className="text-base font-extrabold text-slate-100 group-hover:text-amber-400/90 transition-colors">
+                  <h3 className="text-base font-extrabold text-slate-100 group-hover:text-emerald-500 transition-colors">
                     {p.name}
                   </h3>
                   <p className="text-xs text-slate-400 leading-relaxed min-h-[48px] line-clamp-3">
@@ -189,7 +189,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
                   </div>
                   <div className="bg-slate-800 h-2 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full rounded-full bg-gradient-to-l ${isCritical ? 'from-rose-500 to-rose-400' : 'from-amber-500 to-orange-400'}`} 
+                      className="h-full rounded-full bg-gradient-to-l from-emerald-600 to-teal-400" 
                       style={{ width: `${p.progress}%` }}
                     ></div>
                   </div>
@@ -232,7 +232,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
             
             <div className="flex justify-between items-center bg-[#121522] px-6 py-4 border-b border-slate-800">
               <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                <FolderClosed className="w-4 h-4 text-amber-500" />
+                <FolderClosed className="w-4 h-4 text-emerald-500" />
                 <span>إضافة مشروع استراتيجي جديد</span>
               </h3>
               <button 
@@ -253,7 +253,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
                   placeholder="مثال: خطة التنمية الاستراتيجية 2030" 
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
+                  className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
                 />
               </div>
 
@@ -264,7 +264,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
                   placeholder="اكتب نبذة مختصرة عن أهداف ونطاق المشروع..." 
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none resize-none"
+                  className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none resize-none"
                 />
               </div>
 
@@ -307,7 +307,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
                     placeholder="مثال: 50000000" 
                     value={newBudget}
                     onChange={(e) => setNewBudget(e.target.value)}
-                    className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
+                    className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
                   />
                 </div>
 
@@ -318,7 +318,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
                     placeholder="مثال: نائب الرئيس - الاستثمار" 
                     value={newManager}
                     onChange={(e) => setNewManager(e.target.value)}
-                    className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
+                    className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
                   />
                 </div>
               </div>
