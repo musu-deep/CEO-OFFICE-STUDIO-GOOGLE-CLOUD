@@ -240,3 +240,104 @@
 [data-theme] main [class*="border-t"][class*="border-lime"] {
   border-color: var(--araak-primary) !important;
 }
+
+/* Full internal-view normalization: catches component-local rails, calendar events,
+   compact cards, and badges that are not rendered as span/button elements. */
+
+/* Compact dark surfaces must always be readable. */
+[data-theme] main [class*="rounded"][class*="bg-slate-8"],
+[data-theme] main [class*="rounded"][class*="bg-slate-9"],
+[data-theme] main [class*="rounded"][class*="bg-neutral-8"],
+[data-theme] main [class*="rounded"][class*="bg-neutral-9"],
+[data-theme] main [class*="rounded"][class*="bg-zinc-8"],
+[data-theme] main [class*="rounded"][class*="bg-zinc-9"] {
+  color: #fff !important;
+}
+
+[data-theme] main [class*="rounded"][class*="bg-slate-8"] *,
+[data-theme] main [class*="rounded"][class*="bg-slate-9"] *,
+[data-theme] main [class*="rounded"][class*="bg-neutral-8"] *,
+[data-theme] main [class*="rounded"][class*="bg-neutral-9"] * {
+  color: inherit !important;
+}
+
+/* Saturated compact chips, controls, and calendar events use white labels. */
+[data-theme] main [class*="rounded"][class*="bg-emerald-5"],
+[data-theme] main [class*="rounded"][class*="bg-emerald-6"],
+[data-theme] main [class*="rounded"][class*="bg-green-5"],
+[data-theme] main [class*="rounded"][class*="bg-green-6"],
+[data-theme] main [class*="rounded"][class*="bg-teal-5"],
+[data-theme] main [class*="rounded"][class*="bg-teal-6"],
+[data-theme] main [class*="rounded"][class*="bg-blue-5"],
+[data-theme] main [class*="rounded"][class*="bg-blue-6"],
+[data-theme] main [class*="rounded"][class*="bg-indigo-5"],
+[data-theme] main [class*="rounded"][class*="bg-indigo-6"],
+[data-theme] main [class*="rounded"][class*="bg-violet-5"],
+[data-theme] main [class*="rounded"][class*="bg-violet-6"],
+[data-theme] main [class*="rounded"][class*="bg-purple-5"],
+[data-theme] main [class*="rounded"][class*="bg-purple-6"],
+[data-theme] main [class*="rounded"][class*="bg-orange-5"],
+[data-theme] main [class*="rounded"][class*="bg-orange-6"],
+[data-theme] main [class*="rounded"][class*="bg-amber-5"],
+[data-theme] main [class*="rounded"][class*="bg-amber-6"],
+[data-theme] main [class*="rounded"][class*="bg-rose-5"],
+[data-theme] main [class*="rounded"][class*="bg-rose-6"],
+[data-theme] main [class*="rounded"][class*="bg-red-5"],
+[data-theme] main [class*="rounded"][class*="bg-red-6"] {
+  color: #fff !important;
+}
+
+/* Decorative colour rails (implemented as tiny background blocks) become green. */
+[data-theme] main [class~="w-1"][class*="bg-blue"],
+[data-theme] main [class~="w-1"][class*="bg-cyan"],
+[data-theme] main [class~="w-1"][class*="bg-indigo"],
+[data-theme] main [class~="w-1"][class*="bg-violet"],
+[data-theme] main [class~="w-1"][class*="bg-purple"],
+[data-theme] main [class~="w-1"][class*="bg-orange"],
+[data-theme] main [class~="w-1"][class*="bg-amber"],
+[data-theme] main [class~="w-1.5"][class*="bg-blue"],
+[data-theme] main [class~="w-1.5"][class*="bg-indigo"],
+[data-theme] main [class~="w-1.5"][class*="bg-violet"],
+[data-theme] main [class~="w-1.5"][class*="bg-purple"],
+[data-theme] main [class~="w-1.5"][class*="bg-orange"],
+[data-theme] main [class~="w-1.5"][class*="bg-amber"],
+[data-theme] main [class~="h-1"][class*="bg-blue"],
+[data-theme] main [class~="h-1"][class*="bg-cyan"],
+[data-theme] main [class~="h-1"][class*="bg-indigo"],
+[data-theme] main [class~="h-1"][class*="bg-violet"],
+[data-theme] main [class~="h-1"][class*="bg-purple"],
+[data-theme] main [class~="h-1"][class*="bg-orange"],
+[data-theme] main [class~="h-1"][class*="bg-amber"],
+[data-theme] main [class~="h-1.5"][class*="bg-blue"],
+[data-theme] main [class~="h-1.5"][class*="bg-indigo"],
+[data-theme] main [class~="h-1.5"][class*="bg-violet"],
+[data-theme] main [class~="h-1.5"][class*="bg-purple"],
+[data-theme] main [class~="h-1.5"][class*="bg-orange"],
+[data-theme] main [class~="h-1.5"][class*="bg-amber"] {
+  background-color: var(--araak-primary) !important;
+  background-image: none !important;
+}
+
+/* Non-semantic blue/purple/orange side rails on full cards become green. */
+[data-theme] main [class*="border-r-4"][class*="border-blue"],
+[data-theme] main [class*="border-r-4"][class*="border-indigo"],
+[data-theme] main [class*="border-r-4"][class*="border-violet"],
+[data-theme] main [class*="border-r-4"][class*="border-purple"],
+[data-theme] main [class*="border-r-4"][class*="border-orange"],
+[data-theme] main [class*="border-r-4"][class*="border-amber"],
+[data-theme] main [class*="border-l-4"][class*="border-blue"],
+[data-theme] main [class*="border-l-4"][class*="border-indigo"],
+[data-theme] main [class*="border-l-4"][class*="border-violet"],
+[data-theme] main [class*="border-l-4"][class*="border-purple"],
+[data-theme] main [class*="border-l-4"][class*="border-orange"],
+[data-theme] main [class*="border-l-4"][class*="border-amber"] {
+  border-color: var(--araak-primary) !important;
+}
+
+/* Calendar controls and events follow the institutional palette. */
+[data-theme] main [class*="calendar"] button[class*="bg-slate"],
+[data-theme] main [class*="grid-cols-7"] button[class*="bg-slate"],
+[data-theme] main [class*="grid-cols-7"] [class*="bg-slate-8"] {
+  background-color: var(--araak-navy) !important;
+  color: #fff !important;
+}
