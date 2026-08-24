@@ -146,3 +146,65 @@
   border-color: #cbd5e1 !important;
   color: #64748b !important;
 }
+
+/* Global contrast rule for compact UI components.
+   Dark or saturated badges/buttons always carry white labels across every view. */
+[data-theme] main button[class*="bg-slate-8"],
+[data-theme] main button[class*="bg-slate-9"],
+[data-theme] main button[class*="bg-black"],
+[data-theme] main button[class*="bg-[#0"],
+[data-theme] main button[class*="bg-[#1"],
+[data-theme] main button[class*="bg-emerald-6"],
+[data-theme] main button[class*="bg-green-6"],
+[data-theme] main button[class*="bg-teal-6"],
+[data-theme] main button[class*="bg-blue-6"],
+[data-theme] main button[class*="bg-cyan-6"],
+[data-theme] main button[class*="bg-indigo-6"],
+[data-theme] main button[class*="bg-violet-6"],
+[data-theme] main button[class*="bg-purple-6"],
+[data-theme] main button[class*="bg-rose-6"],
+[data-theme] main button[class*="bg-red-6"],
+[data-theme] main button[class*="bg-orange-6"],
+[data-theme] main button[class*="bg-amber-6"],
+[data-theme] main span[class*="bg-slate-8"],
+[data-theme] main span[class*="bg-slate-9"],
+[data-theme] main span[class*="bg-black"],
+[data-theme] main span[class*="bg-[#0"],
+[data-theme] main span[class*="bg-[#1"],
+[data-theme] main span[class*="bg-emerald-6"],
+[data-theme] main span[class*="bg-green-6"],
+[data-theme] main span[class*="bg-teal-6"],
+[data-theme] main span[class*="bg-blue-6"],
+[data-theme] main span[class*="bg-cyan-6"],
+[data-theme] main span[class*="bg-indigo-6"],
+[data-theme] main span[class*="bg-violet-6"],
+[data-theme] main span[class*="bg-purple-6"],
+[data-theme] main span[class*="bg-rose-6"],
+[data-theme] main span[class*="bg-red-6"],
+[data-theme] main span[class*="bg-orange-6"],
+[data-theme] main span[class*="bg-amber-6"],
+[data-theme] main [role="status"][class*="bg-slate"],
+[data-theme] main [role="status"][class*="bg-emerald"],
+[data-theme] main [role="status"][class*="bg-blue"],
+[data-theme] main [role="status"][class*="bg-rose"],
+[data-theme] main [role="status"][class*="bg-red"] {
+  color: #fff !important;
+}
+
+/* Nested icons and labels inherit the guaranteed contrast colour. */
+[data-theme] main button[class*="bg-"] svg,
+[data-theme] main span[class*="bg-"] svg,
+[data-theme] main [role="status"][class*="bg-"] svg {
+  color: currentColor;
+}
+
+/* Light-tint chips use dark readable labels rather than forced white. */
+[data-theme="spring"] main span[class*="bg-emerald-1"],
+[data-theme="spring"] main span[class*="bg-green-1"],
+[data-theme="spring"] main span[class*="bg-blue-1"],
+[data-theme="spring"] main span[class*="bg-amber-1"],
+[data-theme="spring"] main span[class*="bg-rose-1"],
+[data-theme="spring"] main span[class*="bg-slate-1"],
+[data-theme="spring"] main span[class*="bg-slate-2"] {
+  color: #172033 !important;
+}
