@@ -158,12 +158,12 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
               <div>
                 {/* Sector and priority badge */}
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-[10px] bg-slate-800/80 text-slate-300 font-bold px-2 py-0.5 rounded-md">
+                  <span className="text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-200 font-extrabold px-2.5 py-1 rounded-lg shadow-sm">
                     {p.sector}
                   </span>
                   
-                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${isCritical ? 'bg-rose-950/40 text-rose-400 border border-rose-900/30' : 'bg-slate-800/80 text-slate-300 border border-slate-700/40'}`}>
-                    {isCritical ? 'حرج' : 'تنبيه'}
+                  <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full text-white shadow-sm ${isCritical ? 'bg-rose-600 border border-rose-700' : 'bg-emerald-600 border border-emerald-700'}`}>
+                    {isCritical ? 'حرج' : 'متابعة'}
                   </span>
                 </div>
 
@@ -187,7 +187,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
                     <span className="text-slate-400">نسبة الإنجاز</span>
                     <span className="font-sans font-bold text-slate-200">{p.progress}%</span>
                   </div>
-                  <div className="bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div className={`${theme === 'spring' ? 'bg-slate-200' : 'bg-slate-800'} h-2 rounded-full overflow-hidden`}>
                     <div 
                       className="h-full rounded-full bg-gradient-to-l from-emerald-600 to-teal-400" 
                       style={{ width: `${p.progress}%` }}
@@ -209,11 +209,11 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
 
                 {/* State Controls */}
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded font-bold">
+                  <span className="text-[10px] text-white bg-[#172033] border border-slate-700 px-2.5 py-1 rounded-lg font-extrabold shadow-sm">
                     أولوية: {p.priority}
                   </span>
                   
-                  <span className="text-[10px] text-emerald-400 bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-900/30 font-bold">
+                  <span className="text-[10px] text-emerald-900 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 font-extrabold shadow-sm">
                     {p.status}
                   </span>
                 </div>
