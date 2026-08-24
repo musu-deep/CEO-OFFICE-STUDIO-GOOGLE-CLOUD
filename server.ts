@@ -18,7 +18,7 @@ async function startServer() {
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
-    res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://generativelanguage.googleapis.com https://api.openai.com");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self'; connect-src 'self' https://generativelanguage.googleapis.com https://api.openai.com");
     next();
   });
   app.use(express.json({ limit: '512kb' }));
@@ -26,12 +26,18 @@ async function startServer() {
   const sessionSecret = process.env.SESSION_SECRET || '';
   const authUsers = (() => {
     try {
-      return JSON.parse(process.env.ARAAK_AUTH_USERS || '{}') as Record<string, { password: string; role: string }>;
+      const parsed = JSON.parse(process.env.ARAAK_AUTH_USERS || '{}') as Record<string, { password: string; role: string }>;
+      return Object.fromEntries(
+        Object.entries(parsed).map(([email, account]) => [email.trim().toLowerCase(), account])
+      );
     } catch {
       console.error('ARAAK_AUTH_USERS must be valid JSON.');
       return {};
     }
   })();
+
+  if (!sessionSecret) console.warn('SESSION_SECRET is not configured.');
+  if (!Object.keys(authUsers).length) console.warn('ARAAK_AUTH_USERS has no valid accounts.');
 
   const loginAttempts = new Map<string, { count: number; resetAt: number }>();
   const safeEqual = (left: string, right: string) => {
@@ -64,7 +70,11 @@ async function startServer() {
   app.get('/health', (_req, res) => res.status(200).json({ status: 'ok', service: 'araak-ceo-office' }));
   app.get('/ready', (_req, res) => {
     const ready = Boolean(sessionSecret && Object.keys(authUsers).length);
-    res.status(ready ? 200 : 503).json({ status: ready ? 'ready' : 'configuration_required' });
+    res.status(ready ? 200 : 503).json({
+      status: ready ? 'ready' : 'configuration_required',
+      sessionConfigured: Boolean(sessionSecret),
+      configuredUsers: Object.keys(authUsers).length,
+    });
   });
 
   app.post('/api/auth/login', (req, res) => {
