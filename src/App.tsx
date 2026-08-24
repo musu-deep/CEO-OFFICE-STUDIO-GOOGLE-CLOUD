@@ -788,7 +788,7 @@ export default function App() {
               </button>
  
               {showProfileDropdown && (
-                <div className={`absolute left-0 mt-3 w-56 bg-[#07110e]/[0.98] backdrop-blur-2xl border border-white/15 ${currentTheme.border} rounded-xl shadow-[0_24px_70px_rgba(0,0,0,0.85)] z-[100] overflow-hidden text-right isolate`}>
+                <div className={`absolute left-0 mt-3 w-56 bg-[#07110e]/[0.88] backdrop-blur-2xl backdrop-saturate-150 border border-white/15 ${currentTheme.border} rounded-xl shadow-[0_24px_70px_rgba(0,0,0,0.85)] z-[100] overflow-hidden text-right isolate`}>
                   <div className={`p-4 border-b border-white/10 ${currentTheme.softPanelBg}`}>
                     <span className="text-sm font-bold text-slate-300 block">{currentUser.name}</span>
                     <span className="text-xs text-slate-500">{currentUser.title}</span>
