@@ -37,7 +37,9 @@ import {
   Monitor,
   Activity,
   UserRound,
-  ShieldCheck
+  ShieldCheck,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { PlatformTheme, AppUser } from './types';
 
@@ -136,27 +138,27 @@ const themeTokens: Record<PlatformTheme, ThemeDesignTokens> = {
     } as CSSProperties,
   },
   spring: {
-    name: 'سمة ربيع أراك',
-    mainBg: 'bg-[radial-gradient(circle_at_top_right,rgba(132,204,22,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(101,163,13,0.10),transparent_36%),linear-gradient(135deg,#101a05_0%,#090a12_48%,#050608_100%)]',
-    sidebarBg: 'bg-lime-950/10 backdrop-blur-2xl',
-    headerBg: 'bg-black/25 backdrop-blur-2xl',
-    panelBg: 'bg-white/[0.045] backdrop-blur-xl',
-    softPanelBg: 'bg-lime-500/[0.06] backdrop-blur-xl',
-    text: 'text-lime-400',
-    bg: 'bg-lime-600',
-    bgHover: 'hover:bg-lime-500',
-    border: 'border-lime-500/20',
-    strongBorder: 'border-lime-400/45',
-    glow: 'shadow-lime-500/20',
-    icon: 'text-lime-400',
-    gradientButton: 'bg-gradient-to-r from-lime-600 to-green-500 hover:from-lime-500 hover:to-green-400',
-    activeMenu: 'bg-gradient-to-l from-lime-500/95 to-green-500/85 text-slate-950 border border-lime-200/25 shadow-lg shadow-lime-500/20',
-    selectRing: 'focus-within:border-lime-400/50 focus-within:ring-2 focus-within:ring-lime-400/10',
+    name: 'الوضع النهاري',
+    mainBg: 'bg-[#f3f7f5]',
+    sidebarBg: 'bg-white/95 backdrop-blur-2xl',
+    headerBg: 'bg-white/90 backdrop-blur-2xl',
+    panelBg: 'bg-white/90 backdrop-blur-xl',
+    softPanelBg: 'bg-emerald-50/95 backdrop-blur-xl',
+    text: 'text-emerald-700',
+    bg: 'bg-emerald-600',
+    bgHover: 'hover:bg-emerald-500',
+    border: 'border-emerald-700/15',
+    strongBorder: 'border-emerald-600/30',
+    glow: 'shadow-emerald-600/10',
+    icon: 'text-emerald-700',
+    gradientButton: 'bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-600 hover:to-teal-500',
+    activeMenu: 'bg-gradient-to-l from-emerald-600 to-teal-500 text-white border border-emerald-700/10 shadow-lg shadow-emerald-600/15',
+    selectRing: 'focus-within:border-emerald-600/35 focus-within:ring-2 focus-within:ring-emerald-600/10',
     cssVars: {
-      '--theme-accent': '#84cc16',
-      '--theme-accent-soft': 'rgba(132,204,22,.15)',
-      '--theme-card': 'rgba(132,204,22,.06)',
-      '--theme-border': 'rgba(132,204,22,.24)',
+      '--theme-accent': '#047857',
+      '--theme-accent-soft': 'rgba(5,150,105,.10)',
+      '--theme-card': 'rgba(255,255,255,.92)',
+      '--theme-border': 'rgba(4,120,87,.16)',
     } as CSSProperties,
   },
 };
@@ -192,7 +194,9 @@ import {
 } from './data/mockData';
 
 export default function App() {
-  const [theme, setTheme] = useState<PlatformTheme>('vision_2030');
+  const [theme, setTheme] = useState<PlatformTheme>(() =>
+    localStorage.getItem('arak_display_mode') === 'light' ? 'spring' : 'vision_2030'
+  );
   const [activeView, setActiveView] = useState<string>('dashboard');
   const [notifications, setNotifications] = useState(initialNotifications);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
@@ -258,6 +262,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('arak_ceo_admin_mode', String(ceoAdminMode));
   }, [ceoAdminMode]);
+
+  useEffect(() => {
+    localStorage.setItem('arak_display_mode', theme === 'spring' ? 'light' : 'dark');
+  }, [theme]);
 
   const handleUpdateUser = (updatedUser: AppUser) => {
     setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
@@ -660,19 +668,24 @@ export default function App() {
               <span className="text-xs border border-white/10 rounded-md px-1.5 py-0.5 text-slate-500">Ctrl K</span>
             </button>
 
-            {/* Quick Vision Switcher */}
-            <div className={`flex items-center gap-1.5 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} ${currentTheme.selectRing} rounded-xl px-3 py-1.5 transition-all`}>
-              <Sparkles className={`w-3.5 h-3.5 ${currentTheme.icon} animate-pulse`} />
-              <select 
-                value={theme}
-                onChange={(e) => setTheme(e.target.value as PlatformTheme)}
-                className="bg-transparent text-sm text-slate-200 focus:outline-none cursor-pointer font-bold text-right [color-scheme:dark]"
+            {/* Day / Night display mode */}
+            <div className={`flex items-center gap-1 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl p-1 transition-all`} role="group" aria-label="وضع العرض">
+              <button
+                type="button"
+                onClick={() => setTheme('vision_2030')}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all ${theme === 'vision_2030' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-200'}`}
+                aria-pressed={theme === 'vision_2030'}
               >
-                <option className="bg-[#07110e] text-slate-100" value="vision_2030">سمة رؤية ٢٠٣٠ (الأخضر السيادي)</option>
-                <option className="bg-[#07110e] text-slate-100" value="golden_luxury">سمة الفخامة الذهبية (الملكي)</option>
-                <option className="bg-[#07110e] text-slate-100" value="midnight_navy">سمة كحلي الليل (الوقار)</option>
-                <option className="bg-[#07110e] text-slate-100" value="spring">سمة ربيع أراك (الحيوي)</option>
-              </select>
+                <Moon className="w-3.5 h-3.5" /> ليلي
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme('spring')}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black transition-all ${theme === 'spring' ? 'bg-amber-400 text-slate-950 shadow-md' : 'text-slate-500 hover:text-slate-200'}`}
+                aria-pressed={theme === 'spring'}
+              >
+                <Sun className="w-3.5 h-3.5" /> نهاري
+              </button>
             </div>
 
             {/* CEO Admin Mode Toggle Switch */}
