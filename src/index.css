@@ -208,3 +208,35 @@
 [data-theme="spring"] main span[class*="bg-slate-2"] {
   color: #172033 !important;
 }
+
+/* Unified card accent rails across all internal views.
+   Red/rose remains reserved for genuinely critical records. */
+[data-theme] main [class*="border-r"][class*="border-orange"],
+[data-theme] main [class*="border-r"][class*="border-amber"],
+[data-theme] main [class*="border-r"][class*="border-yellow"],
+[data-theme] main [class*="border-r"][class*="border-blue"],
+[data-theme] main [class*="border-r"][class*="border-cyan"],
+[data-theme] main [class*="border-r"][class*="border-indigo"],
+[data-theme] main [class*="border-r"][class*="border-violet"],
+[data-theme] main [class*="border-r"][class*="border-purple"],
+[data-theme] main [class*="border-r"][class*="border-lime"],
+[data-theme] main [class*="border-l"][class*="border-orange"],
+[data-theme] main [class*="border-l"][class*="border-amber"],
+[data-theme] main [class*="border-l"][class*="border-yellow"],
+[data-theme] main [class*="border-l"][class*="border-blue"],
+[data-theme] main [class*="border-l"][class*="border-cyan"],
+[data-theme] main [class*="border-l"][class*="border-indigo"],
+[data-theme] main [class*="border-l"][class*="border-violet"],
+[data-theme] main [class*="border-l"][class*="border-purple"],
+[data-theme] main [class*="border-l"][class*="border-lime"],
+[data-theme] main [class*="border-t"][class*="border-orange"],
+[data-theme] main [class*="border-t"][class*="border-amber"],
+[data-theme] main [class*="border-t"][class*="border-yellow"],
+[data-theme] main [class*="border-t"][class*="border-blue"],
+[data-theme] main [class*="border-t"][class*="border-cyan"],
+[data-theme] main [class*="border-t"][class*="border-indigo"],
+[data-theme] main [class*="border-t"][class*="border-violet"],
+[data-theme] main [class*="border-t"][class*="border-purple"],
+[data-theme] main [class*="border-t"][class*="border-lime"] {
+  border-color: var(--araak-primary) !important;
+}
