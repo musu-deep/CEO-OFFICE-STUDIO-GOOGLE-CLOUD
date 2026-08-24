@@ -54,3 +54,95 @@
 [data-theme="spring"] header .text-slate-500 {
   color: #64748b !important;
 }
+
+/* Unified Araak interface colour ruler
+   Green = primary action, navy = secondary, amber/red = semantic alerts only. */
+[data-theme] {
+  --araak-primary: #059669;
+  --araak-primary-strong: #047857;
+  --araak-primary-soft: #dff7ed;
+  --araak-navy: #172033;
+  --araak-slate: #475569;
+  --araak-border: rgba(71, 85, 105, 0.20);
+  --araak-info: #2563eb;
+  --araak-warning: #d97706;
+  --araak-danger: #e11d48;
+}
+
+/* Primary actions and selected filters: one institutional green. */
+[data-theme] main button[class*="bg-purple"],
+[data-theme] main button[class*="bg-violet"],
+[data-theme] main button[class*="bg-indigo"],
+[data-theme] main button[class*="bg-cyan"],
+[data-theme] main button[class*="bg-teal"],
+[data-theme] main button[class*="bg-lime"],
+[data-theme] main button[class*="bg-orange"],
+[data-theme] main button[class*="bg-amber"],
+[data-theme] main button[class*="bg-yellow"] {
+  background-color: var(--araak-primary) !important;
+  background-image: none !important;
+  border-color: var(--araak-primary-strong) !important;
+  color: #fff !important;
+}
+
+/* Purple decorative labels become sober navy metadata labels. */
+[data-theme] main span[class*="bg-purple"],
+[data-theme] main span[class*="bg-violet"],
+[data-theme] main span[class*="bg-indigo"],
+[data-theme] main [class*="from-purple"],
+[data-theme] main [class*="from-violet"],
+[data-theme] main [class*="from-indigo"] {
+  background-color: var(--araak-navy) !important;
+  background-image: none !important;
+  border-color: rgba(23, 32, 51, 0.35) !important;
+  color: #fff !important;
+}
+
+/* Links and decorative purple text use the corporate green. */
+[data-theme] main [class*="text-purple"],
+[data-theme] main [class*="text-violet"],
+[data-theme] main [class*="text-indigo"] {
+  color: var(--araak-primary-strong) !important;
+}
+
+/* Keep true semantic states restrained and consistent. */
+[data-theme] main [class*="text-rose"],
+[data-theme] main [class*="text-red"] {
+  color: var(--araak-danger) !important;
+}
+
+[data-theme] main [class*="text-orange"],
+[data-theme] main [class*="text-amber"],
+[data-theme] main [class*="text-yellow"] {
+  color: var(--araak-warning) !important;
+}
+
+[data-theme] main [class*="text-blue"],
+[data-theme] main [class*="text-cyan"] {
+  color: var(--araak-info) !important;
+}
+
+/* Consistent card edges and understated elevation. */
+[data-theme="spring"] main .rounded-xl,
+[data-theme="spring"] main .rounded-2xl,
+[data-theme="spring"] main .rounded-3xl {
+  border-color: var(--araak-border);
+}
+
+[data-theme="spring"] main button:focus-visible,
+[data-theme="vision_2030"] main button:focus-visible {
+  outline: 3px solid rgba(5, 150, 105, 0.25);
+  outline-offset: 2px;
+}
+
+/* Remove candy-like multi-colour gradients from operational surfaces. */
+[data-theme] main button[class*="gradient"],
+[data-theme] main [role="tab"][class*="gradient"] {
+  background-image: none !important;
+}
+
+[data-theme="spring"] main button:disabled {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #64748b !important;
+}
