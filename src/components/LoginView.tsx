@@ -86,7 +86,6 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [selectedLevelTab, setSelectedLevelTab] = useState<1 | 2 | 3>(2);
 
   const t = themeTokens[theme] || themeTokens.vision_2030;
 
@@ -126,18 +125,6 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
       setError('تعذر الاتصال بخدمة المصادقة. حاول مرة أخرى.');
     }
   };
-
-  const handleQuickLogin = (_user: AppUser) => {
-    setError('تم تعطيل الدخول التجريبي في النسخة التشغيلية حفاظاً على أمن المنصة.');
-  };
-
-  const getPredefinedUsersForTab = () => {
-    if (selectedLevelTab === 1) return users.filter((u) => u.role === 'admin');
-    if (selectedLevelTab === 2) return users.filter((u) => u.role === 'ceo');
-    return users.filter((u) => u.role === 'vp' || u.role === 'head' || u.role === 'board_member');
-  };
-
-  const quickUsers = getPredefinedUsersForTab();
 
   /**
    * ضع صورة الخلفية السينمائية داخل public/image بهذا الاسم إن أردت خلفية فوتوغرافية 4K.
@@ -334,69 +321,6 @@ after:pointer-events-none
               </div>
             )}
 
-            <div className="space-y-3">
-              <span className="block text-center text-xs font-semibold text-slate-300/85">اختر الشخصية لغرض التجربة</span>
-              <div className={`grid grid-cols-3 gap-2 rounded-2xl ${innerGlass} p-1.5`}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedLevelTab(1)}
-                  className={`rounded-xl border px-2 py-4 text-center text-xs font-extrabold transition-all ${
-                    selectedLevelTab === 1 ? t.activeTab : 'border-transparent text-slate-300 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  آدمن النظام <span className="block pt-1 text-[11px] font-bold opacity-80">(مستوى ١)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedLevelTab(2)}
-                  className={`rounded-xl border px-2 py-4 text-center text-xs font-extrabold transition-all ${
-                    selectedLevelTab === 2 ? t.activeTab : 'border-transparent text-slate-300 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  الرئيس التنفيذي <span className="block pt-1 text-[11px] font-bold opacity-80">(مستوى ٢)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedLevelTab(3)}
-                  className={`rounded-xl border px-2 py-4 text-center text-xs font-extrabold transition-all ${
-                    selectedLevelTab === 3 ? t.activeTab : 'border-transparent text-slate-300 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  نواب ومدراء <span className="block pt-1 text-[11px] font-bold opacity-80">(مستوى ٣)</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-36 overflow-y-auto pl-1 pr-0 [scrollbar-width:thin]">
-                {quickUsers.map((user) => (
-                  <button
-                    key={user.id}
-                    type="button"
-                    onClick={() => handleQuickLogin(user)}
-                    className={`group rounded-2xl ${innerGlass} hover:bg-white/[0.065] hover:border-white/25 p-3 text-right transition-all flex items-center justify-between`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`grid h-9 w-9 place-items-center rounded-xl text-slate-950 font-black text-xs shadow-lg ${user.color || 'bg-amber-500'}`}>
-                        {user.avatar}
-                      </div>
-                      <div>
-                        <p className="text-xs font-black text-white group-hover:text-emerald-200 transition-colors">{user.name}</p>
-                        <p className="mt-0.5 text-[10px] text-slate-400">{user.title}</p>
-                      </div>
-                    </div>
-                    <span className="rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-bold text-slate-300 group-hover:text-white flex items-center gap-1 transition-all">
-                      دخول سريع <ArrowLeft className="h-3 w-3" />
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/18 to-white/5" />
-              <span className="text-xs text-slate-400">أو</span>
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/18 to-white/5" />
-            </div>
-
             <form onSubmit={handleFormSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-slate-200">البريد الإلكتروني الرسمي للشركة</label>
@@ -418,7 +342,7 @@ after:pointer-events-none
                 <div className="flex items-center justify-between text-sm font-bold">
                   <button
                     type="button"
-                    onClick={() => alert('يمكنك استخدام الدخول السريع للتجربة، أو مراجعة مشرف النظام لإعادة تعيين كلمة المرور.')}
+                    onClick={() => alert('يرجى مراجعة مشرف النظام لإعادة تعيين كلمة المرور.')}
                     className={`${t.text} hover:underline text-xs`}
                   >
                     نسيت كلمة المرور؟
