@@ -488,7 +488,7 @@ export default function App() {
 
   const renderActiveView = () => {
     switch (activeView) {
-      case 'dashboard': return <DashboardView projects={projects} tasks={tasks} theme={theme} onNavigate={setActiveView} />;
+      case 'dashboard': return <DashboardView projects={projects} tasks={tasks} theme={theme} onNavigate={setActiveView} currentUser={safeCurrentUser} />;
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
@@ -516,7 +516,7 @@ export default function App() {
             ceoAdminMode={ceoAdminMode}
           />
         );
-      default: return <DashboardView projects={projects} tasks={tasks} theme={theme} onNavigate={setActiveView} />;
+      default: return <DashboardView projects={projects} tasks={tasks} theme={theme} onNavigate={setActiveView} currentUser={safeCurrentUser} />;
     }
   };
 
