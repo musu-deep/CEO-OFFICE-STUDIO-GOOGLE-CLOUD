@@ -61,16 +61,16 @@ export default function CalendarView({ theme }: CalendarViewProps) {
       case 'vision_2030': return 'text-emerald-400';
       case 'golden_luxury': return 'text-amber-400';
       case 'midnight_navy': return 'text-blue-400';
-      case 'spring': return 'text-lime-400';
+      case 'spring': return 'text-emerald-700';
     }
   };
 
   const getThemeBtnClass = () => {
     switch (theme) {
       case 'vision_2030': return 'bg-emerald-600 hover:bg-emerald-500 text-white';
-      case 'golden_luxury': return 'bg-amber-600 hover:bg-amber-500 text-slate-950';
+      case 'golden_luxury': return 'bg-amber-600 hover:bg-emerald-600 text-slate-950';
       case 'midnight_navy': return 'bg-blue-600 hover:bg-blue-500 text-white';
-      case 'spring': return 'bg-lime-600 hover:bg-lime-500 text-white';
+      case 'spring': return 'bg-emerald-600 hover:bg-emerald-500 text-white';
     }
   };
 
@@ -79,7 +79,7 @@ export default function CalendarView({ theme }: CalendarViewProps) {
       case 'vision_2030': return 'border-emerald-500 bg-emerald-950/20';
       case 'golden_luxury': return 'border-amber-500 bg-amber-950/20';
       case 'midnight_navy': return 'border-blue-500 bg-blue-950/20';
-      case 'spring': return 'border-lime-500 bg-lime-950/20';
+      case 'spring': return 'border-emerald-500 bg-emerald-50';
     }
   };
 
@@ -141,7 +141,7 @@ export default function CalendarView({ theme }: CalendarViewProps) {
 
         {/* Current Month Name label exactly like Page 3 */}
         <h3 className="text-xl font-black text-slate-100 font-sans flex items-center gap-2">
-          <span className="text-amber-500 font-sans">{currentYear}</span>
+          <span className="text-emerald-600 font-sans">{currentYear}</span>
           <span>{monthNames[currentMonth]}</span>
         </h3>
 
@@ -182,7 +182,7 @@ export default function CalendarView({ theme }: CalendarViewProps) {
                 }`}
               >
                 {/* Day number */}
-                <span className={`text-sm font-extrabold font-sans leading-none ${isToday ? 'text-amber-400 scale-110' : 'text-slate-400'}`}>
+                <span className={`text-sm font-extrabold font-sans leading-none ${isToday ? 'text-emerald-600 scale-110' : 'text-slate-400'}`}>
                   {dayNum}
                 </span>
 
@@ -193,13 +193,13 @@ export default function CalendarView({ theme }: CalendarViewProps) {
                       key={index}
                       className="text-[9px] bg-slate-900/90 text-slate-300 border border-slate-800/60 p-1.5 rounded-lg flex items-center justify-between text-right truncate font-sans"
                     >
-                      <Video className="w-2.5 h-2.5 text-amber-500 flex-shrink-0 ml-1" />
+                      <Video className="w-2.5 h-2.5 text-emerald-600 flex-shrink-0 ml-1" />
                       <span className="truncate">{ev.title}</span>
                     </div>
                   ))}
                   
                   {dayEvents.length > 2 && (
-                    <div className="text-[8px] text-amber-500 font-bold text-left pr-1">
+                    <div className="text-[8px] text-emerald-600 font-bold text-left pr-1">
                       {dayEvents.length - 2}+ إضافي
                     </div>
                   )}
@@ -207,7 +207,7 @@ export default function CalendarView({ theme }: CalendarViewProps) {
 
                 {/* Micro accent */}
                 {isToday && (
-                  <span className="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span className="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-emerald-600"></span>
                 )}
               </div>
             );
@@ -224,7 +224,7 @@ export default function CalendarView({ theme }: CalendarViewProps) {
             
             <div className="flex justify-between items-center bg-[#121522] px-6 py-4 border-b border-slate-800">
               <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4 text-amber-500" />
+                <CalendarIcon className="w-4 h-4 text-emerald-600" />
                 <span>إضافة حدث لليوم {selectedDay}</span>
               </h3>
               <button 
@@ -245,7 +245,7 @@ export default function CalendarView({ theme }: CalendarViewProps) {
                   placeholder="مثال: مراجعة خطة موازنة الحديد والصلب" 
                   value={newEventTitle}
                   onChange={(e) => setNewEventTitle(e.target.value)}
-                  className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
+                  className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
                 />
               </div>
 
@@ -256,7 +256,7 @@ export default function CalendarView({ theme }: CalendarViewProps) {
                   required
                   value={newEventTime}
                   onChange={(e) => setNewEventTime(e.target.value)}
-                  className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none font-sans"
+                  className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none font-sans"
                 />
               </div>
 
