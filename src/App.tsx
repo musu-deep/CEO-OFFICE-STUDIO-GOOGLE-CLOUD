@@ -215,17 +215,7 @@ export default function App() {
     }
     return null;
   });
-  const [users, setUsers] = useState<AppUser[]>(() => {
-    const saved = localStorage.getItem('arak_users');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return initialAppUsers;
-      }
-    }
-    return initialAppUsers;
-  });
+  const [users, setUsers] = useState<AppUser[]>(initialAppUsers);
   const [ceoAdminMode, setCeoAdminMode] = useState<boolean>(() => {
     return localStorage.getItem('arak_ceo_admin_mode') === 'true';
   });
@@ -240,8 +230,30 @@ export default function App() {
   }, [currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('arak_users', JSON.stringify(users));
-  }, [users]);
+    let cancelled = false;
+    if (!currentUser) return;
+
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(async response => {
+        if (!response.ok) throw new Error('unauthenticated');
+        const result = await response.json();
+        if (!cancelled && (
+          result.user?.email !== currentUser.email.toLowerCase() ||
+          result.user?.role !== currentUser.role
+        )) {
+          setCurrentUser(null);
+          setCeoAdminMode(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCurrentUser(null);
+          setCeoAdminMode(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [currentUser?.id]);
 
   useEffect(() => {
     localStorage.setItem('arak_ceo_admin_mode', String(ceoAdminMode));

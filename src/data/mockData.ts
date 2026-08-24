@@ -415,7 +415,7 @@ export const initialAppUsers: AppUser[] = [
     status: 'نشط',
     allowedViews: ['reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users'],
     color: 'bg-purple-500',
-    password: 'admin'
+
   },
   {
     id: 'u2',
@@ -427,7 +427,7 @@ export const initialAppUsers: AppUser[] = [
     status: 'نشط',
     allowedViews: ['reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users'],
     color: 'bg-amber-500',
-    password: 'ceo'
+
   },
   {
     id: 'u3',
@@ -439,7 +439,7 @@ export const initialAppUsers: AppUser[] = [
     status: 'نشط',
     allowedViews: ['reports', 'ai-advisor', 'projects', 'tasks', 'calendar', 'meetings', 'documents'],
     color: 'bg-blue-500',
-    password: 'invest'
+
   },
   {
     id: 'u4',
@@ -451,7 +451,7 @@ export const initialAppUsers: AppUser[] = [
     status: 'نشط',
     allowedViews: ['reports', 'projects', 'tasks', 'calendar', 'documents', 'meetings', 'meeting-requests'],
     color: 'bg-emerald-500',
-    password: 'dev'
+
   },
   {
     id: 'u5',
@@ -463,7 +463,7 @@ export const initialAppUsers: AppUser[] = [
     status: 'نشط',
     allowedViews: ['projects', 'egypt'],
     color: 'bg-rose-500',
-    password: 'egypt'
+
   },
   {
     id: 'u6',
@@ -475,7 +475,7 @@ export const initialAppUsers: AppUser[] = [
     status: 'نشط',
     allowedViews: ['logistic', 'tasks', 'documents'],
     color: 'bg-sky-500',
-    password: 'logistic'
+
   },
   {
     id: 'u7',
@@ -487,7 +487,7 @@ export const initialAppUsers: AppUser[] = [
     status: 'نشط',
     allowedViews: ['projects', 'tasks', 'documents'],
     color: 'bg-indigo-500',
-    password: 'steel'
+
   },
   {
     id: 'u8',
@@ -499,6 +499,6 @@ export const initialAppUsers: AppUser[] = [
     status: 'نشط',
     allowedViews: ['meeting-requests', 'messages', 'tasks', 'projects'],
     color: 'bg-teal-500',
-    password: 'board'
+
   }
 ];

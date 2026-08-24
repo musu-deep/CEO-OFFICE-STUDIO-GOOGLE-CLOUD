@@ -90,47 +90,45 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
 
   const t = themeTokens[theme] || themeTokens.vision_2030;
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!email) {
-      setError('يرجى كتابة البريد الإلكتروني الرسمي');
+    if (!email || !password) {
+      setError('يرجى إدخال البريد الإلكتروني وكلمة المرور');
       return;
     }
 
-    const matchedUser = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-
-    if (!matchedUser) {
-      setError('البريد الإلكتروني غير مسجل في مكتب الرئيس التنفيذي');
+    const matchedUser = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
+    if (!matchedUser || matchedUser.status === 'محجوب') {
+      setError('تعذر تسجيل الدخول. يرجى مراجعة مدير النظام.');
       return;
     }
 
-    if (matchedUser.status === 'محجوب') {
-      setError('عذراً، هذا الحساب محجوب مؤقتاً بأمر سيادي من الإدارة العليا للجودة والامتثال.');
-      return;
-    }
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      });
+      const result = await response.json().catch(() => ({}));
 
-    if (!password) {
-      setError('يرجى إدخال كلمة المرور الخاصة بهذا الحساب');
-      return;
-    }
+      if (!response.ok || result.email !== matchedUser.email.toLowerCase() || result.role !== matchedUser.role) {
+        setError(response.status === 429
+          ? 'تم إيقاف المحاولات مؤقتاً. حاول لاحقاً.'
+          : 'بيانات الدخول غير صحيحة أو أن الصلاحية غير متطابقة.');
+        return;
+      }
 
-    const expectedPassword = matchedUser.password || '123456';
-    if (password !== expectedPassword) {
-      setError('عذراً، كلمة المرور المدخلة غير صحيحة. يرجى مراجعة الإدارة أو استخدام التصفح التجريبي السريع.');
-      return;
+      onLoginSuccess({ ...matchedUser, password: undefined });
+    } catch {
+      setError('تعذر الاتصال بخدمة المصادقة. حاول مرة أخرى.');
     }
-
-    onLoginSuccess(matchedUser);
   };
 
-  const handleQuickLogin = (user: AppUser) => {
-    if (user.status === 'محجوب') {
-      alert('عذراً، هذا الحساب تم حجبه/تعليقه من قبل المشرف العام أو الرئيس التنفيذي ولا يمكن الولوج منه حالياً.');
-      return;
-    }
-    onLoginSuccess(user);
+  const handleQuickLogin = (_user: AppUser) => {
+    setError('تم تعطيل الدخول التجريبي في النسخة التشغيلية حفاظاً على أمن المنصة.');
   };
 
   const getPredefinedUsersForTab = () => {

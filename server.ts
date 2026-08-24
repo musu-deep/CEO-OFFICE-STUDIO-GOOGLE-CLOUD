@@ -3,6 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 import { createNamaRouter } from './src/server/namaRoutes';
 
 dotenv.config();
@@ -11,13 +12,103 @@ async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT || 3000);
 
-  app.use(express.json({ limit: '2mb' }));
+  app.disable('x-powered-by');
+  app.use((_req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
+    res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://generativelanguage.googleapis.com https://api.openai.com");
+    next();
+  });
+  app.use(express.json({ limit: '512kb' }));
+
+  const sessionSecret = process.env.SESSION_SECRET || '';
+  const authUsers = (() => {
+    try {
+      return JSON.parse(process.env.ARAAK_AUTH_USERS || '{}') as Record<string, { password: string; role: string }>;
+    } catch {
+      console.error('ARAAK_AUTH_USERS must be valid JSON.');
+      return {};
+    }
+  })();
+
+  const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+  const safeEqual = (left: string, right: string) => {
+    const a = Buffer.from(left);
+    const b = Buffer.from(right);
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  };
+  const signSession = (payload: string) =>
+    crypto.createHmac('sha256', sessionSecret).update(payload).digest('base64url');
+  const readSession = (req: Request) => {
+    if (!sessionSecret) return null;
+    const raw = (req.headers.cookie || '').split(';').map(v => v.trim()).find(v => v.startsWith('araak_session='));
+    if (!raw) return null;
+    const [payload, signature] = decodeURIComponent(raw.slice('araak_session='.length)).split('.');
+    if (!payload || !signature || !safeEqual(signSession(payload), signature)) return null;
+    try {
+      const session = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+      return session.exp > Date.now() ? session : null;
+    } catch {
+      return null;
+    }
+  };
+  const requireAuth = (req: Request, res: Response, next: () => void) => {
+    const session = readSession(req);
+    if (!session) return res.status(401).json({ error: 'Authentication required' });
+    (req as Request & { auth?: unknown }).auth = session;
+    next();
+  };
+
+  app.get('/health', (_req, res) => res.status(200).json({ status: 'ok', service: 'araak-ceo-office' }));
+  app.get('/ready', (_req, res) => {
+    const ready = Boolean(sessionSecret && Object.keys(authUsers).length);
+    res.status(ready ? 200 : 503).json({ status: ready ? 'ready' : 'configuration_required' });
+  });
+
+  app.post('/api/auth/login', (req, res) => {
+    const key = req.ip || 'unknown';
+    const now = Date.now();
+    const current = loginAttempts.get(key);
+    const attempt = !current || current.resetAt < now ? { count: 0, resetAt: now + 15 * 60_000 } : current;
+    if (attempt.count >= 10) return res.status(429).json({ error: 'Too many login attempts' });
+
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    const password = String(req.body?.password || '');
+    const account = authUsers[email];
+    if (!sessionSecret || !account || !password || !safeEqual(password, account.password)) {
+      attempt.count += 1;
+      loginAttempts.set(key, attempt);
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    loginAttempts.delete(key);
+    const payload = Buffer.from(JSON.stringify({
+      email,
+      role: account.role,
+      exp: Date.now() + 8 * 60 * 60_000,
+    })).toString('base64url');
+    const token = encodeURIComponent(`${payload}.${signSession(payload)}`);
+    res.setHeader('Set-Cookie', `araak_session=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=28800`);
+    return res.json({ ok: true, email, role: account.role });
+  });
+
+  app.get('/api/auth/me', (req, res) => {
+    const session = readSession(req);
+    return session ? res.json({ authenticated: true, user: session }) : res.status(401).json({ authenticated: false });
+  });
+
+  app.post('/api/auth/logout', (_req, res) => {
+    res.setHeader('Set-Cookie', 'araak_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0');
+    res.status(204).end();
+  });
 
   // ARAAK NAMA AI: supervised content and academy operations.
-  app.use('/api/nama', createNamaRouter());
+  app.use('/api/nama', requireAuth, createNamaRouter());
 
   // API Route for AI Executive Advisor (Chief of Staff AI / Legal AI / Strategic AI)
-  app.post('/api/advisor', async (req: Request, res: Response) => {
+  app.post('/api/advisor', requireAuth, async (req: Request, res: Response) => {
     const { message, history, agentType, platformData } = req.body;
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -112,7 +203,7 @@ async function startServer() {
       });
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
         contents: contents,
         config: {
           systemInstruction: systemInstruction,
@@ -128,7 +219,7 @@ async function startServer() {
   });
 
   // Unified General Gemini Chat API
-  app.post('/api/gemini/chat', async (req: Request, res: Response) => {
+  app.post('/api/gemini/chat', requireAuth, async (req: Request, res: Response) => {
     const { message } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
@@ -180,7 +271,7 @@ async function startServer() {
   });
 
   // API Route for Voice Command Transcriber & Processor (Whisper + Gemini simulated)
-  app.post('/api/voice-transcribe', async (req: Request, res: Response) => {
+  app.post('/api/voice-transcribe', requireAuth, async (req: Request, res: Response) => {
     const { simulatedAudioDuration } = req.body;
     void simulatedAudioDuration;
     
