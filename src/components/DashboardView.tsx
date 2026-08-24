@@ -6,16 +6,17 @@ import {
   Activity, 
   DollarSign 
 } from 'lucide-react';
-import { Project, Task, PlatformTheme } from '../types';
+import { Project, Task, PlatformTheme, AppUser } from '../types';
 
 interface DashboardViewProps {
   projects: Project[];
   tasks: Task[];
   theme: PlatformTheme;
   onNavigate: (tab: string) => void;
+  currentUser: AppUser;
 }
 
-export default function DashboardView({ projects, tasks, theme, onNavigate }: DashboardViewProps) {
+export default function DashboardView({ projects, tasks, theme, onNavigate, currentUser }: DashboardViewProps) {
   
   // Calculations
   const totalProjects = projects.length;
@@ -57,12 +58,12 @@ export default function DashboardView({ projects, tasks, theme, onNavigate }: Da
           لوحة المتابعة التنفيذية
         </span>
         <h2 className="text-3xl font-extrabold text-white tracking-tight">
-          أهلاً، د. علي العتيبي
+          أهلاً، {currentUser.name}
         </h2>
         <div className="flex items-center gap-2 text-slate-400 text-xs mt-1">
           <span>نظرة شاملة لأداء المجموعة في الوقت الحقيقي</span>
           <span className="text-slate-600">•</span>
-          <span className="font-sans">الأربعاء، ٢٤ يونيو ٢٠٢٦</span>
+          <span className="font-sans">{new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
         </div>
       </div>
 
