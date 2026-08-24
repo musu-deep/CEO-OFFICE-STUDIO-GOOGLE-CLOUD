@@ -366,6 +366,10 @@ export default function App() {
     return `${hours}:${minutes}:${seconds}`;
   };
 
+  // The executive portrait belongs exclusively to the CEO account.
+  // Other users render a safe initials fallback until their own photo is configured.
+  const currentUserPhoto = safeCurrentUser.role === 'ceo' ? '/user-avatar.png' : null;
+
   const userProfileDetails = [
     { label: 'الإدارة', value: 'مكتب الرئيس التنفيذي', icon: Building2 },
     { label: 'المنصب', value: safeCurrentUser.title || 'الرئيس التنفيذي', icon: Crown },
@@ -768,16 +772,19 @@ export default function App() {
                   <span className="text-sm font-black text-white block">{currentUser.name}</span>
                   <span className="text-[11px] text-slate-500 block">{currentUser.email}</span>
                 </div>
-<div className="w-12 h-12 rounded-full overflow-hidden border border-white/15 shadow-lg">
-    <img
-        src="/user-avatar.png"
-        alt={currentUser.name}
-        className="w-full h-full object-cover"
-    />
-  <span className="text-white font-black text-sm">
-    {currentUser.name?.charAt(0) || 'ع'}
-  </span>
-</div>
+<div className={`w-12 h-12 rounded-full overflow-hidden border border-white/15 shadow-lg flex items-center justify-center ${currentUser.color || 'bg-slate-700'}`}>
+                  {currentUserPhoto ? (
+                    <img
+                      src={currentUserPhoto}
+                      alt={currentUser.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-white font-black text-sm" aria-label={`الصورة الافتراضية لـ ${currentUser.name}`}>
+                      {currentUser.avatar || currentUser.name?.trim().charAt(0) || 'ع'}
+                    </span>
+                  )}
+                </div>
               </button>
  
               {showProfileDropdown && (
@@ -838,12 +845,23 @@ export default function App() {
                 <div className="relative grid grid-cols-1 lg:grid-cols-[230px_1fr] gap-6 items-stretch">
                   <div className="relative rounded-[1.7rem] border border-white/15 bg-black/35 p-3 shadow-2xl shadow-black/30">
                     <div className={`absolute inset-0 rounded-[1.7rem] border ${currentTheme.strongBorder} opacity-60`} />
-                    <img
-                      src="/user-avatar.png"
-                      alt={currentUser.name}
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      className="relative h-[300px] w-full rounded-[1.35rem] object-cover object-center border border-white/10 shadow-xl"
-                    />
+                    {currentUserPhoto ? (
+                      <img
+                        src={currentUserPhoto}
+                        alt={currentUser.name}
+                        className="relative h-[300px] w-full rounded-[1.35rem] object-cover object-center border border-white/10 shadow-xl"
+                      />
+                    ) : (
+                      <div
+                        className={`relative h-[300px] w-full rounded-[1.35rem] border border-white/10 shadow-xl flex items-center justify-center ${currentUser.color || 'bg-slate-700'}`}
+                        role="img"
+                        aria-label={`الصورة الافتراضية لـ ${currentUser.name}`}
+                      >
+                        <span className="text-8xl font-black text-white/90">
+                          {currentUser.avatar || currentUser.name?.trim().charAt(0) || 'ع'}
+                        </span>
+                      </div>
+                    )}
                     <div className={`absolute bottom-6 right-6 left-6 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 backdrop-blur-xl p-3`}>
                       <div className="flex items-center justify-between gap-3">
                         <div>
