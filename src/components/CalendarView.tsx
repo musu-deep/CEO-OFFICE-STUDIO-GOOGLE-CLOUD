@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, ChevronRight, ChevronLeft, Plus, X, Video } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronRight, ChevronLeft, Plus, X, Video, Clock, Bell, MapPin, Users, FileText, Flag } from 'lucide-react';
 import { PlatformTheme } from '../types';
 
 interface CalendarViewProps {
@@ -10,6 +10,13 @@ interface CalendarEvent {
   day: number;
   title: string;
   time: string;
+  endTime?: string;
+  type?: string;
+  priority?: string;
+  location?: string;
+  attendees?: string;
+  notes?: string;
+  reminder?: string;
 }
 
 export default function CalendarView({ theme }: CalendarViewProps) {
@@ -19,6 +26,13 @@ export default function CalendarView({ theme }: CalendarViewProps) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [newEventTitle, setNewEventTitle] = useState('');
   const [newEventTime, setNewEventTime] = useState('10:00');
+  const [newEventEndTime, setNewEventEndTime] = useState('11:00');
+  const [newEventType, setNewEventType] = useState('اجتماع تنفيذي');
+  const [newEventPriority, setNewEventPriority] = useState('عادي');
+  const [newEventLocation, setNewEventLocation] = useState('');
+  const [newEventAttendees, setNewEventAttendees] = useState('');
+  const [newEventNotes, setNewEventNotes] = useState('');
+  const [newEventReminder, setNewEventReminder] = useState('30 دقيقة قبل الموعد');
 
   // Days headings in Arabic exactly matching Page 3
   const weekDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
@@ -45,9 +59,16 @@ export default function CalendarView({ theme }: CalendarViewProps) {
   const handleAddEvent = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedDay !== null && newEventTitle) {
-      setEvents([...events, { day: selectedDay, title: newEventTitle, time: newEventTime }]);
+      setEvents([...events, {
+        day: selectedDay, title: newEventTitle, time: newEventTime, endTime: newEventEndTime,
+        type: newEventType, priority: newEventPriority, location: newEventLocation,
+        attendees: newEventAttendees, notes: newEventNotes, reminder: newEventReminder
+      }]);
       setShowEventModal(false);
       setNewEventTitle('');
+      setNewEventNotes('');
+      setNewEventLocation('');
+      setNewEventAttendees('');
     }
   };
 
@@ -217,67 +238,71 @@ export default function CalendarView({ theme }: CalendarViewProps) {
 
       </div>
 
-      {/* Event Insertion Modal */}
+      {/* Professional executive event modal */}
       {showEventModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0f111a] border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl animate-[scaleIn_0.3s_ease_out]">
-            
-            <div className="flex justify-between items-center bg-[#121522] px-6 py-4 border-b border-slate-800">
-              <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4 text-emerald-600" />
-                <span>إضافة حدث لليوم {selectedDay}</span>
-              </h3>
-              <button 
-                onClick={() => setShowEventModal(false)}
-                className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0f111a] border border-slate-700/80 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl animate-[scaleIn_0.3s_ease_out]">
+            <div className="flex justify-between items-center bg-[#121522] px-7 py-5 border-b border-slate-800">
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-100 flex items-center gap-2">
+                  <CalendarIcon className="w-5 h-5 text-emerald-500" />
+                  <span>إضافة موعد تنفيذي</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">اليوم {selectedDay} {monthNames[currentMonth]} {currentYear} • سجل تفاصيل الموعد والتنبيه والمتابعة</p>
+              </div>
+              <button onClick={() => setShowEventModal(false)} className="p-2 hover:bg-slate-800 rounded-xl text-slate-300"><X className="w-5 h-5" /></button>
             </div>
 
-            <form onSubmit={handleAddEvent} className="p-6 space-y-4">
-              
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-300 block">عنوان الفعالية / الاجتماع</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="مثال: مراجعة خطة موازنة الحديد والصلب" 
-                  value={newEventTitle}
-                  onChange={(e) => setNewEventTitle(e.target.value)}
-                  className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
-                />
+            <form onSubmit={handleAddEvent} className="p-7 space-y-5 max-h-[78vh] overflow-y-auto">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-200 flex items-center gap-2"><FileText className="w-4 h-4 text-emerald-500"/>عنوان الموعد / الموضوع</label>
+                <input type="text" required placeholder="مثال: اجتماع مراجعة الخطة التشغيلية للربع الثالث" value={newEventTitle} onChange={(e) => setNewEventTitle(e.target.value)}
+                  className="w-full bg-[#16182c] border border-slate-700 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none" />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-300 block">التوقيت</label>
-                <input 
-                  type="time" 
-                  required
-                  value={newEventTime}
-                  onChange={(e) => setNewEventTime(e.target.value)}
-                  className="w-full bg-[#16182c] border border-slate-800 focus:border-emerald-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none font-sans"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-200">نوع الموعد</label>
+                  <select value={newEventType} onChange={e=>setNewEventType(e.target.value)} className="w-full bg-[#16182c] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100">
+                    {['اجتماع تنفيذي','اجتماع مجلس','مراجعة واعتماد','موعد خارجي','مهمة/استحقاق','متابعة مشروع','موعد قانوني','أخرى'].map(x=><option key={x}>{x}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-200 flex items-center gap-2"><Flag className="w-4 h-4 text-amber-500"/>الأولوية</label>
+                  <select value={newEventPriority} onChange={e=>setNewEventPriority(e.target.value)} className="w-full bg-[#16182c] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100">
+                    {['عادي','مهم','عاجل','حرج'].map(x=><option key={x}>{x}</option>)}
+                  </select>
+                </div>
               </div>
 
-              <div className="flex gap-3 mt-6 justify-end">
-                <button 
-                  type="button"
-                  onClick={() => setShowEventModal(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold cursor-pointer transition-colors text-slate-300"
-                >
-                  إلغاء
-                </button>
-                <button 
-                  type="submit"
-                  className={`px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-colors ${getThemeBtnClass()}`}
-                >
-                  حفظ الحدث بالتقويم
-                </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2"><label className="text-sm font-bold text-slate-200 flex items-center gap-2"><Clock className="w-4 h-4 text-emerald-500"/>وقت البداية</label>
+                  <input type="time" required value={newEventTime} onChange={e=>setNewEventTime(e.target.value)} className="w-full bg-[#16182c] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 font-sans" /></div>
+                <div className="space-y-2"><label className="text-sm font-bold text-slate-200">وقت الانتهاء</label>
+                  <input type="time" value={newEventEndTime} onChange={e=>setNewEventEndTime(e.target.value)} className="w-full bg-[#16182c] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 font-sans" /></div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2"><label className="text-sm font-bold text-slate-200 flex items-center gap-2"><MapPin className="w-4 h-4 text-emerald-500"/>المكان / رابط الاجتماع</label>
+                  <input value={newEventLocation} onChange={e=>setNewEventLocation(e.target.value)} placeholder="مكتب الرئيس التنفيذي أو رابط الاجتماع" className="w-full bg-[#16182c] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500" /></div>
+                <div className="space-y-2"><label className="text-sm font-bold text-slate-200 flex items-center gap-2"><Users className="w-4 h-4 text-emerald-500"/>الحضور / الأطراف</label>
+                  <input value={newEventAttendees} onChange={e=>setNewEventAttendees(e.target.value)} placeholder="الأسماء أو الإدارات المعنية" className="w-full bg-[#16182c] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500" /></div>
+              </div>
+
+              <div className="space-y-2"><label className="text-sm font-bold text-slate-200">الموضوع والملاحظات التنفيذية</label>
+                <textarea rows={4} value={newEventNotes} onChange={e=>setNewEventNotes(e.target.value)} placeholder="الهدف من الموعد، محاور النقاش، القرارات المطلوبة، الملفات أو الروابط ذات العلاقة..." className="w-full bg-[#16182c] border border-slate-700 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm leading-6 text-slate-100 placeholder:text-slate-500 resize-none focus:outline-none" /></div>
+
+              <div className="space-y-2"><label className="text-sm font-bold text-slate-200 flex items-center gap-2"><Bell className="w-4 h-4 text-emerald-500"/>التنبيه</label>
+                <select value={newEventReminder} onChange={e=>setNewEventReminder(e.target.value)} className="w-full bg-[#16182c] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100">
+                  {['بدون تنبيه','15 دقيقة قبل الموعد','30 دقيقة قبل الموعد','ساعة قبل الموعد','يوم قبل الموعد','يومان قبل الموعد'].map(x=><option key={x}>{x}</option>)}
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-2 justify-end border-t border-slate-800">
+                <button type="button" onClick={() => setShowEventModal(false)} className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold text-slate-200">إلغاء</button>
+                <button type="submit" className={`px-6 py-3 rounded-xl text-sm font-bold shadow-lg ${getThemeBtnClass()}`}>حفظ الموعد التنفيذي</button>
+              </div>
             </form>
-
           </div>
         </div>
       )}
