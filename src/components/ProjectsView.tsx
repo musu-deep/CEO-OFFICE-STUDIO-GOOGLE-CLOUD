@@ -32,7 +32,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
   const [newManager, setNewManager] = useState('');
   const [newPriority, setNewPriority] = useState<'عالية' | 'متوسطة' | 'منخفضة' | 'حرج'>('عالية');
 
-  const sectors = ['الكل', 'الاستثمار', 'قطاع التنمية', 'أراك لوجستيك', 'الحديد والصناعة', 'أراك التنمية (مصر)'];
+  const sectors = ['الكل', 'الاستثمار', 'قطاع التنمية', 'أراك لوجستيك', 'الحديد والصناعة', 'أراك التنمية - التدريب والمحتوى'];
 
   const filteredProjects = projects.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -280,7 +280,7 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
                     <option value="التنمية العامة">التنمية العامة</option>
                     <option value="أراك لوجستيك">أراك لوجستيك</option>
                     <option value="الحديد والصناعة">الحديد والصناعة</option>
-                    <option value="أراك التنمية (مصر)">أراك التنمية (مصر)</option>
+                    <option value="أراك التنمية - التدريب والمحتوى">أراك التنمية - التدريب والمحتوى</option>
                   </select>
                 </div>
 
