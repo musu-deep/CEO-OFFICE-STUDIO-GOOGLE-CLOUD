@@ -10,7 +10,13 @@ import {
   Brain, 
   X,
   FileDigit,
-  Eye
+  Eye,
+  Inbox,
+  BellRing,
+  Handshake,
+  ClipboardCheck,
+  History,
+  UserCheck
 } from 'lucide-react';
 import { PlatformTheme } from '../types';
 
@@ -127,6 +133,16 @@ export default function LegalView({ theme }: LegalViewProps) {
     }
   };
 
+  const legalWorkflow = [
+    { icon: Inbox, title: 'استقبال وتصنيف', desc: 'الجهة الطالبة، الأولوية، المسؤول والموعد المستهدف' },
+    { icon: ShieldCheck, title: 'مراجعة وقائية', desc: 'السياسات والإجراءات وسجل المخاطر قبل نشوء النزاع' },
+    { icon: FileText, title: 'تقييم قانوني', desc: 'الوقائع والمستندات والالتزامات والخيارات والتوصية' },
+    { icon: Handshake, title: 'العقود والأطراف', desc: 'ربط الأطراف والالتزامات والمراسلات والنسخ المعتمدة' },
+    { icon: BellRing, title: 'المواعيد والتنبيهات', desc: 'الاستحقاقات والجلسات والتجديدات والتصعيد' },
+    { icon: Scale, title: 'التحصيل والتنفيذ', desc: 'التفاهم والمطالبة والإجراء القانوني ومتابعة التنفيذ' },
+    { icon: ClipboardCheck, title: 'الإغلاق والتعلّم', desc: 'النتيجة والأثر المالي والدرس والإجراء الوقائي' },
+  ];
+
   const filtered = items.filter(it => {
     if (activeTab === 'الكل') return true;
     return it.type === activeTab;
@@ -145,7 +161,7 @@ export default function LegalView({ theme }: LegalViewProps) {
             الشؤون القانونية والمحاضر (Legal Desk)
           </h2>
           <span className="text-xs text-slate-400">
-            أرشفة ذكية لعقود الشركاء، النزاعات الجارية، قضايا التنمية، ومراجعة ذكية بالذكاء الاصطناعي
+            إدارة دورة العمل القانونية من الوقاية ومراجعة العقود والسياسات إلى القضايا والتحصيل والتنفيذ والإغلاق والتعلّم المؤسسي
           </span>
         </div>
 
@@ -177,10 +193,63 @@ export default function LegalView({ theme }: LegalViewProps) {
           </span>
         </div>
         <div className="bg-[#121422] p-5 rounded-2xl border border-slate-800/80">
-          <span className="text-xs text-slate-400 block mb-1">وثائق وتراخيص فدرالية</span>
+          <span className="text-xs text-slate-400 block mb-1">التراخيص والوثائق</span>
           <span className="text-3xl font-extrabold text-emerald-500 font-sans">
             {items.filter(i => i.type === 'ترخيص').length}
           </span>
+        </div>
+      </div>
+
+      {/* Executive legal workflow — adapted from Mohami Araak */}
+      <div className="space-y-4">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <span className={`text-xs font-bold ${getThemeTextClass()}`}>دورة الملف القانوني</span>
+            <h3 className="mt-1 text-xl font-extrabold text-white">من ورود الطلب حتى الإغلاق والتعلّم المؤسسي</h3>
+          </div>
+          <span className="hidden md:block text-xs text-slate-500">لا ملف بلا مسؤول • موعد • حالة • أثر قابل للتتبع</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-7 gap-3">
+          {legalWorkflow.map((stage, index) => (
+            <div key={stage.title} className="bg-[#121422] border border-slate-800/80 rounded-2xl p-4 hover:border-amber-500/30 transition-colors">
+              <div className="flex items-center justify-between">
+                <stage.icon className="w-4 h-4 text-amber-400" />
+                <span className="text-[10px] font-black text-slate-600">{index + 1}/7</span>
+              </div>
+              <div className="mt-3 text-xs font-black text-slate-100">{stage.title}</div>
+              <p className="mt-1 text-[10px] leading-relaxed text-slate-500">{stage.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Governance and review pipeline */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className="bg-[#121422] border border-slate-800/80 rounded-2xl p-6">
+          <h3 className="text-sm font-black text-slate-100 flex items-center gap-2">
+            <History className="w-4 h-4 text-amber-400" />
+            <span>مسار المراجعة والاعتماد</span>
+          </h3>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {['إعداد', 'تدقيق', 'مراجعة', 'اعتماد', 'حفظ ومتابعة'].map((step, i) => (
+              <span key={step} className="px-3 py-2 rounded-xl border border-slate-800 bg-[#16182c] text-[11px] font-bold text-slate-300">
+                {i + 1}. {step}
+              </span>
+            ))}
+          </div>
+          <p className="mt-4 text-xs leading-relaxed text-slate-500">لا يتحول المستند إلى نسخة نهائية ولا يبدأ إجراء خارجي قبل اكتمال المراجعة والاعتماد بحسب الصلاحيات.</p>
+        </div>
+        <div className="bg-[#121422] border border-slate-800/80 rounded-2xl p-6">
+          <h3 className="text-sm font-black text-slate-100 flex items-center gap-2">
+            <UserCheck className="w-4 h-4 text-emerald-400" />
+            <span>الحوكمة والسرية القانونية</span>
+          </h3>
+          <div className="mt-4 grid grid-cols-2 gap-2 text-[11px]">
+            {['الحاجة إلى المعرفة', 'أقل قدر لازم من الصلاحيات', 'فصل الإعداد والمراجعة والاعتماد', 'سجل قرارات وإصدارات قابل للتتبع'].map(point => (
+              <div key={point} className="rounded-xl bg-[#16182c] border border-slate-800 p-3 text-slate-300">{point}</div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs leading-relaxed text-slate-500">مخرجات الذكاء الاصطناعي مساعدة ولا تُعد رأياً قانونياً نهائياً؛ الاعتماد والمسؤولية المهنية لدى المختص وصاحب الصلاحية.</p>
         </div>
       </div>
 
@@ -331,7 +400,7 @@ export default function LegalView({ theme }: LegalViewProps) {
                   >
                     <option value="عقد">عقد أو اتفاقية شراكة</option>
                     <option value="قضية">ملف نزاع أو قضية جارية</option>
-                    <option value="ترخيص">ترخيص ملاحي أو عام فدرالي</option>
+                    <option value="ترخيص">ترخيص أو وثيقة نظامية</option>
                   </select>
                 </div>
 
@@ -363,7 +432,7 @@ export default function LegalView({ theme }: LegalViewProps) {
                 <label className="text-xs font-bold text-slate-300 block">الطرف الآخر</label>
                 <input 
                   type="text" 
-                  placeholder="مثال: شركة المقاولين العرب بمصر" 
+                  placeholder="مثال: شركة أو جهة متعاقدة" 
                   value={newParty}
                   onChange={(e) => setNewParty(e.target.value)}
                   className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
