@@ -14,11 +14,11 @@ import {
 } from 'lucide-react';
 import { PlatformTheme } from '../types';
 
-interface ArakEgyptViewProps {
+interface ArakTrainingViewProps {
   theme: PlatformTheme;
 }
 
-interface EgyptProject {
+interface TrainingProgram {
   id: string;
   name: string;
   location: string;
@@ -26,18 +26,18 @@ interface EgyptProject {
   spent: string;
   progress: number;
   teamCount: number;
-  status: 'قيد التنفيذ' | 'معلق للترخيص' | 'مكتمل';
+  status: 'قيد التنفيذ' | 'قيد المراجعة' | 'مكتمل';
   issuesCount: number;
 }
 
-export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
-  const [projects, setProjects] = useState<EgyptProject[]>([
+export default function ArakTrainingView({ theme }: ArakTrainingViewProps) {
+  const [projects, setProjects] = useState<TrainingProgram[]>([
     {
       id: 'eg-p1',
-      name: 'مشروع الشراكة مع مجمع طلاب المنح بالجامعات ',
-      location: 'القاهرة، مصر',
-      budget: '25,000,000 جنيه',
-      spent: '19,500,000 جنيه',
+      name: 'برنامج تطوير الحقائب التدريبية المؤسسية',
+      location: 'تنفيذ رقمي وعن بُعد',
+      budget: 'حسب نطاق الخدمة',
+      spent: 'حسب نطاق الخدمة',
       progress: 78,
       teamCount: 42,
       status: 'قيد التنفيذ',
@@ -45,10 +45,10 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
     },
     {
       id: 'eg-p2',
-      name: 'حاضنة الأعمال والابتكار ',
-      location: 'القاهرة الكبرى، مصر',
-      budget: '12,000,000 جنيه',
-      spent: '10,200,000 جنيه',
+      name: 'خدمة كتابة وإعداد المحتوى التدريبي',
+      location: 'تنفيذ رقمي وعن بُعد',
+      budget: 'حسب نطاق الخدمة',
+      spent: 'حسب نطاق الخدمة',
       progress: 85,
       teamCount: 18,
       status: 'قيد التنفيذ',
@@ -56,13 +56,13 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
     },
     {
       id: 'eg-p3',
-      name: 'ترخيص وتجهيز مقر أراك الإداري والاستثماري الجديد بالقاهرة',
-      location: 'مدينة نصر، القاهرة، مصر',
-      budget: '8,000,000 جنيه',
-      spent: '5,300,000 جنيه',
+      name: 'برنامج تصميم الأدلة والمدربين ومواد التعلم',
+      location: 'تنفيذ رقمي وعن بُعد',
+      budget: 'حسب نطاق الخدمة',
+      spent: 'حسب نطاق الخدمة',
       progress: 65,
       teamCount: 9,
-      status: 'معلق للترخيص',
+      status: 'قيد المراجعة',
       issuesCount: 0
     }
   ]);
@@ -71,15 +71,15 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
 
   // Form states
   const [newName, setNewName] = useState('');
-  const [newLocation, setNewLocation] = useState('القاهرة الكبرى، مصر');
-  const [newBudget, setNewBudget] = useState('10,000,000 جنيه');
+  const [newLocation, setNewLocation] = useState('تنفيذ رقمي وعن بُعد');
+  const [newBudget, setNewBudget] = useState('حسب نطاق الخدمة');
   const [newProgress, setNewProgress] = useState(10);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName) return;
 
-    const newProj: EgyptProject = {
+    const newProj: TrainingProgram = {
       id: `eg-p-${Date.now()}`,
       name: newName,
       location: newLocation,
@@ -130,13 +130,13 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/60 pb-5">
         <div className="flex flex-col gap-1.5">
           <span className={`text-xs font-bold uppercase tracking-wider ${getThemeTextClass()}`}>
-            قطاعات الاستثمار الخارجية
+            أراك التنمية
           </span>
           <h2 className="text-3xl font-extrabold text-white">
-            فرع اراك التنمية بجمهورية مصر العربية
+            برامج أراك التنمية للتدريب والمحتوى
           </h2>
           <span className="text-xs text-slate-400">
-            متابعة المشروعات القائمة، وتتبع ميزانية مصر الـ 45M جنيه، ورصد مستجدات مشروعات المجموعة
+            إدارة برامج التدريب وخدمات كتابة وإعداد وتطوير المحتوى والحقائب التدريبية
           </span>
         </div>
 
@@ -145,26 +145,26 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all duration-300 shadow-lg ${getThemeBtnClass()}`}
         >
           <Plus className="w-4 h-4" />
-          <span>إدراج مشروع بمصر</span>
+          <span>إضافة برنامج تدريبي</span>
         </button>
       </div>
 
       {/* Grid counters exactly like Page 12 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-[#121422] p-5 rounded-2xl border border-slate-800/80">
-          <span className="text-xs text-slate-400 block mb-1">المشاريع القائمة بمصر</span>
+          <span className="text-xs text-slate-400 block mb-1">البرامج والخدمات النشطة</span>
           <span className="text-3xl font-extrabold text-slate-100 font-sans">{projects.length}</span>
         </div>
         <div className="bg-[#121422] p-5 rounded-2xl border border-slate-800/80">
-          <span className="text-xs text-slate-400 block mb-1">الميزانية الإجمالية (مصر)</span>
-          <span className="text-3xl font-extrabold text-amber-500 font-sans">45M</span>
+          <span className="text-xs text-slate-400 block mb-1">الحقائب قيد التطوير</span>
+          <span className="text-3xl font-extrabold text-amber-500 font-sans">12</span>
         </div>
         <div className="bg-[#121422] p-5 rounded-2xl border border-slate-800/80">
-          <span className="text-xs text-slate-400 block mb-1">متوسط إنجاز مشاريع مصر</span>
+          <span className="text-xs text-slate-400 block mb-1">متوسط إنجاز البرامج</span>
           <span className="text-3xl font-extrabold text-emerald-500 font-sans">78.5%</span>
         </div>
         <div className="bg-[#121422] p-5 rounded-2xl border border-slate-800/80">
-          <span className="text-xs text-slate-400 block mb-1">تباينات ومنازعات نشطة</span>
+          <span className="text-xs text-slate-400 block mb-1">مراجعات جودة مفتوحة</span>
           <span className="text-3xl font-extrabold text-rose-500 font-sans">1</span>
         </div>
       </div>
@@ -175,24 +175,24 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
         <div className="space-y-1.5 pr-4">
           <div className="flex items-center gap-2">
             <span className="text-xs font-black bg-rose-950 text-rose-400 px-2 py-0.5 rounded border border-rose-900/40">
-              ملف نزاع نشط
+              مراجعة جودة
             </span>
             <span className="text-xs text-slate-500 font-sans">آخر تحديث: منذ يومين</span>
           </div>
-          <h3 className="text-base font-extrabold text-slate-100">مستجدات عقد تنفيذ مشروع التدريب</h3>
+          <h3 className="text-base font-extrabold text-slate-100">مستجدات تطوير المحتوى التدريبي</h3>
           <p className="text-xs text-slate-400 leading-relaxed max-w-4xl">
-            يواجه المشروع تأخيراً طفيفاً وتباينات مالية بقيمة 120,000 جنيه في فواتير مقاولي البنية التحتية. يوصى المستشار القانوني بتوقيع تسوية ودية  لتفادي تجميد العقد.
+            تخضع الحقيبة التدريبية لمراجعة المحتوى والأهداف والأنشطة وأدوات القياس قبل اعتماد النسخة النهائية وتسليمها للجهة المستفيدة.
           </p>
         </div>
         <button 
-          onClick={() => alert('تم تكليف الشؤون القانونية والمستشار في مكتب مصر برفع مسودة تسوية عاجلة.')}
+          onClick={() => alert('تم تكليف فريق الجودة بمراجعة النسخة التدريبية ورفع توصيات الاعتماد.')}
           className="px-4 py-2 bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 border border-rose-900/30 text-xs font-bold rounded-xl cursor-pointer transition-colors whitespace-nowrap"
         >
-          تكليف تسوية قانونية
+          تكليف مراجعة الجودة
         </button>
       </div>
 
-      {/* Egypt Projects Grid Cards */}
+      {/* Training Projects Grid Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {projects.map((p) => {
           const isWarning = p.issuesCount > 0;
@@ -244,7 +244,7 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
               <div className="border-t border-slate-800/60 pt-3 mt-4 flex items-center justify-between text-[11px] text-slate-500">
                 <div className="flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5" />
-                  <span>{p.teamCount} فريق بالمشروع</span>
+                  <span>{p.teamCount} عضو بفريق المحتوى</span>
                 </div>
 
                 {isWarning && (
@@ -268,7 +268,7 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
             <div className="flex justify-between items-center bg-[#121522] px-6 py-4 border-b border-slate-800">
               <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-amber-500" />
-                <span>إدراج مشروع جديد بمكتب مصر</span>
+                <span>إضافة برنامج تدريب أو محتوى</span>
               </h3>
               <button 
                 onClick={() => setShowModal(false)}
@@ -281,11 +281,11 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
             <form onSubmit={handleCreate} className="p-6 space-y-4">
               
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-300 block">اسم المشروع التنموي</label>
+                <label className="text-xs font-bold text-slate-300 block">اسم البرنامج أو خدمة المحتوى</label>
                 <input 
                   type="text" 
                   required
-                  placeholder="مثال: مجمع التنمية المستدامة الثاني" 
+                  placeholder="مثال: حقيبة القيادة التنفيذية" 
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
@@ -294,7 +294,7 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-300 block">الموقع المخطط بمصر</label>
+                  <label className="text-xs font-bold text-slate-300 block">نمط التنفيذ</label>
                   <input 
                     type="text" 
                     value={newLocation}
@@ -304,7 +304,7 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-300 block">الميزانية التقديرية بالجنيه</label>
+                  <label className="text-xs font-bold text-slate-300 block">نطاق الخدمة</label>
                   <input 
                     type="text" 
                     value={newBudget}
@@ -336,7 +336,7 @@ export default function ArakEgyptView({ theme }: ArakEgyptViewProps) {
                   type="submit"
                   className={`px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-colors ${getThemeBtnClass()}`}
                 >
-                  إدراج في نظام المتابعة بمصر
+                  إضافة إلى برامج التدريب
                 </button>
               </div>
 
