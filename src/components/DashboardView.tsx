@@ -286,7 +286,7 @@ export default function DashboardView({ projects, tasks, theme, onNavigate, curr
               <div className="flex gap-3 items-start bg-rose-950/20 border border-rose-900/30 p-4 rounded-xl text-right">
                 <div className="p-1.5 bg-rose-500 rounded-full mt-1 flex-shrink-0 animate-ping h-2.5 w-2.5"></div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-rose-400">تدخل فوري مطلوب - مجمع الإسكندرية (مصر)</span>
+                  <span className="text-xs font-bold text-rose-400">مراجعة مطلوبة - برنامج إعداد المحتوى التدريبي</span>
                   <p className="text-slate-300 text-xs leading-relaxed">
                     نسبة الإنجاز متوقفة عند 25٪ بسبب تباطؤ المقاول في صب أساسات المرحلة الثانية. يجب استدعاء الاستشاري الهندسي العام لمراجعة وتدقيق الجدول الزمني للإنقاذ.
                   </p>
