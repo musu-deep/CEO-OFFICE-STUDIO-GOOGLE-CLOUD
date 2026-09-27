@@ -341,3 +341,68 @@
   background-color: var(--araak-navy) !important;
   color: #fff !important;
 }
+
+
+/* Platform-wide Arabic readability — executive UI */
+html, body, #root {
+  font-family: "Cairo", "Noto Sans Arabic", "Tajawal", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+[data-theme] main {
+  letter-spacing: 0;
+}
+
+[data-theme] main .text-xs {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+[data-theme] main .text-\[11px\] {
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+[data-theme] main .text-\[10px\],
+[data-theme] main .text-\[9px\],
+[data-theme] main .text-\[8px\] {
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+[data-theme] main input,
+[data-theme] main select,
+[data-theme] main textarea,
+[data-theme] main button {
+  font-family: inherit;
+}
+
+[data-theme] main input,
+[data-theme] main select,
+[data-theme] main textarea {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+[data-theme] main h1,
+[data-theme] main h2,
+[data-theme] main h3,
+[data-theme] main h4 {
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+[data-theme] main .text-slate-500 {
+  color: #94a3b8;
+}
+
+[data-theme="spring"] main .text-slate-500 {
+  color: #475569 !important;
+}
