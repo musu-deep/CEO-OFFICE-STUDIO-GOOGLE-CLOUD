@@ -460,7 +460,7 @@ export default function App() {
     {
       title: 'القطاعات الخارجية وسلاسل الإمداد',
       items: [
-        { id: 'egypt', name: 'فرع اراك التنمية مصر', icon: Globe },
+        { id: 'egypt', name: 'أراك التنمية | التدريب والمحتوى', icon: Globe },
         { id: 'logistic', name: 'اراك لوجستيك ', icon: Map },
       ]
     }
