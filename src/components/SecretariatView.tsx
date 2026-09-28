@@ -10,7 +10,14 @@ import {
   Trash2, 
   UserPlus, 
   X,
-  MessageSquare
+  MessageSquare,
+  Inbox,
+  Send,
+  CalendarDays,
+  Archive,
+  QrCode,
+  PackageCheck,
+  ClipboardList
 } from 'lucide-react';
 import { PlatformTheme } from '../types';
 
@@ -146,6 +153,33 @@ export default function SecretariatView({ theme }: SecretariatViewProps) {
           <Plus className="w-4 h-4" />
           <span>مذكرة / مكالمة جديدة</span>
         </button>
+      </div>
+
+      {/* Full executive secretariat functions */}
+      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
+        {[
+          [Inbox, 'الوارد', 'استلام وتسجيل وتوجيه'],
+          [Send, 'الصادر', 'ترقيم وإصدار وإرسال'],
+          [QrCode, 'الباركود والتتبع', 'معرف إلكتروني لكل معاملة'],
+          [CalendarDays, 'الاجتماعات', 'دعوات ومحاضر ومتابعة'],
+          [Phone, 'الاتصالات', 'سجل المكالمات والمتابعة'],
+          [FileText, 'المذكرات', 'داخلية وتنفيذية'],
+          [PackageCheck, 'العهد', 'تسليم واستلام ومتابعة'],
+          [Archive, 'الأرشيف التاريخي', 'من تأسيس المجموعة حتى الآن'],
+        ].map(([Icon, title, desc]) => {
+          const TileIcon = Icon as typeof Inbox;
+          return (
+            <button key={String(title)} className="rounded-2xl bg-[#121422] border border-slate-800/80 p-4 text-right hover:border-emerald-500/40 transition-all">
+              <TileIcon className="w-5 h-5 text-emerald-500 mb-3" />
+              <div className="text-sm font-extrabold text-slate-100">{String(title)}</div>
+              <div className="text-xs text-slate-400 mt-1 leading-relaxed">{String(desc)}</div>
+            </button>
+          );
+        })}
+      </div>
+      <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/10 p-4 flex items-start gap-3">
+        <ClipboardList className="w-5 h-5 text-emerald-500 mt-0.5" />
+        <p className="text-sm text-slate-300 leading-relaxed"><strong className="text-slate-100">السجل المركزي للمراسلات:</strong> المستهدف أن تكون كل معاملة صادرة أو واردة مرتبطة بالقطاع، المسؤول، التاريخ، الحالة، المرفقات، رقم مرجعي وباركود، مع حفظ تاريخي قابل للبحث والتتبع.</p>
       </div>
 
       {/* Grid counters exactly like Page 6 */}
