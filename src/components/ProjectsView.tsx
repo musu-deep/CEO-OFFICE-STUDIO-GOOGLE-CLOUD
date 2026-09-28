@@ -9,7 +9,15 @@ import {
   DollarSign, 
   User, 
   CheckCircle, 
-  Percent 
+  Percent,
+  Building2,
+  Factory,
+  Users,
+  Landmark,
+  ShoppingCart,
+  Truck,
+  GraduationCap,
+  Gem
 } from 'lucide-react';
 import { Project, PlatformTheme } from '../types';
 
@@ -109,6 +117,33 @@ export default function ProjectsView({ projects, setProjects, theme }: ProjectsV
           <Plus className="w-4 h-4" />
           <span>مشروع جديد</span>
         </button>
+      </div>
+
+      {/* Executive operating units hub */}
+      <div>
+        <div className="mb-4">
+          <h3 className="text-xl font-extrabold text-slate-100">الإدارات والقطاعات التشغيلية</h3>
+          <p className="text-sm text-slate-400 mt-1">كل وحدة تغذي مركز القيادة بالتقارير، المهام، المخاطر، القرارات ومؤشرات الأداء.</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
+          {[
+            [Factory,'الحديد والصناعة','تشغيل وإنتاج وصيانة وسلامة'],
+            [Users,'الموارد البشرية','قوى عاملة وأداء واحتياج'],
+            [Landmark,'المالية','موازنات وتدفقات وانحرافات'],
+            [ShoppingCart,'التجارة الإلكترونية','مبيعات وطلبات وتجربة عميل'],
+            [Truck,'أراك لوجستيك','نقل ومستودعات وسلاسل إمداد'],
+            [GraduationCap,'التدريب والمحتوى','برامج وحقائب وخدمات تدريبية'],
+            [Gem,'جواهر أراك','منتجات ومبيعات وتشغيل'],
+            [Building2,'المشاريع','كل مشروع بمديره وتقاريره واستحقاقاته'],
+          ].map(([Icon,title,desc]) => {
+            const UnitIcon = Icon as typeof Building2;
+            return <div key={String(title)} className="bg-[#121422] border border-slate-800/80 rounded-2xl p-4 hover:border-emerald-500/40 transition-all">
+              <UnitIcon className="w-5 h-5 text-emerald-500 mb-3" />
+              <div className="text-sm font-extrabold text-slate-100">{String(title)}</div>
+              <div className="text-xs text-slate-400 mt-1 leading-relaxed">{String(desc)}</div>
+            </div>
+          })}
+        </div>
       </div>
 
       {/* Search & Filter Controls */}
