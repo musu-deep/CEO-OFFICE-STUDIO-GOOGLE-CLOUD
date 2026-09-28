@@ -50,11 +50,11 @@ export default function GovernanceView({ theme }: GovernanceViewProps) {
     },
     {
       id: 'gov-3',
-      title: 'تدقيق المصروفات والتدفقات النقدية لمشروعات التنمية بمصر',
+      title: 'تدقيق المصروفات والتدفقات النقدية لالقطاعات والمشاريع التشغيلية',
       category: 'مالية',
       date: '2026-06-16',
       complianceLevel: 'منخفض',
-      description: 'ملاحظة تباين بقيمة 120,000 جنيه في فواتير مقاولي الباطن بمشروع الإسكندرية قيد التحقق والاستقصاء.',
+      description: 'مراجعة دورية للتباينات المالية والمصروفات غير المعتادة ورفع الاستثناءات التي تتطلب تحققاً أو إجراءً تصحيحياً.',
       status: 'نشط',
       inspector: 'المدقق المالي الرئيسي'
     }
@@ -149,6 +149,20 @@ export default function GovernanceView({ theme }: GovernanceViewProps) {
           <Plus className="w-4 h-4" />
           <span>بلاغ تدقيق جديد</span>
         </button>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          ['مالية','الموازنات، المصروفات، الانحرافات والضوابط'],
+          ['إدارية','الإجراءات، الصلاحيات، الأداء والانضباط'],
+          ['قانونية','الالتزام النظامي والعقود والمخاطر'],
+          ['فنية','الجودة، السلامة، التشغيل والمطابقة الفنية'],
+        ].map(([title, desc]) => (
+          <button key={title} onClick={() => setFilter(title as any)} className="bg-[#121422] border border-slate-800/80 rounded-2xl p-5 text-right hover:border-emerald-500/40 transition-all">
+            <div className="text-base font-extrabold text-slate-100">{title}</div>
+            <div className="text-xs text-slate-400 mt-2 leading-relaxed">{desc}</div>
+          </button>
+        ))}
       </div>
 
       {/* Grid counters exactly like Page 5 */}
@@ -293,7 +307,7 @@ export default function GovernanceView({ theme }: GovernanceViewProps) {
                 <input 
                   type="text" 
                   required
-                  placeholder="مثال: مراجعة الدفاتر المحاسبية في الإسكندرية" 
+                  placeholder="مثال: مراجعة المصروفات والإجراءات المالية للقطاع" 
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   className="w-full bg-[#16182c] border border-slate-800 focus:border-amber-500/50 rounded-lg px-4 py-2.5 text-xs text-slate-200 focus:outline-none"
