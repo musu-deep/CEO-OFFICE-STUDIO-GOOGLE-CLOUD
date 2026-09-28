@@ -406,3 +406,31 @@ body {
 [data-theme="spring"] main .text-slate-500 {
   color: #475569 !important;
 }
+
+
+/* Daylight mode: preserve icon meaning and control affordance */
+[data-theme="spring"] svg {
+  color: currentColor;
+  opacity: 1 !important;
+}
+[data-theme="spring"] main button svg,
+[data-theme="spring"] aside button svg,
+[data-theme="spring"] header button svg {
+  color: #334155 !important;
+  stroke-width: 2.15;
+}
+[data-theme="spring"] main button[class*="bg-emerald"] svg,
+[data-theme="spring"] main button[class*="bg-green"] svg,
+[data-theme="spring"] main button[class*="bg-blue"] svg,
+[data-theme="spring"] main button[class*="bg-slate-8"] svg,
+[data-theme="spring"] main button[class*="bg-[#0"] svg,
+[data-theme="spring"] main button[class*="bg-[#1"] svg {
+  color: #fff !important;
+}
+[data-theme="spring"] aside svg {
+  color: #475569 !important;
+}
+[data-theme="spring"] aside button:hover svg,
+[data-theme="spring"] aside button[class*="border-r-4"] svg {
+  color: #047857 !important;
+}
