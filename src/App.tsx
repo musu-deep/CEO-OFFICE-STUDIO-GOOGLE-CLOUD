@@ -420,10 +420,10 @@ export default function App() {
   // Sidebar Menu Items grouped and filtered dynamically
   const rawMenuGroups = [
     {
-      title: 'اتخاذ القرارات والذكاء الاصطناعي',
+      title: 'دعم القرار والذكاء الاصطناعي',
       items: [
         { id: 'dashboard', name: 'مركز القيادة التنفيذي', icon: Layers },
-        { id: 'reports', name: 'التقارير والتحليلات الجغرافية', icon: BarChart3 },
+        { id: 'reports', name: 'التقارير والتحليلات التنفيذية', icon: BarChart3 },
         { id: 'ai-advisor', name: 'المستشار الاستراتيجي الذكي', icon: Brain },
         { id: 'voice-assistant', name: 'الوكيل الصوتي التنفيذي', icon: Mic },
       ]
@@ -431,10 +431,10 @@ export default function App() {
     {
       title: 'الإدارة التنفيذية للمكتب',
       items: [
-        { id: 'projects', name: 'المشاريع والقطاعات التنموية', icon: Building2 },
-        { id: 'tasks', name: 'التكاليف والمهام النشطة', icon: CheckSquare },
+        { id: 'projects', name: 'الإدارات والقطاعات والمشاريع', icon: Building2 },
+        { id: 'tasks', name: 'التكليفات والمهام النشطة', icon: CheckSquare },
         { id: 'secretariat', name: 'السكرتارية التنفيذية ', icon: FolderClosed },
-        { id: 'messages', name: 'القرارات والتوجيهات ', icon: MessageSquare },
+        { id: 'messages', name: 'القرارات والتوجيهات ومتابعتها', icon: MessageSquare },
       ]
     },
     {
@@ -450,7 +450,7 @@ export default function App() {
       items: [
         { id: 'governance', name: 'الرقابة والتفتيش والمتابعة', icon: ShieldAlert },
         { id: 'legal', name: 'الشؤون القانونية', icon: Scale },
-        { id: 'documents', name: 'مركز الوثائق وقاعدة البيانات', icon: FileText },
+        { id: 'documents', name: 'مركز الوثائق وقاعدة المعلومات', icon: FileText },
         // Only visible to Admin or CEO (when admin mode is active)
         ...(currentUser?.role === 'admin' || (currentUser?.role === 'ceo' && ceoAdminMode) ? [
           { id: 'users', name: 'إدارة المستخدمين والصلاحيات', icon: Settings }
@@ -458,7 +458,7 @@ export default function App() {
       ]
     },
     {
-      title: 'القطاعات الخارجية وسلاسل الإمداد',
+      title: 'القطاعات التشغيلية المتخصصة',
       items: [
         { id: 'egypt', name: 'أراك التنمية | التدريب والمحتوى', icon: Globe },
         { id: 'logistic', name: 'اراك لوجستيك ', icon: Map },
