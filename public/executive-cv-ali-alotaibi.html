@@ -246,4 +246,13 @@ display:block;min-height:0;overflow-wrap:normal;word-break:normal
 <div class="section-title skills-title">المهارات</div><div class="skills"><div class="skill">مهارات قيادية - استراتيجية</div><div class="skill">تحمل ضغط العمل</div><div class="skill">إدارة فريق العمل</div><div class="skill">حل المشاكل الإبداعية</div><div class="skill">الإدارة المكتبية</div><div class="skill">التعلم المستمر</div><div class="skill">الشخصية القيادية</div><div class="skill">التأثير</div><div class="skill">التفاوض والاتصال</div></div>
 <div class="midline"></div><div class="section-title activities-title">الأنشطة</div><div class="activities"><b>مؤسس وعضو الأندية الطلابية</b><small>الجامعات - المؤسسات التعليمية</small><b>العمل الطوعي</b><small>الهيئات والجمعيات غير الربحية (القطاعات الحكومية وغير الحكومية)</small><b>المؤتمرات الدولية</b><small>الباحث - أوراق العمل - المشاركة</small><b>البرامج التدريبية</b><small>الاستراتيجيات المتقدمة - التخطيط الاستراتيجي - استراتيجيات الإدارة الإلكترونية - تدريب المدربين</small><b>المعارض الدولية</b><small>جايتكس - ديهاد - هانوفر - شنغهاي، وغيرها</small></div>
 <div class="section-title hobbies-title">الهوايات</div><div class="hobbies"><b>المشي</b><b>السفر</b><b>الغوص</b><small>شهادة محترف دولية في الغوص</small><b>سكواش</b><small>عضو الاتحاد الدولي للسكواش</small><b>القراءة المنتظمة</b><b>الكتاب الورقي</b><b>حارس مرمى</b></div>
-</div></section></div></body></html>
+</div></section></div><script>
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('autoprint') === '1') {
+    window.addEventListener('load', function () {
+      setTimeout(function () { window.print(); }, 450);
+    });
+  }
+})();
+</script>\n</body></html>
