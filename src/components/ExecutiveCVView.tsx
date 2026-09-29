@@ -7,6 +7,7 @@ interface ExecutiveCVViewProps {
 export default function ExecutiveCVView({ onBack }: ExecutiveCVViewProps) {
   const cvUrl = '/executive-cv-ali-alotaibi.html';
   const openCV = () => window.open(cvUrl, '_blank', 'noopener,noreferrer');
+  const printCV = () => window.open(`${cvUrl}?autoprint=1`, '_blank', 'noopener,noreferrer');
 
   const today = new Intl.DateTimeFormat('ar-SA', {
     day: 'numeric',
@@ -33,7 +34,7 @@ export default function ExecutiveCVView({ onBack }: ExecutiveCVViewProps) {
           <button onClick={openCV} className="px-4 py-2 rounded-xl border border-emerald-500/25 text-emerald-300 hover:bg-emerald-500/10 flex items-center gap-2">
             <ExternalLink className="w-4 h-4" /> فتح السيرة
           </button>
-          <button onClick={openCV} className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-black hover:bg-emerald-500 flex items-center gap-2">
+          <button onClick={printCV} className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-black hover:bg-emerald-500 flex items-center gap-2">
             <Printer className="w-4 h-4" /> طباعة / PDF
           </button>
         </div>
