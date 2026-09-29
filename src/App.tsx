@@ -484,9 +484,11 @@ export default function App() {
   // Protection Guard: If current active view is not allowed, revert to first allowed view
   useEffect(() => {
     if (!currentUser) return;
-    const allAllowedViewIds = currentUser.role === 'ceo' || currentUser.role === 'admin'
-      ? ['dashboard', 'reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
-      : ['dashboard', ...currentUser.allowedViews.filter(viewId => viewId !== 'dashboard')];
+    const allAllowedViewIds = currentUser.role === 'ceo'
+      ? ['dashboard', 'executive-cv', 'reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
+      : currentUser.role === 'admin'
+        ? ['dashboard', 'reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
+        : ['dashboard', ...currentUser.allowedViews.filter(viewId => viewId !== 'dashboard')];
       
     if (!allAllowedViewIds.includes(activeView)) {
       if (allAllowedViewIds.length > 0) {
