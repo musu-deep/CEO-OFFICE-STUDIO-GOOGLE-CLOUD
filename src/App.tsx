@@ -182,6 +182,7 @@ import ArakEgyptView from './components/ArakEgyptView';
 import ArakLogisticView from './components/ArakLogisticView';
 import UserManagementView from './components/UserManagementView';
 import LoginView from './components/LoginView';
+import ExecutiveCVView from './components/ExecutiveCVView';
 
 import { 
   initialNotifications, 
@@ -512,6 +513,7 @@ export default function App() {
       case 'documents': return <DocumentCenterView theme={theme} />;
       case 'egypt': return <ArakEgyptView theme={theme} />;
       case 'logistic': return <ArakLogisticView theme={theme} />;
+      case 'executive-cv': return <ExecutiveCVView onBack={() => setActiveView('dashboard')} />;
       case 'users':
         return (
           <UserManagementView
@@ -814,6 +816,14 @@ export default function App() {
                     <span className="text-xs text-slate-500">{currentUser.title}</span>
                   </div>
                   <div className="p-2 space-y-1">
+                    {currentUser.role === 'ceo' && (
+                      <button
+                        onClick={() => { setActiveView('executive-cv'); setShowProfileDropdown(false); }}
+                        className="w-full text-right hover:bg-emerald-500/10 px-3 py-2 rounded-lg text-sm text-emerald-300 font-black"
+                      >
+                        السيرة الذاتية التنفيذية
+                      </button>
+                    )}
                     <button 
                       onClick={() => alert(`رتبة حسابك: ${currentUser.title} ومسجل بنجاح.`)}
                       className="w-full text-right hover:bg-white/10 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white"
@@ -855,6 +865,14 @@ export default function App() {
                     </span>
                     <h2 className="text-4xl md:text-5xl font-black text-white mt-4 leading-tight">{currentUser.name}</h2>
                     <p className="text-slate-400 mt-2 text-lg font-bold">{currentUser.title}</p>
+                    {currentUser.role === 'ceo' && (
+                      <button
+                        onClick={() => setActiveView('executive-cv')}
+                        className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-black text-white ${currentTheme.gradientButton} shadow-lg ${currentTheme.glow}`}
+                      >
+                        <FileText className="w-4 h-4" /> عرض السيرة التنفيذية
+                      </button>
+                    )}
                   </div>
                   <div className="hidden lg:flex flex-col items-end gap-2 text-left">
                     <span className="text-xs text-slate-500 font-bold">التوقيت المحلي</span>
