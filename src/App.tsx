@@ -883,8 +883,21 @@ export default function App() {
                 </div>
 
                 <div className="relative grid grid-cols-1 lg:grid-cols-[230px_1fr] gap-6 items-stretch">
-                  <div className="relative rounded-[1.7rem] border border-white/15 bg-black/35 p-3 shadow-2xl shadow-black/30">
-                    <div className={`absolute inset-0 rounded-[1.7rem] border ${currentTheme.strongBorder} opacity-60`} />
+                  <div
+                    className={`relative rounded-[1.7rem] border border-white/15 bg-black/35 p-3 shadow-2xl shadow-black/30 ${currentUser.role === 'ceo' ? 'cursor-pointer group focus:outline-none focus:ring-2 focus:ring-emerald-500/60' : ''}`}
+                    onClick={() => currentUser.role === 'ceo' && setActiveView('executive-cv')}
+                    onKeyDown={(event) => {
+                      if (currentUser.role === 'ceo' && (event.key === 'Enter' || event.key === ' ')) {
+                        event.preventDefault();
+                        setActiveView('executive-cv');
+                      }
+                    }}
+                    role={currentUser.role === 'ceo' ? 'link' : undefined}
+                    tabIndex={currentUser.role === 'ceo' ? 0 : undefined}
+                    aria-label={currentUser.role === 'ceo' ? 'فتح السيرة الذاتية التنفيذية للدكتور علي العتيبي' : undefined}
+                    title={currentUser.role === 'ceo' ? 'عرض السيرة الذاتية التنفيذية' : undefined}
+                  >
+                    <div className={`absolute inset-0 rounded-[1.7rem] border ${currentTheme.strongBorder} opacity-60 ${currentUser.role === 'ceo' ? 'group-hover:opacity-100 transition-opacity' : ''}`} />
                     {currentUserPhoto ? (
                       <img
                         src={currentUserPhoto}
