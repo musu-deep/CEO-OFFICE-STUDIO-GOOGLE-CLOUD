@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
-  Activity, AlertTriangle, BarChart3, Bot, Building2, CheckCircle2, ChevronLeft,
-  CircleDollarSign, Database, FileCheck2, Gauge, Layers3, LineChart, Network,
-  RefreshCw, ShoppingCart, Store, Target, TrendingUp
+  Activity, AlertTriangle, Bot, ChevronLeft, Database, FileCheck2, Gauge,
+  Layers3, LineChart, Network, RefreshCw, ShoppingCart, Store, Target
 } from 'lucide-react';
 import type { PlatformTheme } from '../types';
 
@@ -18,7 +17,7 @@ const departments: Department[] = [
   {
     id: 'ecommerce',
     name: 'إدارة التجارة الإلكترونية',
-    description: 'إدارة الأداء التنفيذي للقنوات والمتاجر الرقمية وربط خططها بالمؤشرات والميزانيات والقرارات.',
+    description: 'إدارة تنفيذية تجمع أنشطة ومتاجر التجارة الإلكترونية التابعة للمجموعة، وتعرض أداءها من خلال وظائف المنصة القائمة دون تكرارها.',
     units: [
       {
         id: 'araak-home',
@@ -47,13 +46,6 @@ const departments: Department[] = [
       },
     ],
   },
-  { id: 'operations', name: 'العمليات والموارد المؤسسية', description: 'المشاريع والمالية والموارد والجودة وقياس التنفيذ.', units: [] },
-  { id: 'academy', name: 'الأكاديمية وتنمية المعرفة', description: 'البرامج والمسارات والتدريب والاعتمادات.', units: [] },
-  { id: 'governance', name: 'الاعتمادات والحوكمة', description: 'الاعتمادات والسياسات والالتزام والقرارات المطلوبة.', units: [] },
-  { id: 'communication', name: 'الاتصال المؤسسي والرصد', description: 'المحتوى والحملات والإعلانات والرصد الرقمي.', units: [] },
-  { id: 'stakeholders', name: 'المجتمع وأصحاب المصلحة', description: 'الموظفون والعملاء والمستفيدون والاستطلاعات والمقترحات.', units: [] },
-  { id: 'services', name: 'الأعمال والخدمات المهنية', description: 'الخدمات الاستشارية والطلبات والمواعيد ورضا العملاء.', units: [] },
-  { id: 'portfolio', name: 'محفظة البرامج والمبادرات', description: 'البرامج الجارية والمتعثرة والقادمة وقياس الأثر.', units: [] },
 ];
 
 const statusMeta: Record<Status, { label: string; cls: string }> = {
@@ -78,7 +70,7 @@ export default function ExecutiveDepartmentsView({ theme }: { theme: PlatformThe
           <div className={`mb-2 flex items-center gap-2 text-xs font-black ${accent}`}><Network className="h-4 w-4" /> منظومة التنفيذ المؤسسي</div>
           <h2 className="text-3xl font-black text-white">الإدارات التنفيذية ومراقبة الأداء</h2>
           <p className="mt-2 max-w-4xl text-sm leading-7 text-slate-400">
-            من الخطة المعتمدة إلى الإدارة والوحدة والمؤشر، ثم المطابقة والتحليل والتنبيه ودعم القرار التنفيذي.
+            هذه الشاشة تمثل الهيكل الإداري التنفيذي الفعلي فقط. التخطيط والمشاريع والمهام والتقارير والحوكمة والوثائق تبقى وظائف مشتركة في القائمة الرئيسية وتخدم الإدارات دون تكرار.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
@@ -89,8 +81,8 @@ export default function ExecutiveDepartmentsView({ theme }: { theme: PlatformThe
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {[
-          [Target, 'الإدارات', departments.length, 'هيكل المتابعة التنفيذية'],
-          [Layers3, 'الوحدات المرتبطة', departments.reduce((n,d)=>n+d.units.length,0), 'شركات ومنصات ومؤسسات'],
+          [Target, 'الإدارات', departments.length, 'إدارات فعلية معتمدة'],
+          [Layers3, 'الوحدات المرتبطة', departments.reduce((n,d)=>n+d.units.length,0), 'شركات ووحدات تابعة للإدارة'],
           [Gauge, 'المؤشرات', departments.flatMap(d=>d.units).reduce((n,u)=>n+u.kpis.length,0), 'بدون أرقام افتراضية'],
           [AlertTriangle, 'قرارات مطلوبة', '—', 'تظهر عند تحقق شروط التنبيه'],
         ].map(([Icon,label,value,sub]) => {
@@ -122,7 +114,7 @@ export default function ExecutiveDepartmentsView({ theme }: { theme: PlatformThe
               <div><p className={`text-xs font-black ${accent}`}>الإدارة المختارة</p><h3 className="mt-1 text-2xl font-black text-white">{department.name}</h3><p className="mt-2 text-sm text-slate-400">{department.description}</p></div>
               <div className="flex gap-2">
                 <span className="rounded-xl border border-white/10 bg-black/15 px-3 py-2 text-xs text-slate-300">دورية المتابعة: أسبوعي / شهري</span>
-                <span className="rounded-xl border border-white/10 bg-black/15 px-3 py-2 text-xs text-slate-300">الخطة ← الأداء ← القرار</span>
+                <span className="rounded-xl border border-white/10 bg-black/15 px-3 py-2 text-xs text-slate-300">تجميع تنفيذي دون ازدواجية</span>
               </div>
             </div>
           </div>
@@ -163,19 +155,14 @@ export default function ExecutiveDepartmentsView({ theme }: { theme: PlatformThe
                 </div>
               </div>}
             </>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.025] p-10 text-center">
-              <Building2 className="mx-auto h-8 w-8 text-slate-600"/><h4 className="mt-3 font-black text-slate-300">الإدارة جاهزة لاستقبال الوحدات والخطط المعتمدة</h4>
-              <p className="mt-2 text-xs text-slate-500">لن تُنشأ أرقام أو مؤشرات افتراضية. تُعرض البيانات بعد ربط الخطة ومصدر البيانات الخاص بالوحدة.</p>
-            </div>
-          )}
+          ) : null}
         </section>
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-        <div className="mb-4 flex items-center gap-2"><Activity className={`h-5 w-5 ${accent}`}/><h3 className="font-black text-white">مسار القراءة التنفيذية</h3></div>
+        <div className="mb-4 flex items-center gap-2"><Activity className={`h-5 w-5 ${accent}`}/><h3 className="font-black text-white">مسار الإدارة التنفيذية داخل المنصة</h3></div>
         <div className="grid gap-2 md:grid-cols-4 xl:grid-cols-8">
-          {['الخطة المعتمدة','الإدارة','الوحدة','KPI + Budget','بيانات الأداء','المطابقة والتحليل','تنبيه / توقع','قرار ومتابعة'].map((s,i)=><div key={s} className="rounded-xl border border-white/10 bg-black/15 p-3 text-center text-xs font-bold text-slate-300"><span className="mb-1 block text-[10px] text-slate-600">{String(i+1).padStart(2,'0')}</span>{s}</div>)}
+          {['الخطة المعتمدة','الإدارة الفعلية','الشركة / الوحدة','KPI + Budget','مصادر البيانات','المطابقة والتحليل','تنبيه / توقع','قرار ومتابعة'].map((s,i)=><div key={s} className="rounded-xl border border-white/10 bg-black/15 p-3 text-center text-xs font-bold text-slate-300"><span className="mb-1 block text-[10px] text-slate-600">{String(i+1).padStart(2,'0')}</span>{s}</div>)}
         </div>
       </div>
 
