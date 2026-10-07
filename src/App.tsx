@@ -183,6 +183,7 @@ import ArakLogisticView from './components/ArakLogisticView';
 import UserManagementView from './components/UserManagementView';
 import LoginView from './components/LoginView';
 import ExecutiveCVView from './components/ExecutiveCVView';
+import ExecutiveDepartmentsView from './components/ExecutiveDepartmentsView';
 
 import { 
   initialNotifications, 
@@ -392,6 +393,7 @@ export default function App() {
     { label: 'افتح مركز القيادة', description: 'الانتقال إلى الصفحة التنفيذية الأولى', target: 'dashboard', icon: Command },
     { label: 'اعرض التقارير والتحليلات', description: 'الموازنات والإنفاق ومؤشرات الأداء', target: 'reports', icon: BarChart3 },
     { label: 'أنشئ تكليفاً جديداً', description: 'فتح صفحة التكاليف والمهام النشطة', target: 'tasks', icon: CheckSquare },
+    { label: 'افتح الإدارات التنفيذية', description: 'الخطط والمؤشرات والميزانيات والانحرافات حسب الإدارة والوحدة', target: 'executive-departments', icon: Activity },
     { label: 'اعرض المشاريع المتأخرة', description: 'متابعة القطاعات والمشاريع الحرجة', target: 'projects', icon: Building2 },
     { label: 'افتح مركز القرارات', description: 'القرارات والتوجيهات التنفيذية', target: 'messages', icon: MessageSquare },
     { label: 'راجع اجتماعات اليوم', description: 'التقويم والاجتماعات الحية', target: 'calendar', icon: Calendar },
@@ -432,7 +434,8 @@ export default function App() {
     {
       title: 'الإدارة التنفيذية للمكتب',
       items: [
-        { id: 'projects', name: 'الإدارات والقطاعات والمشاريع', icon: Building2 },
+        { id: 'executive-departments', name: 'الإدارات التنفيذية والأداء', icon: Activity },
+        { id: 'projects', name: 'المشاريع والمبادرات', icon: Building2 },
         { id: 'tasks', name: 'التكليفات والمهام النشطة', icon: CheckSquare },
         { id: 'secretariat', name: 'السكرتارية التنفيذية ', icon: FolderClosed },
         { id: 'messages', name: 'القرارات والتوجيهات ومتابعتها', icon: MessageSquare },
@@ -485,9 +488,9 @@ export default function App() {
   useEffect(() => {
     if (!currentUser) return;
     const allAllowedViewIds = currentUser.role === 'ceo'
-      ? ['dashboard', 'executive-cv', 'reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
+      ? ['dashboard', 'executive-cv', 'reports', 'ai-advisor', 'voice-assistant', 'executive-departments', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
       : currentUser.role === 'admin'
-        ? ['dashboard', 'reports', 'ai-advisor', 'voice-assistant', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
+        ? ['dashboard', 'reports', 'ai-advisor', 'voice-assistant', 'executive-departments', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
         : ['dashboard', ...currentUser.allowedViews.filter(viewId => viewId !== 'dashboard')];
       
     if (!allAllowedViewIds.includes(activeView)) {
@@ -503,6 +506,7 @@ export default function App() {
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
+      case 'executive-departments': return <ExecutiveDepartmentsView theme={theme} />;
       case 'projects': return <ProjectsView projects={projects} setProjects={setProjects} theme={theme} />;
       case 'tasks': return <TasksView tasks={tasks} setTasks={setTasks} theme={theme} />;
       case 'secretariat': return <SecretariatView theme={theme} />;
