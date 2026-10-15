@@ -200,6 +200,7 @@ export default function App() {
     localStorage.getItem('arak_display_mode') === 'light' ? 'spring' : 'vision_2030'
   );
   const [activeView, setActiveView] = useState<string>('dashboard');
+  const [organizationRoot, setOrganizationRoot] = useState('ceo');
   const [notifications, setNotifications] = useState(initialNotifications);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -393,7 +394,7 @@ export default function App() {
     { label: 'افتح مركز القيادة', description: 'الانتقال إلى الصفحة التنفيذية الأولى', target: 'dashboard', icon: Command },
     { label: 'اعرض التقارير والتحليلات', description: 'الموازنات والإنفاق ومؤشرات الأداء', target: 'reports', icon: BarChart3 },
     { label: 'أنشئ تكليفاً جديداً', description: 'فتح صفحة التكاليف والمهام النشطة', target: 'tasks', icon: CheckSquare },
-    { label: 'افتح الإدارات التنفيذية', description: 'الخطط والمؤشرات والميزانيات والانحرافات حسب الإدارة والوحدة', target: 'executive-departments', icon: Activity },
+    { label: 'افتح الهيكل التنظيمي', description: 'الخطط والمؤشرات والميزانيات والانحرافات حسب الإدارة والوحدة', target: 'executive-departments', icon: Activity },
     { label: 'اعرض المشاريع المتأخرة', description: 'متابعة القطاعات والمشاريع الحرجة', target: 'projects', icon: Building2 },
     { label: 'افتح مركز القرارات', description: 'القرارات والتوجيهات التنفيذية', target: 'messages', icon: MessageSquare },
     { label: 'راجع اجتماعات اليوم', description: 'التقويم والاجتماعات الحية', target: 'calendar', icon: Calendar },
@@ -421,53 +422,39 @@ export default function App() {
   };
 
   // Sidebar Menu Items grouped and filtered dynamically
-  const rawMenuGroups = [
-    {
-      title: 'دعم القرار والذكاء الاصطناعي',
-      items: [
-        { id: 'dashboard', name: 'مركز القيادة التنفيذي', icon: Layers },
-        { id: 'reports', name: 'التقارير والتحليلات التنفيذية', icon: BarChart3 },
-        { id: 'ai-advisor', name: 'المستشار الاستراتيجي الذكي', icon: Brain },
-        { id: 'voice-assistant', name: 'الوكيل الصوتي التنفيذي', icon: Mic },
-      ]
-    },
-    {
-      title: 'الإدارة التنفيذية للمكتب',
-      items: [
-        { id: 'executive-departments', name: 'الإدارات التنفيذية والأداء', icon: Activity },
-        { id: 'projects', name: 'المشاريع والمبادرات', icon: Building2 },
-        { id: 'tasks', name: 'التكليفات والمهام النشطة', icon: CheckSquare },
-        { id: 'secretariat', name: 'السكرتارية التنفيذية ', icon: FolderClosed },
-        { id: 'messages', name: 'القرارات والتوجيهات ومتابعتها', icon: MessageSquare },
-      ]
-    },
-    {
-      title: 'اللقاءات والمحاضر',
-      items: [
-        { id: 'calendar', name: 'التقويم واللقاءات السنوية', icon: Calendar },
-        { id: 'meetings', name: 'اجتماعات حية وفيديو مباشر', icon: Video },
-        { id: 'meeting-requests', name: 'طلبات اللقاء والزيارات الخارجية', icon: UserCheck },
-      ]
-    },
-    {
-      title: 'الرقابة والالتزامات والوثائق',
-      items: [
-        { id: 'governance', name: 'الرقابة والتفتيش والمتابعة', icon: ShieldAlert },
-        { id: 'legal', name: 'الشؤون القانونية', icon: Scale },
-        { id: 'documents', name: 'مركز الوثائق وقاعدة المعلومات', icon: FileText },
-        // Only visible to Admin or CEO (when admin mode is active)
-        ...(currentUser?.role === 'admin' || (currentUser?.role === 'ceo' && ceoAdminMode) ? [
-          { id: 'users', name: 'إدارة المستخدمين والصلاحيات', icon: Settings }
-        ] : [])
-      ]
-    },
-    {
-      title: 'القطاعات التشغيلية المتخصصة',
-      items: [
-        { id: 'egypt', name: 'أراك التنمية | التدريب والمحتوى', icon: Globe },
-        { id: 'logistic', name: 'اراك لوجستيك ', icon: Map },
-      ]
-    }
+  const rawMenuGroups: { title: string; items: { id: string; name: string; icon: typeof Layers; orgRoot?: string }[] }[] = [
+    { title: 'الرئيس التنفيذي', items: [
+      { id: 'dashboard', name: 'مركز القيادة التنفيذي', icon: Layers },
+      { id: 'executive-departments', name: 'الجهات المرتبطة بالرئيس التنفيذي', icon: Activity, orgRoot: 'ceo' },
+      { id: 'secretariat', name: 'السكرتارية التنفيذية', icon: FolderClosed },
+      { id: 'ai-advisor', name: 'مستشار الذكاء الاصطناعي', icon: Brain },
+      { id: 'legal', name: 'المستشار القانوني', icon: Scale },
+      { id: 'governance', name: 'الحوكمة والجودة', icon: ShieldAlert },
+    ] },
+    { title: 'شركات المجموعة وإداراتها التنفيذية', items: [
+      { id: 'executive-departments', name: 'اراك للاستثمار', icon: Building2, orgRoot: 'investment' },
+      { id: 'executive-departments', name: 'الإدارات المساندة', icon: Layers, orgRoot: 'support' },
+      { id: 'executive-departments', name: 'اراك للتنمية', icon: Globe, orgRoot: 'development' },
+      { id: 'executive-departments', name: 'مشاريع في الخطة', icon: TrendingUp, orgRoot: 'planned' },
+    ] },
+    { title: 'التنفيذ والمتابعة', items: [
+      { id: 'projects', name: 'المشاريع والمبادرات', icon: Building2 },
+      { id: 'tasks', name: 'التكليفات والمهام', icon: CheckSquare },
+      { id: 'messages', name: 'القرارات والتوجيهات', icon: MessageSquare },
+      { id: 'reports', name: 'التقارير والتحليلات', icon: BarChart3 },
+      { id: 'documents', name: 'الوثائق', icon: FileText },
+    ] },
+    { title: 'التقويم واللقاءات', items: [
+      { id: 'calendar', name: 'التقويم', icon: Calendar },
+      { id: 'meetings', name: 'الاجتماعات', icon: Video },
+      { id: 'meeting-requests', name: 'طلبات اللقاء والزيارات', icon: UserCheck },
+    ] },
+    { title: 'أدوات وخدمات المنصة', items: [
+      { id: 'voice-assistant', name: 'الوكيل الصوتي التنفيذي', icon: Mic },
+      { id: 'egypt', name: 'التدريب والتأهيل', icon: Globe },
+      { id: 'logistic', name: 'خدمات اراك لوجستيك', icon: Map },
+      ...(currentUser?.role === 'admin' || (currentUser?.role === 'ceo' && ceoAdminMode) ? [{ id: 'users', name: 'المستخدمون والصلاحيات', icon: Settings }] : []),
+    ] },
   ];
 
   const menuGroups = rawMenuGroups.map(group => {
@@ -506,7 +493,7 @@ export default function App() {
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
-      case 'executive-departments': return <ExecutiveDepartmentsView theme={theme} />;
+      case 'executive-departments': return <ExecutiveDepartmentsView theme={theme} rootId={organizationRoot} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? rawMenuGroups.flatMap(g => g.items.map(i => i.id)) : currentUser?.allowedViews || []} />;
       case 'projects': return <ProjectsView projects={projects} setProjects={setProjects} theme={theme} />;
       case 'tasks': return <TasksView tasks={tasks} setTasks={setTasks} theme={theme} />;
       case 'secretariat': return <SecretariatView theme={theme} />;
@@ -598,13 +585,13 @@ export default function App() {
 
       <div className="space-y-1">
         {group.items.map((item) => {
-          const isActive = activeView === item.id;
+          const isActive = activeView === item.id && (!item.orgRoot || item.orgRoot === organizationRoot);
           const IconComponent = item.icon;
 
           return (
             <button
-              key={item.id}
-              onClick={() => setActiveView(item.id)}
+              key={item.orgRoot || item.id}
+              onClick={() => { if (item.orgRoot) setOrganizationRoot(item.orgRoot); setActiveView(item.id); }}
               className={`w-full flex flex-row-reverse items-center justify-between px-3.5 py-3 rounded-xl text-[15px] transition-all cursor-pointer group ${
                 isActive
                   ? `${currentTheme.activeMenu} font-black`

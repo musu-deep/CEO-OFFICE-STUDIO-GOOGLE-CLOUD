@@ -51,7 +51,8 @@ export default function UserManagementView({
 
   // Available Views list with their Arabic names and groups
   const allAvailableViews = [
-    { id: 'reports', name: 'التقارير والتحليلات الجغرافية', group: 'الذكاء والتحليل' },
+    { id: 'executive-departments', name: 'الهيكل التنظيمي وشركات المجموعة', group: 'الهيكل التنظيمي' },
+    { id: 'reports', name: 'التقارير والتحليلات', group: 'الذكاء والتحليل' },
     { id: 'ai-advisor', name: 'المستشار الاستراتيجي الذكي', group: 'الذكاء والتحليل' },
     { id: 'voice-assistant', name: 'الوكيل الصوتي التنفيذي', group: 'الذكاء والتحليل' },
     { id: 'projects', name: 'المشاريع والقطاعات التنموية', group: 'الإدارة التنفيذية' },
@@ -61,10 +62,10 @@ export default function UserManagementView({
     { id: 'calendar', name: 'التقويم واللقاءات السنوية', group: 'اللقاءات والمحاضر' },
     { id: 'meetings', name: 'اجتماعات حية وفيديو كونفرنس', group: 'اللقاءات والمحاضر' },
     { id: 'meeting-requests', name: 'طلبات اللقاء والزيارات الخارجية', group: 'اللقاءات والمحاضر' },
-    { id: 'governance', name: 'الرقابة والتفتيش والامتثال', group: 'الرقابة والالتزامات' },
-    { id: 'legal', name: 'الشؤون القانونية والمحاضر الموثقة', group: 'الرقابة والالتزامات' },
+    { id: 'governance', name: 'الحوكمة والجودة', group: 'الرقابة والالتزامات' },
+    { id: 'legal', name: 'المستشار القانوني', group: 'الرقابة والالتزامات' },
     { id: 'documents', name: 'مركز الوثائق وقاعدة المعرفة', group: 'الرقابة والالتزامات' },
-    { id: 'egypt', name: 'فرع أراك التنمية بجمهورية مصر', group: 'القطاعات الخارجية' },
+    { id: 'egypt', name: 'التدريب والتأهيل', group: 'القطاعات الخارجية' },
     { id: 'logistic', name: 'أراك لوجستيك للشحن والموانئ', group: 'القطاعات الخارجية' },
   ];
 
