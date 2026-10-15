@@ -428,8 +428,10 @@ export default function App() {
       { id: 'executive-departments', name: 'الجهات المرتبطة بالرئيس التنفيذي', icon: Activity, orgRoot: 'ceo' },
       { id: 'secretariat', name: 'السكرتارية التنفيذية', icon: FolderClosed },
       { id: 'ai-advisor', name: 'مستشار الذكاء الاصطناعي', icon: Brain },
+      { id: 'voice-assistant', name: 'الوكيل الصوتي', icon: Mic },
       { id: 'legal', name: 'المستشار القانوني', icon: Scale },
       { id: 'governance', name: 'الحوكمة والجودة', icon: ShieldAlert },
+      ...(currentUser?.role === 'admin' || (currentUser?.role === 'ceo' && ceoAdminMode) ? [{ id: 'users', name: 'المستخدمون والصلاحيات', icon: Settings }] : []),
     ] },
     { title: 'شركات المجموعة وإداراتها التنفيذية', items: [
       { id: 'executive-departments', name: 'اراك للاستثمار', icon: Building2, orgRoot: 'investment' },
@@ -437,23 +439,17 @@ export default function App() {
       { id: 'executive-departments', name: 'اراك للتنمية', icon: Globe, orgRoot: 'development' },
       { id: 'executive-departments', name: 'مشاريع في الخطة', icon: TrendingUp, orgRoot: 'planned' },
     ] },
-    { title: 'التنفيذ والمتابعة', items: [
+    { title: 'أعمال المكتب', items: [
       { id: 'projects', name: 'المشاريع والمبادرات', icon: Building2 },
       { id: 'tasks', name: 'التكليفات والمهام', icon: CheckSquare },
       { id: 'messages', name: 'القرارات والتوجيهات', icon: MessageSquare },
       { id: 'reports', name: 'التقارير والتحليلات', icon: BarChart3 },
       { id: 'documents', name: 'الوثائق', icon: FileText },
-    ] },
-    { title: 'التقويم واللقاءات', items: [
       { id: 'calendar', name: 'التقويم', icon: Calendar },
       { id: 'meetings', name: 'الاجتماعات', icon: Video },
       { id: 'meeting-requests', name: 'طلبات اللقاء والزيارات', icon: UserCheck },
-    ] },
-    { title: 'أدوات وخدمات المنصة', items: [
-      { id: 'voice-assistant', name: 'الوكيل الصوتي التنفيذي', icon: Mic },
       { id: 'egypt', name: 'التدريب والتأهيل', icon: Globe },
       { id: 'logistic', name: 'خدمات اراك لوجستيك', icon: Map },
-      ...(currentUser?.role === 'admin' || (currentUser?.role === 'ceo' && ceoAdminMode) ? [{ id: 'users', name: 'المستخدمون والصلاحيات', icon: Settings }] : []),
     ] },
   ];
 
@@ -583,7 +579,7 @@ export default function App() {
         {group.title}
       </span>
 
-      <div className="space-y-1">
+      <div data-office-menu={gIdx === 0 ? "executive" : undefined} className="space-y-1">
         {group.items.map((item) => {
           const isActive = activeView === item.id && (!item.orgRoot || item.orgRoot === organizationRoot);
           const IconComponent = item.icon;

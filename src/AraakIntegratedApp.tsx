@@ -45,7 +45,7 @@ export default function AraakIntegratedApp() {
       const currentTheme = themedElement?.dataset.theme as PlatformTheme | undefined;
       if (currentTheme) setTheme(currentTheme);
 
-      const nav = document.querySelector<HTMLElement>('aside nav');
+      const nav = document.querySelector<HTMLElement>('[data-office-menu="executive"]');
       setMenuTarget(previous => (previous === nav ? previous : nav));
     };
 
@@ -82,10 +82,7 @@ export default function AraakIntegratedApp() {
       <App />
 
       {hasAccess && menuTarget && createPortal(
-        <div className="space-y-1.5 border-t border-white/10 pt-5">
-          <span className="block px-3 text-right text-[12px] font-black uppercase tracking-wider text-slate-500">
-            منظومة نماء والذكاء التشغيلي
-          </span>
+        <div>
           <button
             type="button"
             onClick={() => setOpen(true)}
@@ -97,7 +94,7 @@ export default function AraakIntegratedApp() {
           >
             <div className="flex flex-1 flex-row-reverse items-center justify-start gap-2.5">
               <Sparkles className={`h-5 w-5 ${open ? 'text-white' : 'text-slate-500 group-hover:text-emerald-300'}`} />
-              <span className="flex-1 text-right">مركز القيادة الذكية</span>
+              <span className="flex-1 text-right">نماء</span>
             </div>
             <ChevronLeft className={`h-4 w-4 transition-all ${open ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
           </button>
