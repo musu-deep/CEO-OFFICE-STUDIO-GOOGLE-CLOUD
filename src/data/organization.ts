@@ -34,7 +34,7 @@ export const organization: OrgNode[] = [
     node('education', 'الحلول التعليمية', [node('education-platforms', 'منصات التعليم'), node('university-partnerships', 'الشراكات الجامعية')]),
     node('consulting', 'الاستشارات والتطوير', [node('consulting-services', 'الخدمات الاستشارية'), node('research', 'الدراسات والأبحاث'), node('training', 'التدريب والتأهيل', undefined, 'egypt'), node('accreditation', 'المقاييس والاعتمادات')]),
   ]),
-  { ...node('planned', 'مشاريع في الخطة', [node('food', 'اراك الغذائية'), node('araak-ai', 'اراك AI')]), planned: true },
+  { ...node('planned', 'قيد التنفيذ', [node('food', 'اراك الغذائية'), node('araak-ai', 'اراك AI')]), planned: true },
 ];
 export function findOrgPath(id: string, nodes = organization, trail: OrgNode[] = []): OrgNode[] {
   for (const item of nodes) {

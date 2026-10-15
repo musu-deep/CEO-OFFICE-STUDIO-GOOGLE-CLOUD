@@ -4,7 +4,7 @@ import type { OrgNode } from '../data/organization';
 
 type Props = { nodes: OrgNode[]; selectedId?: string; onSelect: (id: string) => void };
 export default function OrganizationSidebarTree({ nodes, selectedId, onSelect }: Props) {
-  return <div className="mr-4 space-y-1 border-r border-white/10 pr-2" role="group" aria-label="شركات ووحدات اراك للاستثمار">
+  return <div className="mr-4 space-y-1 border-r border-white/10 pr-2" role="group" aria-label="الجهات والوحدات التابعة">
     {nodes.map(node => <Branch key={node.id} node={node} selectedId={selectedId} onSelect={onSelect}/>)}
   </div>;
 }

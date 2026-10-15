@@ -203,8 +203,8 @@ export default function App() {
   );
   const [activeView, setActiveView] = useState<string>('dashboard');
   const [organizationRoot, setOrganizationRoot] = useState('ceo');
-  const [investmentExpanded, setInvestmentExpanded] = useState(false);
-  const [investmentSelection, setInvestmentSelection] = useState('investment');
+  const [expandedOrgRoots, setExpandedOrgRoots] = useState<Record<string, boolean>>({});
+  const [orgSelections, setOrgSelections] = useState<Record<string, string>>({});
   const [notifications, setNotifications] = useState(initialNotifications);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -439,9 +439,9 @@ export default function App() {
     ] },
     { title: 'شركات المجموعة وإداراتها التنفيذية', items: [
       { id: 'executive-departments', name: 'اراك للاستثمار', icon: Building2, orgRoot: 'investment' },
-      { id: 'executive-departments', name: 'الإدارات المساندة', icon: Layers, orgRoot: 'support' },
       { id: 'executive-departments', name: 'اراك للتنمية', icon: Globe, orgRoot: 'development' },
-      { id: 'executive-departments', name: 'مشاريع في الخطة', icon: TrendingUp, orgRoot: 'planned' },
+      { id: 'executive-departments', name: 'قيد التنفيذ', icon: TrendingUp, orgRoot: 'planned' },
+      { id: 'executive-departments', name: 'الإدارات المساندة', icon: Layers, orgRoot: 'support' },
     ] },
     { title: 'أعمال المكتب', items: [
       { id: 'projects', name: 'المشاريع والمبادرات', icon: Building2 },
@@ -493,7 +493,7 @@ export default function App() {
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
-      case 'executive-departments': return <ExecutiveDepartmentsView theme={theme} rootId={organizationRoot} selectedId={organizationRoot === 'investment' ? investmentSelection : undefined} onSelect={setInvestmentSelection} hideNavigation={organizationRoot === 'investment'} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? rawMenuGroups.flatMap(g => g.items.map(i => i.id)) : currentUser?.allowedViews || []} />;
+      case 'executive-departments': return <ExecutiveDepartmentsView theme={theme} rootId={organizationRoot} selectedId={organizationRoot !== 'ceo' ? orgSelections[organizationRoot] || organizationRoot : undefined} onSelect={id => setOrgSelections(previous => ({ ...previous, [organizationRoot]: id }))} hideNavigation={organizationRoot !== 'ceo'} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? rawMenuGroups.flatMap(g => g.items.map(i => i.id)) : currentUser?.allowedViews || []} />;
       case 'projects': return <ProjectsView projects={projects} setProjects={setProjects} theme={theme} />;
       case 'tasks': return <TasksView tasks={tasks} setTasks={setTasks} theme={theme} />;
       case 'secretariat': return <SecretariatView theme={theme} />;
@@ -587,12 +587,14 @@ export default function App() {
         {group.items.map((item) => {
           const isActive = activeView === item.id && (!item.orgRoot || item.orgRoot === organizationRoot);
           const IconComponent = item.icon;
+          const expandableRoot = item.orgRoot && item.orgRoot !== 'ceo' ? item.orgRoot : undefined;
+          const isExpanded = !!expandableRoot && !!expandedOrgRoots[expandableRoot];
 
           return (
             <div key={item.orgRoot || item.id}>
             <button
-              aria-expanded={item.orgRoot === 'investment' ? investmentExpanded : undefined}
-              onClick={() => { if (item.orgRoot === 'investment') { setInvestmentExpanded(value => !value); return; } if (item.orgRoot) setOrganizationRoot(item.orgRoot); setActiveView(item.id); }}
+              aria-expanded={expandableRoot ? isExpanded : undefined}
+              onClick={() => { if (expandableRoot) { setExpandedOrgRoots(previous => ({ ...previous, [expandableRoot]: !previous[expandableRoot] })); return; } if (item.orgRoot) setOrganizationRoot(item.orgRoot); setActiveView(item.id); }}
               className={`w-full flex flex-row-reverse items-center justify-between px-3.5 py-3 rounded-xl text-[15px] transition-all cursor-pointer group ${
                 isActive
                   ? `${currentTheme.activeMenu} font-black`
@@ -611,10 +613,10 @@ export default function App() {
               </div>
 
               <ChevronLeft
-                className={`w-4 h-4 transition-all ${item.orgRoot === 'investment' ? (investmentExpanded ? '-rotate-90 opacity-100' : 'opacity-100') : isActive ? 'opacity-100 translate-x-0' : 'opacity-0 group-hover:opacity-100 -translate-x-1'}`}
+                className={`w-4 h-4 transition-all ${expandableRoot ? (isExpanded ? '-rotate-90 opacity-100' : 'opacity-100') : isActive ? 'opacity-100 translate-x-0' : 'opacity-0 group-hover:opacity-100 -translate-x-1'}`}
               />
             </button>
-            {item.orgRoot === 'investment' && investmentExpanded && <OrganizationSidebarTree nodes={organization.find(node => node.id === 'investment')?.children || []} selectedId={activeView === 'executive-departments' && organizationRoot === 'investment' ? investmentSelection : undefined} onSelect={id => { setInvestmentSelection(id); setOrganizationRoot('investment'); setActiveView('executive-departments'); }}/>}
+            {expandableRoot && isExpanded && <OrganizationSidebarTree nodes={organization.find(node => node.id === expandableRoot)?.children || []} selectedId={activeView === 'executive-departments' && organizationRoot === expandableRoot ? orgSelections[expandableRoot] : undefined} onSelect={id => { setOrgSelections(previous => ({ ...previous, [expandableRoot]: id })); setOrganizationRoot(expandableRoot); setActiveView('executive-departments'); }}/>}
             </div>
           );
         })}
