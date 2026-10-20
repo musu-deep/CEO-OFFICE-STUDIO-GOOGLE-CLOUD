@@ -104,6 +104,7 @@ export default function AraakIntegratedApp() {
 
       {hasAccess && open && (
         <div className="fixed inset-0 z-[100] flex flex-col bg-[#06080f]/95 text-slate-100 backdrop-blur-xl" dir="rtl">
+          <p className="border-b border-amber-500/20 bg-amber-500/5 px-5 py-2 text-xs text-amber-300">مساحة تشغيل مساندة تتضمن بيانات تجريبية؛ لا تمثل نتائج فعلية للمجموعة.</p>
           <header className="flex min-h-[76px] items-center justify-between border-b border-white/10 bg-black/25 px-5 shadow-2xl md:px-8">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald-500/25 bg-emerald-500/10">

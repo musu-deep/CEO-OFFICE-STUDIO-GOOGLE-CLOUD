@@ -39,7 +39,9 @@ import {
   UserRound,
   ShieldCheck,
   Sun,
-  Moon
+  Moon,
+  Menu,
+  X
 } from 'lucide-react';
 import { PlatformTheme, AppUser } from './types';
 
@@ -176,7 +178,7 @@ import GovernanceView from './components/GovernanceView';
 import LegalView from './components/LegalView';
 import AiAdvisorView from './components/AiAdvisorView';
 import VoiceAssistantView from './components/VoiceAssistantView';
-import DashboardView from './components/DashboardView';
+import ExecutiveWorkspaceHome, { workspaceModes, type WorkspaceMode } from './components/ExecutiveWorkspaceHome';
 import ReportsView from './components/ReportsView';
 import ArakEgyptView from './components/ArakEgyptView';
 import ArakLogisticView from './components/ArakLogisticView';
@@ -201,11 +203,13 @@ export default function App() {
   const [theme, setTheme] = useState<PlatformTheme>(() =>
     localStorage.getItem('arak_display_mode') === 'light' ? 'spring' : 'vision_2030'
   );
+  const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>('information');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState<string>('dashboard');
   const [organizationRoot, setOrganizationRoot] = useState('ceo');
   const [expandedOrgRoots, setExpandedOrgRoots] = useState<Record<string, boolean>>({});
   const [orgSelections, setOrgSelections] = useState<Record<string, string>>({});
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [notifications, setNotifications] = useState<typeof initialNotifications>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showCommandBar, setShowCommandBar] = useState(false);
@@ -345,21 +349,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const executiveSummary = {
-    decisions: 4,
-    delayedProjects: projects.filter(p => p.status === 'معلق' || p.progress < 45).length || 1,
-    meetings: meetings.filter(m => m.status === 'مجدول').length || 2,
-    financialRisks: 1,
-    delegatedTasks: tasks.filter(t => t.status !== 'مكتمل').length || 7,
-  };
-
-  const executiveTimeline = [
-    { time: '08:12', title: 'اعتماد تقرير الأداء المالي والتشغيلي', type: 'تم الاعتماد', icon: CheckCircle2 },
-    { time: '09:15', title: 'تكليف نائب التنمية بمتابعة المشاريع المتأخرة', type: 'تفويض', icon: ArrowUpRight },
-    { time: '10:40', title: 'تنبيه مخاطرة على بند المصروف الفعلي المعتمد', type: 'تنبيه', icon: AlertTriangle },
-    { time: '11:20', title: 'الوكيل التنفيذي لخص محضر اجتماع السكرتارية', type: 'ذكاء تنفيذي', icon: Bot },
-  ];
-
   const safeCurrentUser: AppUser = currentUser || {
     id: 'guest',
     name: 'ضيف المنصة',
@@ -385,29 +374,21 @@ export default function App() {
   // Other users render a safe initials fallback until their own photo is configured.
   const currentUserPhoto = safeCurrentUser.role === 'ceo' ? '/user-avatar.png' : null;
 
-  const userProfileDetails = [
-    { label: 'الإدارة', value: 'مكتب الرئيس التنفيذي', icon: Building2 },
-    { label: 'المنصب', value: safeCurrentUser.title || 'الرئيس التنفيذي', icon: Crown },
-    { label: 'نوع الحساب', value: safeCurrentUser.role === 'admin' ? 'مدير النظام' : safeCurrentUser.role === 'ceo' ? 'الرئيس التنفيذي' : 'مستخدم تنفيذي', icon: ShieldCheck },
-    { label: 'تاريخ تسجيل الدخول', value: new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }), icon: Calendar },
-    { label: 'زمن الجلسة', value: formatSessionDuration(sessionSeconds), icon: Clock3 },
-    { label: 'آخر نشاط', value: 'متصل الآن', icon: Activity },
-  ];
-
   const commandActions = [
-    { label: 'افتح مركز القيادة', description: 'الانتقال إلى الصفحة التنفيذية الأولى', target: 'dashboard', icon: Command },
+    { label: 'اعرض الموجز التنفيذي', description: 'الانتقال إلى الصفحة التنفيذية الأولى', target: 'dashboard', icon: Command },
     { label: 'اعرض التقارير والتحليلات', description: 'الموازنات والإنفاق ومؤشرات الأداء', target: 'reports', icon: BarChart3 },
-    { label: 'أنشئ تكليفاً جديداً', description: 'فتح صفحة التكاليف والمهام النشطة', target: 'tasks', icon: CheckSquare },
+    { label: 'افتح التكليفات', description: 'فتح صفحة التكاليف والمهام النشطة', target: 'tasks', icon: CheckSquare },
     ...(currentUser?.role === 'ceo' || currentUser?.role === 'admin' || currentUser?.allowedViews.includes('executive-departments') ? [{ label: 'عرض خطة المشتريات والعقود', description: 'استدعاء الخطة الاستراتيجية وخارطة المائة يوم جاهزة للقراءة', target: 'procurement-plan', icon: FileText }] : []),
     { label: 'افتح الهيكل التنظيمي', description: 'الخطط والمؤشرات والميزانيات والانحرافات حسب الإدارة والوحدة', target: 'executive-departments', icon: Activity },
-    { label: 'اعرض المشاريع المتأخرة', description: 'متابعة القطاعات والمشاريع الحرجة', target: 'projects', icon: Building2 },
+    { label: 'اعرض المشاريع', description: 'متابعة القطاعات والمشاريع الحرجة', target: 'projects', icon: Building2 },
     { label: 'افتح مركز القرارات', description: 'القرارات والتوجيهات التنفيذية', target: 'messages', icon: MessageSquare },
-    { label: 'راجع اجتماعات اليوم', description: 'التقويم والاجتماعات الحية', target: 'calendar', icon: Calendar },
+    { label: 'اعرض التقويم', description: 'التقويم والاجتماعات الحية', target: 'calendar', icon: Calendar },
     { label: 'اسأل المستشار الذكي', description: 'تحليل، توصية، ومساندة قرار', target: 'ai-advisor', icon: Brain },
   ];
 
+  const availableCommandActions = commandActions.filter(action=>action.target==='dashboard'||currentUser?.role==='ceo'||currentUser?.role==='admin'||currentUser?.allowedViews.includes(action.target==='procurement-plan'?'executive-departments':action.target));
   const asksForProcurementPlan = /مشتريات|المشتريات|خطة.*عقود/.test(commandQuery);
-  const filteredCommandActions = commandActions.filter(action =>
+  const filteredCommandActions = availableCommandActions.filter(action =>
     (asksForProcurementPlan && action.target === 'procurement-plan') ||
     `${action.label} ${action.description}`.toLowerCase().includes(commandQuery.trim().toLowerCase())
   );
@@ -420,9 +401,12 @@ export default function App() {
       setActiveView('executive-departments');
       window.dispatchEvent(new Event('araak:procurement-plan'));
     } else setActiveView(target);
+    setSidebarOpen(false);
     setShowCommandBar(false);
     setCommandQuery('');
   };
+
+  useEffect(()=>{if(!sidebarOpen)return;const close=(event:KeyboardEvent)=>{if(event.key==='Escape')setSidebarOpen(false);};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close);},[sidebarOpen]);
 
   const getThemeTextClass = () => currentTheme.text;
   const getThemeBgClass = () => currentTheme.bg;
@@ -435,36 +419,38 @@ export default function App() {
   };
 
   // Sidebar Menu Items grouped and filtered dynamically
-  const rawMenuGroups: { title: string; items: { id: string; name: string; icon: typeof Layers; orgRoot?: string }[] }[] = [
-    { title: 'الرئيس التنفيذي', items: [
-      { id: 'dashboard', name: 'مركز القيادة التنفيذي', icon: Layers },
-      { id: 'executive-departments', name: 'الجهات المرتبطة بالرئيس التنفيذي', icon: Activity, orgRoot: 'ceo' },
-      { id: 'secretariat', name: 'السكرتارية التنفيذية', icon: FolderClosed },
-      { id: 'ai-advisor', name: 'مستشار الذكاء الاصطناعي', icon: Brain },
-      { id: 'voice-assistant', name: 'الوكيل الصوتي', icon: Mic },
-      { id: 'legal', name: 'المستشار القانوني', icon: Scale },
-      { id: 'governance', name: 'الحوكمة والجودة', icon: ShieldAlert },
-      ...(currentUser?.role === 'admin' || (currentUser?.role === 'ceo' && ceoAdminMode) ? [{ id: 'users', name: 'المستخدمون والصلاحيات', icon: Settings }] : []),
-    ] },
-    { title: 'شركات المجموعة وإداراتها التنفيذية', items: [
-      { id: 'executive-departments', name: 'اراك للاستثمار', icon: Building2, orgRoot: 'investment' },
-      { id: 'executive-departments', name: 'اراك للتنمية', icon: Globe, orgRoot: 'development' },
-      { id: 'executive-departments', name: 'قيد التنفيذ', icon: TrendingUp, orgRoot: 'planned' },
-      { id: 'executive-departments', name: 'الإدارات المساندة', icon: Layers, orgRoot: 'support' },
-    ] },
-    { title: 'أعمال المكتب', items: [
-      { id: 'projects', name: 'المشاريع والمبادرات', icon: Building2 },
-      { id: 'tasks', name: 'التكليفات والمهام', icon: CheckSquare },
-      { id: 'messages', name: 'القرارات والتوجيهات', icon: MessageSquare },
-      { id: 'reports', name: 'التقارير والتحليلات', icon: BarChart3 },
-      { id: 'documents', name: 'الوثائق', icon: FileText },
-      { id: 'calendar', name: 'التقويم', icon: Calendar },
-      { id: 'meetings', name: 'الاجتماعات', icon: Video },
-      { id: 'meeting-requests', name: 'طلبات اللقاء والزيارات', icon: UserCheck },
-      { id: 'egypt', name: 'التدريب والتأهيل', icon: Globe },
-      { id: 'logistic', name: 'خدمات اراك لوجستيك', icon: Map },
-    ] },
+  const rawMenuGroups: { title: string; mode: WorkspaceMode; items: { id: string; name: string; icon: typeof Layers; orgRoot?: string }[] }[] = [
+    { title: 'المعلومة', mode: 'information', items: [
+      { id:'dashboard', name:'الموجز التنفيذي', icon:Layers },
+      { id:'documents', name:'الخطط والوثائق', icon:FileText },
+      { id:'reports', name:'التقارير', icon:BarChart3 },
+      { id:'executive-departments', name:'اراك للاستثمار', icon:Building2, orgRoot:'investment' },
+      { id:'executive-departments', name:'اراك للتنمية', icon:Globe, orgRoot:'development' },
+      { id:'executive-departments', name:'قيد التنفيذ', icon:TrendingUp, orgRoot:'planned' },
+      { id:'executive-departments', name:'الإدارات المساندة', icon:Layers, orgRoot:'support' },
+      { id:'executive-departments', name:'مكتب الرئيس التنفيذي', icon:Crown, orgRoot:'ceo' },
+    ]},
+    { title:'القرار', mode:'decision', items:[
+      { id:'messages', name:'القرارات والتوجيهات', icon:MessageSquare },
+      { id:'ai-advisor', name:'مساندة القرار', icon:Brain },
+      { id:'voice-assistant', name:'المساعد الصوتي', icon:Mic },
+    ]},
+    { title:'المتابعة', mode:'followup', items:[
+      { id:'tasks', name:'التكليفات', icon:CheckSquare },
+      { id:'projects', name:'المشاريع', icon:Building2 },
+      { id:'calendar', name:'التقويم', icon:Calendar },
+      { id:'meetings', name:'الاجتماعات', icon:Video },
+      { id:'meeting-requests', name:'طلبات اللقاء', icon:UserCheck },
+      { id:'secretariat', name:'السكرتارية', icon:FolderClosed },
+    ]},
   ];
+  const canAccessView = (view:string) => view === 'dashboard' || currentUser?.role === 'admin' || currentUser?.role === 'ceo' || !!currentUser?.allowedViews.includes(view);
+  useEffect(() => {
+    if (activeView === 'dashboard') return;
+    const group = rawMenuGroups.find(g=>g.items.some(i=>i.id===activeView));
+    if (group) setWorkspaceMode(group.mode);
+    setSidebarOpen(false);
+  }, [activeView]);
 
   const menuGroups = rawMenuGroups.map(group => {
     const filteredItems = group.items.filter(item => {
@@ -498,11 +484,11 @@ export default function App() {
 
   const renderActiveView = () => {
     switch (activeView) {
-      case 'dashboard': return <DashboardView projects={projects} tasks={tasks} theme={theme} onNavigate={setActiveView} currentUser={safeCurrentUser} />;
+      case 'dashboard': return <ExecutiveWorkspaceHome mode={workspaceMode} user={safeCurrentUser} onNavigate={runCommand} onCommand={()=>setShowCommandBar(true)} canAccess={canAccessView}/>;
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
-      case 'executive-departments': return <ExecutiveDepartmentsView userKey={currentUser?.email || currentUser?.id || 'local-user'} theme={theme} rootId={organizationRoot} selectedId={organizationRoot !== 'ceo' ? orgSelections[organizationRoot] || organizationRoot : undefined} onSelect={id => setOrgSelections(previous => ({ ...previous, [organizationRoot]: id }))} hideNavigation={organizationRoot !== 'ceo'} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? rawMenuGroups.flatMap(g => g.items.map(i => i.id)) : currentUser?.allowedViews || []} />;
+      case 'executive-departments': return <ExecutiveDepartmentsView userKey={currentUser?.email || currentUser?.id || 'local-user'} theme={theme} rootId={organizationRoot} selectedId={orgSelections[organizationRoot] || organizationRoot} onSelect={id => setOrgSelections(previous => ({ ...previous, [organizationRoot]: id }))} hideNavigation={true} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? [...rawMenuGroups.flatMap(g => g.items.map(i => i.id)), 'legal', 'governance', 'egypt', 'logistic', 'users'] : currentUser?.allowedViews || []} />;
       case 'projects': return <ProjectsView projects={projects} setProjects={setProjects} theme={theme} />;
       case 'tasks': return <TasksView tasks={tasks} setTasks={setTasks} theme={theme} />;
       case 'secretariat': return <SecretariatView theme={theme} />;
@@ -528,7 +514,7 @@ export default function App() {
             ceoAdminMode={ceoAdminMode}
           />
         );
-      default: return <DashboardView projects={projects} tasks={tasks} theme={theme} onNavigate={setActiveView} currentUser={safeCurrentUser} />;
+      default: return <ExecutiveWorkspaceHome mode={workspaceMode} user={safeCurrentUser} onNavigate={runCommand} onCommand={()=>setShowCommandBar(true)} canAccess={canAccessView}/>;
     }
   };
 
@@ -556,8 +542,9 @@ export default function App() {
       className={`min-h-screen ${currentTheme.mainBg} text-slate-100 flex overflow-x-hidden antialiased selection:bg-[var(--theme-accent-soft)]`}
     >
       
+      {sidebarOpen&&<button aria-label="إغلاق القائمة" onClick={()=>setSidebarOpen(false)} className="fixed inset-0 z-40 bg-black/65 lg:hidden"/>}
       {/* Sidebar on the Right (Arabic layout standard) */}
-      <aside className={`w-[22rem] ${currentTheme.sidebarBg} border-l border-white/10 ${currentTheme.border} flex flex-col justify-between flex-shrink-0 z-30 h-screen sticky top-0 shadow-2xl shadow-black/30`}>
+      <aside className={`w-[min(88vw,320px)] lg:w-[288px] ${sidebarOpen?'visible translate-x-0':'invisible translate-x-full'} lg:visible lg:translate-x-0 fixed inset-y-0 right-0 lg:sticky lg:top-0 transition-transform ${currentTheme.sidebarBg} border-l border-white/10 ${currentTheme.border} flex flex-col justify-between flex-shrink-0 z-50 h-screen shadow-2xl shadow-black/30`}>
         <div className="flex flex-col h-full overflow-y-auto px-2">
           
           {/* Araak Group official logo */}
@@ -572,72 +559,21 @@ export default function App() {
             </div>
           </div>
  
-          {/* Quick Active CEO Status Tracker */}
-          <div className={`m-4 p-4 rounded-xl ${getThemePanelClass()} flex justify-between items-center text-right shadow-lg shadow-black/15`}>
-            <div className="flex flex-col">
-              <span className="text-xs text-slate-500">التوقيت المحلي للمكتب</span>
-              <span className={`text-sm font-mono font-bold ${currentTheme.text}`}>{time || '12:00:00'}</span>
-            </div>
-            <div className="flex flex-col items-end">
-              <span className="text-sm text-slate-400 font-semibold">المستخدم النشط</span>
-              <span className="text-sm font-extrabold text-white">{currentUser.name}</span>
-            </div>
-          </div>
- 
          {/* Sidebar Menu Items */}
-<nav className="p-4 space-y-6">
-  {menuGroups.map((group, gIdx) => (
-    <div key={gIdx} className="space-y-1.5">
-      <span className="text-[12px] font-black text-slate-500 uppercase tracking-wider block px-3 text-right">
-        {group.title}
-      </span>
-
-      <div data-office-menu={gIdx === 0 ? "executive" : undefined} className="space-y-1">
-        {group.items.map((item) => {
-          const isActive = activeView === item.id && (!item.orgRoot || item.orgRoot === organizationRoot);
-          const IconComponent = item.icon;
-          const expandableRoot = item.orgRoot && item.orgRoot !== 'ceo' ? item.orgRoot : undefined;
-          const isExpanded = !!expandableRoot && !!expandedOrgRoots[expandableRoot];
-
-          return (
-            <div key={item.orgRoot || item.id}>
-            <button
-              aria-expanded={expandableRoot ? isExpanded : undefined}
-              onClick={() => { if (expandableRoot) { setExpandedOrgRoots(previous => ({ ...previous, [expandableRoot]: !previous[expandableRoot] })); return; } if (item.orgRoot) setOrganizationRoot(item.orgRoot); setActiveView(item.id); }}
-              className={`w-full flex flex-row-reverse items-center justify-between px-3.5 py-3 rounded-xl text-[15px] transition-all cursor-pointer group ${
-                isActive
-                  ? `${currentTheme.activeMenu} font-black`
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-white/10 hover:backdrop-blur-xl'
-              }`}
-            >
-              <div className="flex flex-row-reverse items-center gap-2.5 flex-1 justify-start">
-                <IconComponent
-                  className={`w-5 h-5 ${
-                    isActive
-                      ? 'text-white'
-                      : 'text-slate-500 group-hover:text-slate-300'
-                  }`}
-                />
-                <span className="flex-1 text-right">{item.name}</span>
-              </div>
-
-              <ChevronLeft
-                className={`w-4 h-4 transition-all ${expandableRoot ? (isExpanded ? '-rotate-90 opacity-100' : 'opacity-100') : isActive ? 'opacity-100 translate-x-0' : 'opacity-0 group-hover:opacity-100 -translate-x-1'}`}
-              />
-            </button>
-            {expandableRoot && isExpanded && <OrganizationSidebarTree nodes={organization.find(node => node.id === expandableRoot)?.children || []} selectedId={activeView === 'executive-departments' && organizationRoot === expandableRoot ? orgSelections[expandableRoot] : undefined} onSelect={id => { setOrgSelections(previous => ({ ...previous, [expandableRoot]: id })); setOrganizationRoot(expandableRoot); setActiveView('executive-departments'); }}/>}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  ))}
+<nav className="p-3 space-y-5" aria-label="التنقل الرئيسي">
+  <div className="space-y-2">{workspaceModes.map(mode=>{const Icon=mode.icon;return <button key={mode.id} onClick={()=>{setWorkspaceMode(mode.id);setActiveView('dashboard');setSidebarOpen(false);}} aria-current={workspaceMode===mode.id?'page':undefined} className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-right ${workspaceMode===mode.id?currentTheme.activeMenu:'text-slate-400 hover:bg-white/5'}`}><Icon className="h-5 w-5"/><span className="font-black">{mode.name}</span></button>;})}</div>
+  {menuGroups.filter(group=>group.mode===workspaceMode).map(group=><div key={group.mode} className="space-y-3 border-t border-white/10 pt-4">
+    <div data-office-menu={group.mode==='decision'?'executive':undefined} className="space-y-1">{group.items.filter(item=>!item.orgRoot).map(item=>{const Icon=item.icon;return <button key={item.id} onClick={()=>{setActiveView(item.id);setSidebarOpen(false);}} className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-right text-sm ${activeView===item.id?'bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]':'text-slate-400 hover:bg-white/5'}`}><Icon className="h-4 w-4"/>{item.name}</button>;})}</div>
+    {group.items.some(item=>item.orgRoot)&&<details open={activeView==='executive-departments'} className="rounded-xl border border-white/10 p-2"><summary className="cursor-pointer px-2 py-2 text-sm font-bold">الجهات والخطط</summary><div className="mt-2 space-y-1">{group.items.filter(item=>item.orgRoot).map(item=>{const root=item.orgRoot!;const expanded=!!expandedOrgRoots[root];return <div key={root}><button aria-expanded={expanded} onClick={()=>setExpandedOrgRoots(previous=>({...previous,[root]:!previous[root]}))} className={`w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-right text-sm ${organizationRoot===root&&activeView==='executive-departments'?'text-[var(--theme-accent)]':'text-slate-400'}`}><span>{item.name}</span><ChevronLeft className={`h-4 w-4 ${expanded?'-rotate-90':''}`}/></button>{expanded&&<OrganizationSidebarTree nodes={organization.find(node=>node.id===root)?.children||[]} selectedId={organizationRoot===root?orgSelections[root]:undefined} onSelect={id=>{setOrgSelections(previous=>({...previous,[root]:id}));setOrganizationRoot(root);setActiveView('executive-departments');setSidebarOpen(false);}}/>}</div>;})}</div></details>}
+  </div>)}
+  {(currentUser.role==='admin'||(currentUser.role==='ceo'&&ceoAdminMode))&&<details className="border-t border-white/10 pt-3"><summary className="cursor-pointer px-3 text-xs text-slate-500">إدارة المنصة</summary><button onClick={()=>{setActiveView('users');setSidebarOpen(false);}} className="px-3 py-3 text-xs text-slate-400">المستخدمون والصلاحيات</button></details>}
 </nav>
  
         </div>
  
         {/* Bottom copyright & logout */}
         <div className={`p-4 border-t border-white/10 ${currentTheme.headerBg}`}>
+          <button onClick={()=>setTheme(theme==='spring'?'vision_2030':'spring')} className="mb-3 w-full rounded-lg border border-white/10 py-2 text-xs text-slate-400 xl:hidden">{theme==='spring'?'الوضع الليلي':'الوضع النهاري'}</button>
           <div className="flex items-center justify-between text-xs text-slate-500">
             <button 
               onClick={() => {
@@ -655,26 +591,26 @@ export default function App() {
       </aside>
  
       {/* Main Content Area */}
-      <main className="flex-1 min-h-screen flex flex-col overflow-x-hidden">
+      <main className="min-w-0 flex-1 min-h-screen flex flex-col overflow-x-hidden">
         
         {/* Top Sticky Header */}
-        <header className={`h-[72px] ${currentTheme.headerBg} border-b border-white/10 ${currentTheme.border} px-8 flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-black/20`}>
+        <header className={`h-[72px] ${currentTheme.headerBg} border-b border-white/10 ${currentTheme.border} px-3 sm:px-6 gap-2 flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-black/20`}>
           
           {/* Right Header: Fast Search and System indicators */}
-          <div className="flex items-center gap-4">
-            
+          <div className="flex min-w-0 items-center gap-1 sm:gap-4">
+            <button aria-label="فتح القائمة" onClick={()=>setSidebarOpen(true)} className="shrink-0 rounded-xl border border-white/10 p-2 lg:hidden"><Menu className="h-5 w-5"/></button>
             {/* Global Command Bar Trigger */}
             <button
               onClick={() => setShowCommandBar(true)}
-              className={`${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl px-3 py-1.5 min-w-[300px] flex items-center justify-between gap-3 text-sm text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-all`}
+              className={`${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl px-3 py-1.5 min-w-0 sm:min-w-[240px] flex items-center justify-between gap-3 text-sm text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-all`}
               title="Ctrl + K"
             >
               <span className="flex items-center gap-2"><Search className="w-3.5 h-3.5" /> ماذا تريد أن تنجز؟</span>
-              <span className="text-xs border border-white/10 rounded-md px-1.5 py-0.5 text-slate-500">Ctrl K</span>
+              <span className="hidden sm:block text-xs border border-white/10 rounded-md px-1.5 py-0.5 text-slate-500">Ctrl K</span>
             </button>
 
             {/* Day / Night display mode */}
-            <div className={`flex items-center gap-1 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl p-1 transition-all`} role="group" aria-label="وضع العرض">
+            <div className={`hidden xl:flex items-center gap-1 ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} rounded-xl p-1 transition-all`} role="group" aria-label="وضع العرض">
               <button
                 type="button"
                 onClick={() => setTheme('vision_2030')}
@@ -709,7 +645,7 @@ export default function App() {
                   };
                   setNotifications(prev => [newAlert, ...prev]);
                 }}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-black transition-all border cursor-pointer ${
+                className={`hidden xl:flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-black transition-all border cursor-pointer ${
                   ceoAdminMode 
                     ? `${currentTheme.softPanelBg} ${currentTheme.text} ${currentTheme.strongBorder} shadow ${currentTheme.glow}` 
                     : `${currentTheme.panelBg} text-slate-400 border-white/10 hover:text-slate-200 hover:bg-white/10`
@@ -722,8 +658,8 @@ export default function App() {
  
             {/* Quick help button */}
             <button 
-              onClick={() => alert('نظام المساعد التنفيذي متصل بقاعدة البيانات وعقود وميزانيات المجموعة لرصد الأداء واتخاذ القرار.')}
-              className="p-2 hover:bg-white/10 text-slate-400 hover:text-slate-200 rounded-xl transition-all cursor-pointer"
+              onClick={() => alert('الخطط المرجعية متاحة. بعض أقسام التشغيل تتضمن بيانات تجريبية، ولم يفعّل ربط أودوو بعد.')}
+              className="hidden md:block p-2 hover:bg-white/10 text-slate-400 hover:text-slate-200 rounded-xl transition-all cursor-pointer"
               title="معلومات النظام"
             >
               <HelpCircle className="w-4.5 h-4.5" />
@@ -732,7 +668,7 @@ export default function App() {
           </div>
  
           {/* Left Header: Profile + Notification alerts */}
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-4">
             
             {/* Notifications Dropdown Container */}
             <div className="relative">
@@ -793,7 +729,7 @@ export default function App() {
                 }}
                 className="flex items-center gap-2.5 p-1.5 hover:bg-white/10 rounded-xl transition-all cursor-pointer"
               >
-                <div className="text-right hidden sm:block">
+                <div className="text-right hidden xl:block">
                   <span className="text-sm font-black text-white block">{currentUser.name}</span>
                   <span className="text-[11px] text-slate-500 block">{currentUser.email}</span>
                 </div>
@@ -852,189 +788,9 @@ export default function App() {
  
         </header>
  
-        {/* Executive morning brief shown after login */}
-        {activeView === 'dashboard' && (
-          <section className="px-8 pt-8 max-w-[1700px] mx-auto w-full">
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
-              {/* Luxury Passport Profile Card */}
-              <div className={`xl:col-span-7 relative overflow-hidden rounded-[2rem] ${currentTheme.panelBg} border border-white/10 ${currentTheme.strongBorder} p-6 shadow-2xl shadow-black/30`}>
-                <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.10),transparent_28%),radial-gradient(circle_at_88%_72%,var(--theme-accent-soft),transparent_34%)]" />
-                <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[var(--theme-accent-soft)] blur-3xl opacity-70" />
-                <div className="relative flex items-start justify-between gap-4 mb-6">
-                  <div>
-                    <span className={`inline-flex items-center gap-2 text-xs font-black ${currentTheme.text} bg-black/25 border border-white/10 rounded-full px-4 py-2`}>
-                      <span className={`${currentTheme.bg} w-2 h-2 rounded-full animate-pulse`} />
-                      بطاقة المستخدم التنفيذية
-                    </span>
-                    <h2 className="text-4xl md:text-5xl font-black text-white mt-4 leading-tight">{currentUser.name}</h2>
-                    <p className="text-slate-400 mt-2 text-lg font-bold">{currentUser.title}</p>
-                    {currentUser.role === 'ceo' && (
-                      <button
-                        onClick={() => setActiveView('executive-cv')}
-                        className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-black text-white ${currentTheme.gradientButton} shadow-lg ${currentTheme.glow}`}
-                      >
-                        <FileText className="w-4 h-4" /> عرض السيرة التنفيذية
-                      </button>
-                    )}
-                  </div>
-                  <div className="hidden lg:flex flex-col items-end gap-2 text-left">
-                    <span className="text-xs text-slate-500 font-bold">التوقيت المحلي</span>
-                    <span className={`font-mono text-2xl font-black ${currentTheme.text}`}>{time || '00:00:00'}</span>
-                  </div>
-                </div>
-
-                <div className="relative grid grid-cols-1 lg:grid-cols-[230px_1fr] gap-6 items-stretch">
-                  <div
-                    className={`relative rounded-[1.7rem] border border-white/15 bg-black/35 p-3 shadow-2xl shadow-black/30 ${currentUser.role === 'ceo' ? 'cursor-pointer group focus:outline-none focus:ring-2 focus:ring-emerald-500/60' : ''}`}
-                    onClick={() => currentUser.role === 'ceo' && setActiveView('executive-cv')}
-                    onKeyDown={(event) => {
-                      if (currentUser.role === 'ceo' && (event.key === 'Enter' || event.key === ' ')) {
-                        event.preventDefault();
-                        setActiveView('executive-cv');
-                      }
-                    }}
-                    role={currentUser.role === 'ceo' ? 'link' : undefined}
-                    tabIndex={currentUser.role === 'ceo' ? 0 : undefined}
-                    aria-label={currentUser.role === 'ceo' ? 'فتح السيرة الذاتية التنفيذية للدكتور علي العتيبي' : undefined}
-                    title={currentUser.role === 'ceo' ? 'عرض السيرة الذاتية التنفيذية' : undefined}
-                  >
-                    <div className={`absolute inset-0 rounded-[1.7rem] border ${currentTheme.strongBorder} opacity-60 ${currentUser.role === 'ceo' ? 'group-hover:opacity-100 transition-opacity' : ''}`} />
-                    {currentUserPhoto ? (
-                      <img
-                        src={currentUserPhoto}
-                        alt={currentUser.name}
-                        className="relative h-[300px] w-full rounded-[1.35rem] object-cover object-center border border-white/10 shadow-xl"
-                      />
-                    ) : (
-                      <div
-                        className={`relative h-[300px] w-full rounded-[1.35rem] border border-white/10 shadow-xl flex items-center justify-center ${currentUser.color || 'bg-slate-700'}`}
-                        role="img"
-                        aria-label={`الصورة الافتراضية لـ ${currentUser.name}`}
-                      >
-                        <span className="text-8xl font-black text-white/90">
-                          {currentUser.avatar || currentUser.name?.trim().charAt(0) || 'ع'}
-                        </span>
-                      </div>
-                    )}
-                    <div className={`absolute bottom-6 right-6 left-6 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 backdrop-blur-xl p-3`}>
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-[11px] text-slate-400 font-bold">حالة الدخول</p>
-                          <p className="text-sm text-white font-black">نشط وآمن</p>
-                        </div>
-                        <ShieldCheck className={`w-6 h-6 ${currentTheme.text}`} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {userProfileDetails.map((item) => {
-                      const DetailIcon = item.icon;
-                      return (
-                        <div key={item.label} className="rounded-2xl bg-black/25 border border-white/10 p-4 hover:bg-white/[0.07] transition-all">
-                          <div className="flex items-center justify-between gap-3">
-                            <div className={`w-10 h-10 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center`}>
-                              <DetailIcon className={`w-4.5 h-4.5 ${currentTheme.text}`} />
-                            </div>
-                            <div className="text-right">
-                              <p className="text-[11px] text-slate-500 font-bold">{item.label}</p>
-                              <p className="text-sm text-slate-100 font-black mt-1 leading-relaxed">{item.value}</p>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    <div className="sm:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
-                      <div className="rounded-2xl bg-black/25 border border-white/10 p-4 flex items-center justify-between gap-3">
-                        <MapPin className={`w-5 h-5 ${currentTheme.text}`} />
-                        <div className="text-right">
-                          <p className="text-[11px] text-slate-500 font-bold">موقع الجلسة</p>
-                          <p className="text-sm text-slate-200 font-black">مكتب الرئيس التنفيذي</p>
-                        </div>
-                      </div>
-                      <div className="rounded-2xl bg-black/25 border border-white/10 p-4 flex items-center justify-between gap-3">
-                        <Monitor className={`w-5 h-5 ${currentTheme.text}`} />
-                        <div className="text-right">
-                          <p className="text-[11px] text-slate-500 font-bold">الجهاز</p>
-                          <p className="text-sm text-slate-200 font-black">جلسة متصفح آمنة</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Executive Timeline */}
-              <div className={`xl:col-span-5 relative overflow-hidden rounded-[2rem] ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} p-6 shadow-2xl shadow-black/25`}>
-                <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_0%,var(--theme-accent-soft),transparent_32%)]" />
-                <div className="relative flex items-center justify-between mb-6">
-                  <div>
-                    <span className={`text-xs font-black ${currentTheme.text}`}>Executive Timeline</span>
-                    <h3 className="text-2xl font-black text-white mt-1">التايم لاين التنفيذي</h3>
-                  </div>
-                  <div className={`w-12 h-12 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center`}>
-                    <Clock3 className={`w-5 h-5 ${currentTheme.text}`} />
-                  </div>
-                </div>
-
-                <div className="relative pr-6 space-y-4">
-                  <div className="absolute right-[1.15rem] top-2 bottom-2 w-px bg-gradient-to-b from-transparent via-[var(--theme-accent)] to-transparent opacity-50" />
-                  {executiveTimeline.map((item, idx) => {
-                    const TimelineIcon = item.icon;
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => idx === 0 ? setActiveView('messages') : idx === 1 ? setActiveView('tasks') : idx === 2 ? setActiveView('reports') : setActiveView('ai-advisor')}
-                        className="relative w-full grid grid-cols-[54px_1fr] gap-4 rounded-2xl bg-black/20 border border-white/10 p-4 text-right hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all group"
-                      >
-                        <div className={`relative z-10 w-12 h-12 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center shadow-lg ${currentTheme.glow}`}>
-                          <TimelineIcon className={`w-5 h-5 ${currentTheme.text}`} />
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between gap-3 mb-1">
-                            <span className="font-sans text-xs text-slate-500">{item.time}</span>
-                            <span className={`text-[10px] font-black ${currentTheme.text} bg-black/25 border border-white/10 rounded-full px-2 py-0.5`}>{item.type}</span>
-                          </div>
-                          <p className="text-sm md:text-base font-black text-slate-100 leading-relaxed group-hover:text-white">{item.title}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Executive KPI Strip */}
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
-              {[
-                ['قرارات تنتظر الاعتماد', executiveSummary.decisions, 'messages', CheckCircle2],
-                ['مشروع متأخر يحتاج تدخل', executiveSummary.delayedProjects, 'projects', AlertTriangle],
-                ['اجتماعات قادمة', executiveSummary.meetings, 'calendar', Calendar],
-                ['مخاطرة مالية', executiveSummary.financialRisks, 'reports', TrendingUp],
-                ['تكليفات مفتوحة', executiveSummary.delegatedTasks, 'tasks', CheckSquare],
-              ].map(([label, value, target, Icon]) => {
-                const KpiIcon = Icon as typeof CheckCircle2;
-                return (
-                  <button key={String(label)} onClick={() => setActiveView(String(target))} className={`rounded-3xl ${currentTheme.panelBg} border border-white/10 ${currentTheme.border} p-5 text-right hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all shadow-xl shadow-black/15`}>
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <span className="block text-3xl font-black text-white">{String(value)}</span>
-                        <span className="block text-sm text-slate-400 mt-1 leading-relaxed">{String(label)}</span>
-                      </div>
-                      <div className={`w-12 h-12 rounded-2xl ${currentTheme.softPanelBg} border border-white/10 flex items-center justify-center`}>
-                        <KpiIcon className={`w-5 h-5 ${currentTheme.text}`} />
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
         {/* View content container */}
-        <div className={`${activeView === 'dashboard' ? 'p-8 pt-7' : 'p-8'} flex-1 max-w-[1700px] mx-auto w-full`}>
+        <div className="min-w-0 p-4 sm:p-6 flex-1 max-w-[1500px] mx-auto w-full">
+          {['reports','projects','tasks','calendar','meetings','meeting-requests','messages','secretariat','egypt','logistic'].includes(activeView)&&<p role="note" className="mb-5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-xs leading-6 text-amber-300">يتضمن هذا القسم بيانات تجريبية؛ لا تمثل أداءً أو اعتمادات فعلية، ولم تربط بالمصدر التشغيلي بعد.</p>}
           {renderActiveView()}
         </div>
 
@@ -1054,7 +810,7 @@ export default function App() {
                 <span className="text-[10px] text-slate-500 border border-white/10 rounded-lg px-2 py-1">ESC</span>
               </div>
               <div className="p-3 max-h-[420px] overflow-y-auto">
-                {(filteredCommandActions.length ? filteredCommandActions : commandActions).map((action) => {
+                {(filteredCommandActions.length ? filteredCommandActions : availableCommandActions).map((action) => {
                   const ActionIcon = action.icon;
                   return (
                     <button
