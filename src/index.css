@@ -434,3 +434,27 @@ body {
 [data-theme="spring"] aside button[class*="border-r-4"] svg {
   color: #047857 !important;
 }
+
+/* Native select menus must not inherit light option surfaces with light text. */
+select {
+  color-scheme: dark;
+}
+select option,
+select optgroup {
+  background-color: #101722;
+  color: #e2e8f0;
+}
+select option:disabled {
+  color: #94a3b8;
+}
+[data-theme="spring"] select {
+  color-scheme: light;
+}
+[data-theme="spring"] select option,
+[data-theme="spring"] select optgroup {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+[data-theme="spring"] select option:disabled {
+  color: #64748b !important;
+}
