@@ -398,6 +398,7 @@ export default function App() {
     { label: 'افتح مركز القيادة', description: 'الانتقال إلى الصفحة التنفيذية الأولى', target: 'dashboard', icon: Command },
     { label: 'اعرض التقارير والتحليلات', description: 'الموازنات والإنفاق ومؤشرات الأداء', target: 'reports', icon: BarChart3 },
     { label: 'أنشئ تكليفاً جديداً', description: 'فتح صفحة التكاليف والمهام النشطة', target: 'tasks', icon: CheckSquare },
+    ...(currentUser?.role === 'ceo' || currentUser?.role === 'admin' || currentUser?.allowedViews.includes('executive-departments') ? [{ label: 'عرض خطة المشتريات والعقود', description: 'استدعاء الخطة الاستراتيجية وخارطة المائة يوم جاهزة للقراءة', target: 'procurement-plan', icon: FileText }] : []),
     { label: 'افتح الهيكل التنظيمي', description: 'الخطط والمؤشرات والميزانيات والانحرافات حسب الإدارة والوحدة', target: 'executive-departments', icon: Activity },
     { label: 'اعرض المشاريع المتأخرة', description: 'متابعة القطاعات والمشاريع الحرجة', target: 'projects', icon: Building2 },
     { label: 'افتح مركز القرارات', description: 'القرارات والتوجيهات التنفيذية', target: 'messages', icon: MessageSquare },
@@ -405,12 +406,20 @@ export default function App() {
     { label: 'اسأل المستشار الذكي', description: 'تحليل، توصية، ومساندة قرار', target: 'ai-advisor', icon: Brain },
   ];
 
+  const asksForProcurementPlan = /مشتريات|المشتريات|خطة.*عقود/.test(commandQuery);
   const filteredCommandActions = commandActions.filter(action =>
+    (asksForProcurementPlan && action.target === 'procurement-plan') ||
     `${action.label} ${action.description}`.toLowerCase().includes(commandQuery.trim().toLowerCase())
   );
 
   const runCommand = (target: string) => {
-    setActiveView(target);
+    if (target === 'procurement-plan') {
+      setOrgSelections(previous => ({ ...previous, support: 'procurement' }));
+      setExpandedOrgRoots(previous => ({ ...previous, support: true }));
+      setOrganizationRoot('support');
+      setActiveView('executive-departments');
+      window.dispatchEvent(new Event('araak:procurement-plan'));
+    } else setActiveView(target);
     setShowCommandBar(false);
     setCommandQuery('');
   };
@@ -1037,6 +1046,7 @@ export default function App() {
                 <input
                   autoFocus
                   value={commandQuery}
+                  onKeyDown={e => { if (e.key === 'Enter' && asksForProcurementPlan && filteredCommandActions.some(action => action.target === 'procurement-plan')) runCommand('procurement-plan'); }}
                   onChange={(e) => setCommandQuery(e.target.value)}
                   placeholder="اكتب أمراً... افتح المشاريع، لخص التقارير، أنشئ تكليفاً"
                   className="flex-1 bg-transparent outline-none text-base text-white placeholder:text-slate-500 text-right"
