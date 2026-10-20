@@ -23,6 +23,7 @@ export const organization: OrgNode[] = [
     node('logistics', 'اراك لوجستيك', undefined, 'logistic'),
   ]),
   node('support', 'الإدارات المساندة', [
+    node('procurement', 'إدارة المشتريات والعقود'),
     node('hr', 'الموارد البشرية'), node('finance', 'الشؤون المالية'),
     node('administration', 'الإدارية والخدمات'), node('maintenance', 'المتابعة والصيانة'),
     node('it', 'تقنية المعلومات', [node('digital-transformation', 'التحول الرقمي'), node('marketing-media', 'تسويق وإعلام')]),

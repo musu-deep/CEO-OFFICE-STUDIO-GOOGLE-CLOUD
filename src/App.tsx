@@ -493,7 +493,7 @@ export default function App() {
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
-      case 'executive-departments': return <ExecutiveDepartmentsView theme={theme} rootId={organizationRoot} selectedId={organizationRoot !== 'ceo' ? orgSelections[organizationRoot] || organizationRoot : undefined} onSelect={id => setOrgSelections(previous => ({ ...previous, [organizationRoot]: id }))} hideNavigation={organizationRoot !== 'ceo'} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? rawMenuGroups.flatMap(g => g.items.map(i => i.id)) : currentUser?.allowedViews || []} />;
+      case 'executive-departments': return <ExecutiveDepartmentsView userKey={currentUser?.email || currentUser?.id || 'local-user'} theme={theme} rootId={organizationRoot} selectedId={organizationRoot !== 'ceo' ? orgSelections[organizationRoot] || organizationRoot : undefined} onSelect={id => setOrgSelections(previous => ({ ...previous, [organizationRoot]: id }))} hideNavigation={organizationRoot !== 'ceo'} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? rawMenuGroups.flatMap(g => g.items.map(i => i.id)) : currentUser?.allowedViews || []} />;
       case 'projects': return <ProjectsView projects={projects} setProjects={setProjects} theme={theme} />;
       case 'tasks': return <TasksView tasks={tasks} setTasks={setTasks} theme={theme} />;
       case 'secretariat': return <SecretariatView theme={theme} />;

@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { Building2, ChevronLeft, Network, Search } from 'lucide-react';
 import { organization, findOrgPath, type OrgNode } from '../data/organization';
 import type { PlatformTheme } from '../types';
+import ProcurementWorkspace from './ProcurementWorkspace';
 import EcommercePerformanceView from './EcommercePerformanceView';
 
-type Props = { theme: PlatformTheme; rootId?: string; selectedId?: string; onSelect?: (id: string) => void; hideNavigation?: boolean; onNavigate?: (view: string) => void; allowedViews?: string[] };
-export default function ExecutiveDepartmentsView({ theme, rootId = 'ceo', selectedId, onSelect, hideNavigation = false, onNavigate, allowedViews = [] }: Props) {
+type Props = { theme: PlatformTheme; userKey?: string; rootId?: string; selectedId?: string; onSelect?: (id: string) => void; hideNavigation?: boolean; onNavigate?: (view: string) => void; allowedViews?: string[] };
+export default function ExecutiveDepartmentsView({ theme, userKey = 'local-user', rootId = 'ceo', selectedId, onSelect, hideNavigation = false, onNavigate, allowedViews = [] }: Props) {
   const [selected, setSelected] = useState(rootId);
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState('structure');
@@ -23,6 +24,7 @@ export default function ExecutiveDepartmentsView({ theme, rootId = 'ceo', select
       {item.children && renderTree(item.children, depth + 1)}
     </div>;
   });
+  if (['procurement','contracts-procurement'].includes(current.id)) return <ProcurementWorkspace userKey={userKey}/>;
   const services = [['projects','المشاريع والمبادرات'],['tasks','التكليفات والمهام'],['reports','التقارير والتحليلات'],['documents','الوثائق']];
   return <div dir="rtl" className="space-y-6 text-right">
     <header className="border-b border-white/10 pb-5"><p className="mb-2 flex items-center gap-2 text-xs text-[var(--theme-accent)]"><Network className="h-4 w-4"/>مجموعة اراك للتنمية · الهيكل التنظيمي 2026</p><h2 className="text-3xl font-black">{root.name}</h2><p className="mt-2 text-sm text-slate-400">مجلس الإدارة ← الرئيس التنفيذي · المصفوفة المؤرخة في 29 يوليو 2026</p></header>
