@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, BarChart3, Building2, CircleDollarSign, Package, Target, TrendingUp, Users, Wrench } from 'lucide-react';
+import { Activity, Building2, CircleDollarSign, Target, TrendingUp, Users, Wrench } from 'lucide-react';
 import type { PlatformTheme } from '../types';
 
 const reportAreas = [
