@@ -7,7 +7,7 @@ import ProcurementWorkspace from './ProcurementWorkspace';
 import EcommercePerformanceView from './EcommercePerformanceView';
 
 type Props = { theme: PlatformTheme; userKey?: string; rootId?: string; selectedId?: string; onSelect?: (id: string) => void; hideNavigation?: boolean; onNavigate?: (view: string) => void; allowedViews?: string[] };
-export default function ExecutiveDepartmentsView({ theme, userKey = 'local-user', rootId = 'ceo', selectedId, onSelect, hideNavigation = false, onNavigate, allowedViews = [] }: Props) {
+export default function ExecutiveDepartmentsView({ theme, userKey = 'local-user', rootId = 'investment', selectedId, onSelect, hideNavigation = false, onNavigate, allowedViews = [] }: Props) {
   const [selected, setSelected] = useState(rootId);
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState('structure');

@@ -2,10 +2,6 @@
 export type OrgNode = { id: string; name: string; view?: string; planned?: boolean; status?: string; description?: string; website?: string; children?: OrgNode[] };
 const node = (id: string, name: string, children?: OrgNode[], view?: string): OrgNode => ({ id, name, children, view });
 export const organization: OrgNode[] = [
-  node('ceo', 'الرئيس التنفيذي', [
-    node('ai-advisor', 'مستشار الذكاء الاصطناعي', undefined, 'ai-advisor'),
-    node('internal-audit', 'المراجعة الداخلية'),
-  ]),
   node('investment', 'اراك للاستثمار', [
     node('national', 'اراك الوطنية', [
       node('national-projects', 'اراك المشاريع', [
@@ -21,6 +17,7 @@ export const organization: OrgNode[] = [
   ]),
   node('logistics', 'اراك اللوجستية', undefined, 'logistic'),
   node('support', 'الإدارات المساندة', [
+    node('internal-audit', 'المراجعة الداخلية'),
     node('secretariat', 'السكرتارية التنفيذية'), node('legal', 'الشؤون القانونية'),
     node('hr', 'الموارد البشرية'), node('archive-documents', 'الأرشفة والوثائق'),
     node('governance', 'الحوكمة والجودة'),

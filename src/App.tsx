@@ -205,7 +205,7 @@ export default function App() {
   );
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState<string>('dashboard');
-  const [organizationRoot, setOrganizationRoot] = useState('ceo');
+  const [organizationRoot, setOrganizationRoot] = useState('investment');
   const [expandedOrgRoots, setExpandedOrgRoots] = useState<Record<string, boolean>>({});
   const [orgSelections, setOrgSelections] = useState<Record<string, string>>({});
   const [notifications, setNotifications] = useState<typeof initialNotifications>([]);
@@ -423,7 +423,6 @@ export default function App() {
       { id: 'dashboard', name: 'لوحة المعلومات التفاعلية', icon: Monitor },
     ]},
     { id: 'companies', title: 'شركات ومؤسسات أراك', items: [
-      { id: 'executive-departments', name: 'مكتب الرئيس التنفيذي', icon: Crown, orgRoot: 'ceo' },
       { id: 'executive-departments', name: 'أراك للاستثمار', icon: Building2, orgRoot: 'investment' },
       { id: 'executive-departments', name: 'أراك للتنمية', icon: Globe, orgRoot: 'development' },
       { id: 'executive-departments', name: 'المشاريع الاستراتيجية', icon: TrendingUp, orgRoot: 'strategic-projects' },
