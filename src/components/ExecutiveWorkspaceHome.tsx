@@ -44,15 +44,15 @@ const scopeTree: ScopeNode[] = [
   ]},
 ];
 
-type Indicator = { id: string; title: string; group: string; icon: LucideIcon; description: string; source: string; measures: string[] };
+type Indicator = { id: string; title: string; group: string; icon: LucideIcon; description: string; source: string; owner: string; measures: string[] };
 const indicators: Indicator[] = [
-  { id: 'sales', title: 'المبيعات', group: 'مالي وتجاري', icon: ShoppingCart, description: 'القيمة والكميات حسب الشركة والقناة والمنتج، ومقارنتها بالمستهدف والفترة السابقة.', source: 'الفواتير ونقاط البيع والمتاجر الإلكترونية', measures: ['المبيعات حسب الشركة والمنتج', 'المبيعات حسب القناة: متجر، معرض، مصنع، مشاريع', 'المستهدف مقابل الفعلي واتجاه النمو'] },
-  { id: 'margins', title: 'الهوامش والربحية', group: 'مالي', icon: CircleDollarSign, description: 'هامش الربح والتكلفة والربحية حسب المنتج والخدمة والقناة.', source: 'المالية والتكاليف وقسم التسعير المركزي', measures: ['هامش الربح الإجمالي والتشغيلي', 'التكلفة مقابل سعر البيع', 'الربحية حسب المنتج والخدمة والجهة'] },
-  { id: 'effectiveness', title: 'الفاعلية', group: 'أداء', icon: Target, description: 'مدى تحقق الأهداف والنتائج والأنشطة ذات الأولوية.', source: 'الخطط والمشاريع ومؤشرات الإدارات', measures: ['تحقق الأهداف مقابل الخطة', 'حالة المبادرات والأنشطة', 'النتائج التي تحتاج إلى تدخل'] },
-  { id: 'efficiency', title: 'الكفاءة', group: 'أداء', icon: Gauge, description: 'كفاءة استخدام الوقت والموارد والتكلفة لإنتاج النتائج.', source: 'بيانات التشغيل والمشاريع والمالية', measures: ['تكلفة الوحدة أو الخدمة', 'الوقت ودورة الإنجاز', 'الإنتاجية واستخدام الموارد'] },
-  { id: 'assets', title: 'الأصول وحالتها', group: 'تشغيل', icon: Wrench, description: 'حالة الأصول ومدى استخدامها واحتياجات الصيانة.', source: 'سجل الأصول والصيانة', measures: ['حالة الأصل وجاهزيته', 'معدل الاستخدام والاستفادة', 'الصيانة المتأخرة والمخاطر'] },
-  { id: 'people', title: 'أداء العاملين', group: 'موارد بشرية', icon: Users, description: 'مؤشرات الأداء والإنجاز والقدرات على مستوى الإدارات.', source: 'الموارد البشرية وأهداف الإدارات', measures: ['إنجاز الأهداف والمسؤوليات', 'القدرات والاحتياج التدريبي', 'توزيع القوى العاملة'] },
-  { id: 'market', title: 'السوق والمنافسة', group: 'سوق', icon: TrendingUp, description: 'حركة أسعار السوق ومقارنتها بتكلفة المجموعة وأسعار المنافسين.', source: 'مصدر سوقي خارجي يعتمد قبل تفعيله', measures: ['السعر المرجعي للحديد اليوم واتجاهه', 'مؤشرات مواد البناء', 'مقارنة أسعار المنافسين والقدرة الشرائية'] },
+  { id: 'sales', title: 'المبيعات', group: 'مالي وتجاري', icon: ShoppingCart, description: 'القيمة والكميات حسب الشركة والقناة والمنتج، ومقارنتها بالمستهدف والفترة السابقة.', source: 'الفواتير ونقاط البيع والمتاجر الإلكترونية', owner: 'الرئيس التنفيذي للجهة بالتنسيق مع المالية والتسويق', measures: ['المبيعات حسب الشركة والمنتج', 'المبيعات حسب القناة: متجر، معرض، مصنع، مشاريع', 'المستهدف مقابل الفعلي واتجاه النمو'] },
+  { id: 'margins', title: 'الهوامش والربحية', group: 'مالي', icon: CircleDollarSign, description: 'هامش الربح والتكلفة والربحية حسب المنتج والخدمة والقناة.', source: 'المالية والتكاليف وقسم التسعير المركزي', owner: 'الرئيس التنفيذي والقيادة المالية', measures: ['هامش الربح الإجمالي والتشغيلي', 'التكلفة مقابل سعر البيع', 'الربحية حسب المنتج والخدمة والجهة'] },
+  { id: 'effectiveness', title: 'الفاعلية', group: 'أداء', icon: Target, description: 'مدى تحقق الأهداف والنتائج والأنشطة ذات الأولوية.', source: 'الخطط والمشاريع ومؤشرات الإدارات', owner: 'الرئيس التنفيذي للجهة ومكتب الرئيس التنفيذي', measures: ['تحقق الأهداف مقابل الخطة', 'حالة المبادرات والأنشطة', 'النتائج التي تحتاج إلى تدخل'] },
+  { id: 'efficiency', title: 'الكفاءة', group: 'أداء', icon: Gauge, description: 'كفاءة استخدام الوقت والموارد والتكلفة لإنتاج النتائج.', source: 'بيانات التشغيل والمشاريع والمالية', owner: 'الرئيس التنفيذي للجهة ورؤساء القطاعات ذات الصلة', measures: ['تكلفة الوحدة أو الخدمة', 'الوقت ودورة الإنجاز', 'الإنتاجية واستخدام الموارد'] },
+  { id: 'assets', title: 'الأصول وحالتها', group: 'تشغيل', icon: Wrench, description: 'حالة الأصول ومدى استخدامها واحتياجات الصيانة.', source: 'سجل الأصول والصيانة', owner: 'الرئيس التنفيذي للجهة ومسؤول الأصول', measures: ['حالة الأصل وجاهزيته', 'معدل الاستخدام والاستفادة', 'الصيانة المتأخرة والمخاطر'] },
+  { id: 'people', title: 'أداء العاملين', group: 'موارد بشرية', icon: Users, description: 'مؤشرات الأداء والإنجاز والقدرات على مستوى الإدارات.', source: 'الموارد البشرية وأهداف الإدارات', owner: 'الرئيس التنفيذي للجهة والموارد البشرية', measures: ['إنجاز الأهداف والمسؤوليات', 'القدرات والاحتياج التدريبي', 'توزيع القوى العاملة'] },
+  { id: 'market', title: 'السوق والمنافسة', group: 'سوق', icon: TrendingUp, description: 'حركة أسعار السوق ومقارنتها بتكلفة المجموعة وأسعار المنافسين.', source: 'مصدر سوقي خارجي يعتمد قبل تفعيله', owner: 'الرئيس التنفيذي للجهة والمالية والتسعير المركزي', measures: ['السعر المرجعي للحديد اليوم واتجاهه', 'مؤشرات مواد البناء', 'مقارنة أسعار المنافسين والقدرة الشرائية'] },
 ];
 
 function findNode(id: string, nodes: ScopeNode[] = scopeTree, trail: ScopeNode[] = []): ScopeNode[] {
@@ -88,7 +88,7 @@ export default function ExecutiveWorkspaceHome({
       <div>
         <p className="text-xs text-[var(--theme-accent)]">مكتب الرئيس التنفيذي · لوحة قيادة الأداء</p>
         <h1 className="mt-2 text-3xl font-black">{scopeTitle}</h1>
-        <p className="mt-2 text-sm text-slate-400">أهلاً {user.name}، اختر مستوى العرض ثم افتح المؤشر للتفاصيل والجهة المرتبطة به.</p>
+        <p className="mt-2 text-sm text-slate-400">أهلاً {user.name}، هذه نظرة تنفيذية على أداء المجموعة والجهات والمسؤوليات والقرارات ذات الأولوية.</p>
       </div>
       <button onClick={onCommand} className="flex items-center gap-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-accent-soft)] px-4 py-3 text-sm font-bold text-[var(--theme-accent)]">
         <Search className="h-4 w-4"/>اطلب ما تحتاجه
@@ -112,8 +112,8 @@ export default function ExecutiveWorkspaceHome({
 
     {currentScope && children.length > 0 && <section className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-black">التفصيل حسب الجهة أو النشاط</h2>
-        <button onClick={() => onOpenOrganization(currentScope.root, currentScope.orgId)} className="text-xs font-bold text-[var(--theme-accent)] hover:underline">فتح الهيكل التنظيمي <ArrowUpLeftIcon/></button>
+        <h2 className="font-black">الانتقال إلى الجهة أو نطاق المسؤول التنفيذي</h2>
+        <button onClick={() => onOpenOrganization(currentScope.root, currentScope.orgId)} className="text-xs font-bold text-[var(--theme-accent)] hover:underline">عرض ملف الجهة <ArrowUpLeftIcon/></button>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {children.map(node => <button key={node.id} onClick={() => setScopeId(node.id)} className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-right transition hover:border-[var(--theme-border)] hover:bg-[var(--theme-accent-soft)]">
@@ -123,13 +123,13 @@ export default function ExecutiveWorkspaceHome({
     </section>}
 
     {currentScope && <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.025] p-4">
-      <div><p className="text-xs text-slate-500">المؤسسة المحددة</p><p className="mt-1 font-bold">{currentScope.name}</p></div>
-      <button onClick={() => onOpenOrganization(currentScope.root, currentScope.orgId)} className="rounded-lg bg-[var(--theme-accent-soft)] px-4 py-2 text-xs font-bold text-[var(--theme-accent)]">فتح صفحة الجهة والقسم</button>
+      <div><p className="text-xs text-slate-500">الجهة ونطاق المسؤولية</p><p className="mt-1 font-bold">{currentScope.name}</p></div>
+      <button onClick={() => onOpenOrganization(currentScope.root, currentScope.orgId)} className="rounded-lg bg-[var(--theme-accent-soft)] px-4 py-2 text-xs font-bold text-[var(--theme-accent)]">عرض الملف التنفيذي للجهة</button>
     </div>}
 
     <section aria-label="مؤشرات الأداء" className="space-y-3">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h2 className="font-black">مؤشرات الأداء</h2><p className="mt-1 text-xs text-slate-500">اضغط أي مؤشر لعرض مكوناته ومصدر بياناته، ثم انتقل إلى الجهة المعنية.</p></div>
+        <div><h2 className="font-black">مؤشرات الرئيس التنفيذي</h2><p className="mt-1 text-xs text-slate-500">تبدأ بالصورة العامة، ثم تنتقل إلى الجهة والمسؤول التنفيذي؛ وتفاصيل القسم والنشاط تظهر عند الحاجة.</p></div>
         {canAccess('reports') && <button onClick={() => onNavigate('reports')} className="text-xs font-bold text-[var(--theme-accent)] hover:underline">التقارير التفصيلية</button>}
       </div>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -155,7 +155,7 @@ export default function ExecutiveWorkspaceHome({
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
           {selectedIndicator.measures.map(measure => <div key={measure} className="flex items-center gap-2 rounded-lg bg-white/[0.035] px-3 py-2.5 text-xs text-slate-300"><CheckCircle2 className="h-4 w-4 shrink-0 text-slate-500"/>{measure}</div>)}
         </div>
-        <p className="mt-4 text-xs text-slate-500">مصدر البيانات المقترح: {selectedIndicator.source}</p>
+        <p className="mt-4 text-xs text-slate-500">المسؤول التنفيذي عن المؤشر: {selectedIndicator.owner}</p><p className="mt-1 text-xs text-slate-500">مصدر البيانات المقترح: {selectedIndicator.source}</p>
         <p className="mt-1 text-xs font-bold text-amber-300">لا تظهر قيمة فعلية حتى يكتمل ربط مصدر البيانات والتحقق من تحديثه.</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {canAccess('reports') && <button onClick={() => onNavigate('reports')} className="rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-white/5">عرض التقارير</button>}
@@ -164,9 +164,9 @@ export default function ExecutiveWorkspaceHome({
       </div>
 
       <aside className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
-        <h2 className="font-black">ما يحتاج التركيز</h2>
-        <p className="mt-2 text-xs leading-6 text-slate-400">تظهر هنا الأنشطة التي تحتاج تدخلاً بعد ورود بيانات موثقة عن الأهداف، الحالة، الفاعلية والكفاءة.</p>
-        <div className="mt-4 rounded-xl border border-dashed border-white/10 p-4 text-xs leading-6 text-slate-500">لا توجد أولويات تشغيلية مؤكدة حالياً؛ مصادر الأداء لم تُربط بعد.</div>
+        <h2 className="font-black">أولويات الرئيس التنفيذي</h2>
+        <p className="mt-2 text-xs leading-6 text-slate-400">تُبرز الانحرافات التي تحتاج قراراً أو توجيهاً، مع الجهة المسؤولة والأثر المتوقع.</p>
+        <div className="mt-4 rounded-xl border border-dashed border-white/10 p-4 text-xs leading-6 text-slate-500">تظهر الأولويات المؤكدة بعد ربط بيانات الأداء ومراجعتها مع الرؤساء التنفيذيين للجهات.</div>
       </aside>
     </section>
 
