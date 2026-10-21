@@ -178,7 +178,7 @@ import GovernanceView from './components/GovernanceView';
 import LegalView from './components/LegalView';
 import AiAdvisorView from './components/AiAdvisorView';
 import VoiceAssistantView from './components/VoiceAssistantView';
-import ExecutiveWorkspaceHome, { workspaceModes, type WorkspaceMode } from './components/ExecutiveWorkspaceHome';
+import ExecutiveWorkspaceHome, { type WorkspaceMode } from './components/ExecutiveWorkspaceHome';
 import ReportsView from './components/ReportsView';
 import ArakEgyptView from './components/ArakEgyptView';
 import ArakLogisticView from './components/ArakLogisticView';
@@ -418,49 +418,49 @@ export default function App() {
     setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
-  // Sidebar Menu Items grouped and filtered dynamically
-  const rawMenuGroups: { title: string; mode: WorkspaceMode; items: { id: string; name: string; icon: typeof Layers; orgRoot?: string }[] }[] = [
-    { title: 'المعلومة', mode: 'information', items: [
-      { id:'dashboard', name:'الموجز التنفيذي', icon:Layers },
-      { id:'documents', name:'الخطط والوثائق', icon:FileText },
-      { id:'reports', name:'التقارير', icon:BarChart3 },
-      { id:'executive-departments', name:'اراك للاستثمار', icon:Building2, orgRoot:'investment' },
-      { id:'executive-departments', name:'اراك للتنمية', icon:Globe, orgRoot:'development' },
-      { id:'executive-departments', name:'قيد التنفيذ', icon:TrendingUp, orgRoot:'planned' },
-      { id:'executive-departments', name:'الإدارات المساندة', icon:Layers, orgRoot:'support' },
-      { id:'executive-departments', name:'مكتب الرئيس التنفيذي', icon:Crown, orgRoot:'ceo' },
+  // Sidebar navigation organized around the five requested executive destinations.
+  const rawMenuGroups: { id: string; title: string; items: { id: string; name: string; icon: typeof Layers; orgRoot?: string }[] }[] = [
+    { id: 'dashboard', title: 'لوحة المعلومات التفاعلية', items: [
+      { id: 'dashboard', name: 'لوحة المعلومات التفاعلية', icon: Monitor },
     ]},
-    { title:'القرار', mode:'decision', items:[
-      { id:'messages', name:'القرارات والتوجيهات', icon:MessageSquare },
-      { id:'ai-advisor', name:'مساندة القرار', icon:Brain },
-      { id:'voice-assistant', name:'المساعد الصوتي', icon:Mic },
+    { id: 'companies', title: 'شركات ومؤسسات أراك', items: [
+      { id: 'executive-departments', name: 'مكتب الرئيس التنفيذي', icon: Crown, orgRoot: 'ceo' },
+      { id: 'executive-departments', name: 'أراك للاستثمار', icon: Building2, orgRoot: 'investment' },
+      { id: 'executive-departments', name: 'أراك للتنمية', icon: Globe, orgRoot: 'development' },
+      { id: 'executive-departments', name: 'قيد التنفيذ', icon: TrendingUp, orgRoot: 'planned' },
+      { id: 'executive-departments', name: 'أراك اللوجستية', icon: Map, orgRoot: 'logistics' },
+      { id: 'egypt', name: 'أراك مصر', icon: MapPin },
     ]},
-    { title:'المتابعة', mode:'followup', items:[
-      { id:'tasks', name:'التكليفات', icon:CheckSquare },
-      { id:'projects', name:'المشاريع', icon:Building2 },
-      { id:'calendar', name:'التقويم', icon:Calendar },
-      { id:'meetings', name:'الاجتماعات', icon:Video },
-      { id:'meeting-requests', name:'طلبات اللقاء', icon:UserCheck },
-      { id:'secretariat', name:'السكرتارية', icon:FolderClosed },
+    { id: 'control', title: 'الرقابة والمتابعة', items: [
+      { id: 'reports', name: 'التقارير ومؤشرات الأداء', icon: BarChart3 },
+      { id: 'tasks', name: 'التكليفات', icon: CheckSquare },
+      { id: 'projects', name: 'المشاريع', icon: Building2 },
+      { id: 'calendar', name: 'التقويم', icon: Calendar },
+      { id: 'meetings', name: 'الاجتماعات', icon: Video },
+      { id: 'meeting-requests', name: 'طلبات اللقاء', icon: UserCheck },
+      { id: 'messages', name: 'القرارات والتوجيهات', icon: MessageSquare },
+      { id: 'documents', name: 'الخطط والوثائق', icon: FileText },
+    ]},
+    { id: 'support', title: 'الإدارات المساندة', items: [
+      { id: 'executive-departments', name: 'الإدارات المساندة', icon: Layers, orgRoot: 'support' },
+      { id: 'secretariat', name: 'السكرتارية', icon: FolderClosed },
+      { id: 'governance', name: 'الحوكمة', icon: ShieldCheck },
+      { id: 'legal', name: 'الشؤون القانونية', icon: Scale },
+    ]},
+    { id: 'agents', title: 'الوكلاء التنفيذيون', items: [
+      { id: 'ai-advisor', name: 'المستشار التنفيذي الذكي', icon: Bot },
+      { id: 'voice-assistant', name: 'الوكيل الصوتي', icon: Mic },
     ]},
   ];
   const canAccessView = (view:string) => view === 'dashboard' || currentUser?.role === 'admin' || currentUser?.role === 'ceo' || !!currentUser?.allowedViews.includes(view);
   useEffect(() => {
-    if (activeView === 'dashboard') return;
-    const group = rawMenuGroups.find(g=>g.items.some(i=>i.id===activeView));
-    if (group) setWorkspaceMode(group.mode);
-    setSidebarOpen(false);
+    if (activeView !== 'dashboard') setSidebarOpen(false);
   }, [activeView]);
 
   const menuGroups = rawMenuGroups.map(group => {
     const filteredItems = group.items.filter(item => {
-      // Every authenticated user has a personal executive dashboard.
-      if (item.id === 'dashboard') {
-        return true;
-      }
-      if (currentUser?.role === 'admin' || currentUser?.role === 'ceo') {
-        return true;
-      }
+      if (item.id === 'dashboard') return true;
+      if (currentUser?.role === 'admin' || currentUser?.role === 'ceo') return true;
       return currentUser?.allowedViews.includes(item.id);
     });
     return { ...group, items: filteredItems };
@@ -560,13 +560,31 @@ export default function App() {
           </div>
  
          {/* Sidebar Menu Items */}
-<nav className="p-3 space-y-5" aria-label="التنقل الرئيسي">
-  <div className="space-y-2">{workspaceModes.map(mode=>{const Icon=mode.icon;return <button key={mode.id} onClick={()=>{setWorkspaceMode(mode.id);setActiveView('dashboard');setSidebarOpen(false);}} aria-current={workspaceMode===mode.id?'page':undefined} className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-right ${workspaceMode===mode.id?currentTheme.activeMenu:'text-slate-400 hover:bg-white/5'}`}><Icon className="h-5 w-5"/><span className="font-black">{mode.name}</span></button>;})}</div>
-  {menuGroups.filter(group=>group.mode===workspaceMode).map(group=><div key={group.mode} className="space-y-3 border-t border-white/10 pt-4">
-    <div data-office-menu={group.mode==='decision'?'executive':undefined} className="space-y-1">{group.items.filter(item=>!item.orgRoot).map(item=>{const Icon=item.icon;return <button key={item.id} onClick={()=>{setActiveView(item.id);setSidebarOpen(false);}} className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-right text-sm ${activeView===item.id?'bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]':'text-slate-400 hover:bg-white/5'}`}><Icon className="h-4 w-4"/>{item.name}</button>;})}</div>
-    {group.items.some(item=>item.orgRoot)&&<details open={activeView==='executive-departments'} className="rounded-xl border border-white/10 p-2"><summary className="cursor-pointer px-2 py-2 text-sm font-bold">الجهات والخطط</summary><div className="mt-2 space-y-1">{group.items.filter(item=>item.orgRoot).map(item=>{const root=item.orgRoot!;const expanded=!!expandedOrgRoots[root];return <div key={root}><button aria-expanded={expanded} onClick={()=>setExpandedOrgRoots(previous=>({...previous,[root]:!previous[root]}))} className={`w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-right text-sm ${organizationRoot===root&&activeView==='executive-departments'?'text-[var(--theme-accent)]':'text-slate-400'}`}><span>{item.name}</span><ChevronLeft className={`h-4 w-4 ${expanded?'-rotate-90':''}`}/></button>{expanded&&<OrganizationSidebarTree nodes={organization.find(node=>node.id===root)?.children||[]} selectedId={organizationRoot===root?orgSelections[root]:undefined} onSelect={id=>{setOrgSelections(previous=>({...previous,[root]:id}));setOrganizationRoot(root);setActiveView('executive-departments');setSidebarOpen(false);}}/>}</div>;})}</div></details>}
-  </div>)}
-  {(currentUser.role==='admin'||(currentUser.role==='ceo'&&ceoAdminMode))&&<details className="border-t border-white/10 pt-3"><summary className="cursor-pointer px-3 text-xs text-slate-500">إدارة المنصة</summary><button onClick={()=>{setActiveView('users');setSidebarOpen(false);}} className="px-3 py-3 text-xs text-slate-400">المستخدمون والصلاحيات</button></details>}
+<nav className="p-3 space-y-3" aria-label="التنقل الرئيسي">
+  <div className="space-y-2">
+    {menuGroups.map(group => {
+      if (group.id === 'dashboard') {
+        const item = group.items[0];
+        const Icon = item.icon;
+        return <button key={group.id} onClick={() => { setWorkspaceMode('information'); setActiveView('dashboard'); setSidebarOpen(false); }} aria-current={activeView === 'dashboard' ? 'page' : undefined} className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-right ${activeView === 'dashboard' ? currentTheme.activeMenu : 'text-slate-400 hover:bg-white/5'}`}><Icon className="h-5 w-5"/><span className="font-black">{group.title}</span></button>;
+      }
+      return <details key={group.id} className="rounded-xl border border-white/10 p-2">
+        <summary className="cursor-pointer px-2 py-2.5 text-sm font-black text-slate-200">{group.title}</summary>
+        <div className="mt-2 space-y-1">
+          {group.items.filter(item => !item.orgRoot).map(item => { const Icon = item.icon; return <button key={item.id} onClick={() => { setActiveView(item.id); setSidebarOpen(false); }} className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-right text-sm ${activeView === item.id ? 'bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]' : 'text-slate-400 hover:bg-white/5'}`}><Icon className="h-4 w-4"/>{item.name}</button>; })}
+          {group.items.filter(item => item.orgRoot).map(item => {
+            const root = item.orgRoot!;
+            const expanded = !!expandedOrgRoots[root];
+            return <div key={root}>
+              <button aria-expanded={expanded} onClick={() => setExpandedOrgRoots(previous => ({ ...previous, [root]: !previous[root] }))} className={`w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-right text-sm ${organizationRoot === root && activeView === 'executive-departments' ? 'text-[var(--theme-accent)]' : 'text-slate-400 hover:bg-white/5'}`}><span>{item.name}</span><ChevronLeft className={`h-4 w-4 ${expanded ? '-rotate-90' : ''}`}/></button>
+              {expanded && <OrganizationSidebarTree nodes={organization.find(node => node.id === root)?.children || []} selectedId={organizationRoot === root ? orgSelections[root] : undefined} onSelect={id => { setOrgSelections(previous => ({ ...previous, [root]: id })); setOrganizationRoot(root); setActiveView('executive-departments'); setSidebarOpen(false); }}/>}
+            </div>;
+          })}
+        </div>
+      </details>;
+    })}
+  </div>
+  {(currentUser.role === 'admin' || (currentUser.role === 'ceo' && ceoAdminMode)) && <details className="border-t border-white/10 pt-3"><summary className="cursor-pointer px-3 text-xs text-slate-500">إدارة المنصة</summary><button onClick={() => { setActiveView('users'); setSidebarOpen(false); }} className="px-3 py-3 text-xs text-slate-400">المستخدمون والصلاحيات</button></details>}
 </nav>
  
         </div>
