@@ -1,22 +1,16 @@
 import { useMemo, useState } from 'react';
 import {
-  Activity,
   ArrowRight,
   ArrowUpRight,
-  BarChart3,
-  Building2,
   CheckCircle2,
   CircleDollarSign,
-  Factory,
   FileText,
   Gauge,
-  Package,
   Search,
   ShoppingCart,
   Target,
   TrendingUp,
   Users,
-  Wallet,
   Wrench,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -86,6 +80,7 @@ export default function ExecutiveWorkspaceHome({
   const currentScope = path[path.length - 1];
   const selectedIndicator = indicators.find(item => item.id === indicatorId) || indicators[0];
   const children = currentScope?.children || [];
+  const SelectedIndicatorIcon = selectedIndicator.icon;
   const scopeTitle = currentScope?.name || 'مجموعة أراك';
 
   return <div className="space-y-6 text-right" dir="rtl">
@@ -154,7 +149,7 @@ export default function ExecutiveWorkspaceHome({
       <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
         <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-4">
           <div><p className="text-[10px] text-[var(--theme-accent)]">{selectedIndicator.group}</p><h2 className="mt-1 text-xl font-black">{selectedIndicator.title} · {scopeTitle}</h2></div>
-          <selectedIndicator.icon className="h-6 w-6 text-[var(--theme-accent)]"/>
+          <SelectedIndicatorIcon className="h-6 w-6 text-[var(--theme-accent)]"/>
         </div>
         <p className="mt-4 text-sm leading-7 text-slate-400">{selectedIndicator.description}</p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
