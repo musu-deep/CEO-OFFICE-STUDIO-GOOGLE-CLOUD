@@ -178,7 +178,7 @@ import GovernanceView from './components/GovernanceView';
 import LegalView from './components/LegalView';
 import AiAdvisorView from './components/AiAdvisorView';
 import VoiceAssistantView from './components/VoiceAssistantView';
-import ExecutiveWorkspaceHome, { type WorkspaceMode } from './components/ExecutiveWorkspaceHome';
+import ExecutiveWorkspaceHome from './components/ExecutiveWorkspaceHome';
 import ReportsView from './components/ReportsView';
 import ArakEgyptView from './components/ArakEgyptView';
 import ArakLogisticView from './components/ArakLogisticView';
@@ -203,7 +203,6 @@ export default function App() {
   const [theme, setTheme] = useState<PlatformTheme>(() =>
     localStorage.getItem('arak_display_mode') === 'light' ? 'spring' : 'vision_2030'
   );
-  const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>('information');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState<string>('dashboard');
   const [organizationRoot, setOrganizationRoot] = useState('ceo');
@@ -486,7 +485,7 @@ export default function App() {
 
   const renderActiveView = () => {
     switch (activeView) {
-      case 'dashboard': return <ExecutiveWorkspaceHome mode={workspaceMode} user={safeCurrentUser} onNavigate={runCommand} onCommand={()=>setShowCommandBar(true)} canAccess={canAccessView}/>;
+      case 'dashboard': return <ExecutiveWorkspaceHome user={safeCurrentUser} onNavigate={runCommand} onCommand={()=>setShowCommandBar(true)} canAccess={canAccessView} onOpenOrganization={(root, orgId) => { setOrganizationRoot(root); setOrgSelections(previous => ({ ...previous, [root]: orgId })); setExpandedOrgRoots(previous => ({ ...previous, [root]: true })); setActiveView('executive-departments'); }}/>;
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
@@ -516,7 +515,7 @@ export default function App() {
             ceoAdminMode={ceoAdminMode}
           />
         );
-      default: return <ExecutiveWorkspaceHome mode={workspaceMode} user={safeCurrentUser} onNavigate={runCommand} onCommand={()=>setShowCommandBar(true)} canAccess={canAccessView}/>;
+      default: return <ExecutiveWorkspaceHome user={safeCurrentUser} onNavigate={runCommand} onCommand={()=>setShowCommandBar(true)} canAccess={canAccessView} onOpenOrganization={(root, orgId) => { setOrganizationRoot(root); setOrgSelections(previous => ({ ...previous, [root]: orgId })); setExpandedOrgRoots(previous => ({ ...previous, [root]: true })); setActiveView('executive-departments'); }}/>;
     }
   };
 
@@ -568,7 +567,7 @@ export default function App() {
       if (group.id === 'dashboard') {
         const item = group.items[0];
         const Icon = item.icon;
-        return <button key={group.id} onClick={() => { setWorkspaceMode('information'); setActiveView('dashboard'); setSidebarOpen(false); }} aria-current={activeView === 'dashboard' ? 'page' : undefined} className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-right ${activeView === 'dashboard' ? currentTheme.activeMenu : 'text-slate-400 hover:bg-white/5'}`}><Icon className="h-5 w-5"/><span className="font-black">{group.title}</span></button>;
+        return <button key={group.id} onClick={() => { setActiveView('dashboard'); setSidebarOpen(false); }} aria-current={activeView === 'dashboard' ? 'page' : undefined} className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-right ${activeView === 'dashboard' ? currentTheme.activeMenu : 'text-slate-400 hover:bg-white/5'}`}><Icon className="h-5 w-5"/><span className="font-black">{group.title}</span></button>;
       }
       return <details key={group.id} className="rounded-xl border border-white/10 p-2">
         <summary className="cursor-pointer px-2 py-2.5 text-sm font-black text-slate-200">{group.title}</summary>
