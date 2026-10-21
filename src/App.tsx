@@ -443,9 +443,10 @@ export default function App() {
     ]},
     { id: 'support', title: 'الإدارات المساندة', items: [
       { id: 'executive-departments', name: 'الإدارات المساندة', icon: Layers, orgRoot: 'support' },
-      { id: 'secretariat', name: 'السكرتارية', icon: FolderClosed },
-      { id: 'governance', name: 'الحوكمة', icon: ShieldCheck },
+      { id: 'secretariat', name: 'السكرتارية التنفيذية', icon: FolderClosed },
+      { id: 'governance', name: 'الحوكمة والجودة', icon: ShieldCheck },
       { id: 'legal', name: 'الشؤون القانونية', icon: Scale },
+      { id: 'documents', name: 'الأرشفة والوثائق', icon: FileText },
     ]},
     { id: 'agents', title: 'الوكلاء التنفيذيون', items: [
       { id: 'ai-advisor', name: 'المستشار التنفيذي الذكي', icon: Bot },
@@ -580,6 +581,10 @@ export default function App() {
               {expanded && <OrganizationSidebarTree nodes={organization.find(node => node.id === root)?.children || []} selectedId={organizationRoot === root ? orgSelections[root] : undefined} onSelect={id => { setOrgSelections(previous => ({ ...previous, [root]: id })); setOrganizationRoot(root); setActiveView('executive-departments'); setSidebarOpen(false); }}/>}
             </div>;
           })}
+          {group.id === 'agents' && <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-3 text-xs leading-6 text-slate-400">
+            <p className="font-bold text-slate-300">مهام الوكلاء التنفيذيين</p>
+            <p>قراءة التقارير وتحليلها وإعداد الملخصات، مراجعة الجوانب المالية والقانونية، وصياغة التوصيات المساندة للرئيس التنفيذي.</p>
+          </div>}
         </div>
       </details>;
     })}
