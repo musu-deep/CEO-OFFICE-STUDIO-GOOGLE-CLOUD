@@ -425,6 +425,7 @@ export default function App() {
     { id: 'companies', title: 'شركات ومؤسسات أراك', items: [
       { id: 'executive-departments', name: 'أراك للاستثمار', icon: Building2, orgRoot: 'investment' },
       { id: 'executive-departments', name: 'أراك للتنمية', icon: Globe, orgRoot: 'development' },
+      { id: 'executive-departments', name: 'أراك الرقمية', icon: Monitor, orgRoot: 'digital' },
       { id: 'executive-departments', name: 'المشاريع الاستراتيجية', icon: TrendingUp, orgRoot: 'strategic-projects' },
       { id: 'executive-departments', name: 'أراك اللوجستية', icon: Map, orgRoot: 'logistics' },
     ]},

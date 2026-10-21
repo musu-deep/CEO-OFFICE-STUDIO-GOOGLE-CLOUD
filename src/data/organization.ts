@@ -13,7 +13,6 @@ export const organization: OrgNode[] = [
       node('trading', 'اراك التجارية', [node('showroom', 'المعرض'), node('warehouse', 'المستودع'), node('wholesale', 'الجملة والصفقات'), node('branches', 'الفروع')]),
     ]),
     node('industrial', 'اراك الصناعية', [node('steel-factory', 'اراك الحديد'), node('food', 'اراك الغذائية')]),
-    node('digital', 'اراك الرقمية', [node('araak-stores', 'اراك ستور'), node('grow-on', 'جرون'), node('araak-home', 'اراك هوم'), node('araak-ai', 'اراك AI')]),
   ]),
   node('logistics', 'اراك اللوجستية', undefined, 'logistic'),
   node('support', 'الإدارات المساندة', [
@@ -48,9 +47,13 @@ export const organization: OrgNode[] = [
   ]),
   node('development', 'اراك للتنمية', [
     node('external-offices', 'المكاتب الخارجية', [node('london', 'لندن (مكتب افتراضي)'), node('khartoum', 'الخرطوم'), node('cairo', 'القاهرة', undefined, 'egypt'), node('istanbul', 'إسطنبول')]),
-    node('platforms', 'منصات اراك', [node('academy', 'أكاديمية اراك')]),
-    node('education', 'الحلول التعليمية', [node('education-platforms', 'منصات التعليم'), node('university-partnerships', 'الشراكات الجامعية')]),
+    node('education', 'الحلول التعليمية', [node('university-partnerships', 'الشراكات الجامعية')]),
     node('consulting', 'الاستشارات والتطوير', [node('consulting-services', 'الخدمات الاستشارية'), node('research', 'الدراسات والأبحاث'), node('training', 'التدريب والتأهيل'), node('accreditation', 'المقاييس والاعتمادات')]),
+  ]),
+  node('digital', 'أراك الرقمية', [
+    node('araak-stores', 'اراك ستور'), node('grow-on', 'جرون'),
+    node('araak-home', 'اراك هوم'), node('araak-ai', 'اراك AI'),
+    node('academy', 'أكاديمية اراك'), node('education-platforms', 'منصات التعليم'),
   ]),
   node('strategic-projects', 'المشاريع الاستراتيجية', [
     { id: 'university', name: 'جامعة أراك', status: 'قيد استكمال التراخيص', description: 'مشروع الجامعة ومتابعة متطلبات الترخيص', website: 'https://araak-university.org' },
