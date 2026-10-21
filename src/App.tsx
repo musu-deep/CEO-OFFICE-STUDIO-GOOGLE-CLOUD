@@ -427,6 +427,7 @@ export default function App() {
       { id: 'executive-departments', name: 'مكتب الرئيس التنفيذي', icon: Crown, orgRoot: 'ceo' },
       { id: 'executive-departments', name: 'أراك للاستثمار', icon: Building2, orgRoot: 'investment' },
       { id: 'executive-departments', name: 'أراك للتنمية', icon: Globe, orgRoot: 'development' },
+      { id: 'executive-departments', name: 'المشاريع الاستراتيجية', icon: TrendingUp, orgRoot: 'strategic-projects' },
       { id: 'executive-departments', name: 'قيد التنفيذ', icon: TrendingUp, orgRoot: 'planned' },
       { id: 'executive-departments', name: 'أراك اللوجستية', icon: Map, orgRoot: 'logistics' },
       { id: 'egypt', name: 'أراك مصر', icon: MapPin },
@@ -583,7 +584,7 @@ export default function App() {
           })}
           {group.id === 'agents' && <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-3 text-xs leading-6 text-slate-400">
             <p className="font-bold text-slate-300">مهام الوكلاء التنفيذيين</p>
-            <p>قراءة التقارير وتحليلها وإعداد الملخصات، مراجعة الجوانب المالية والقانونية، وصياغة التوصيات المساندة للرئيس التنفيذي.</p>
+            <p>قراءة التقارير وتحليلها وإعداد الملخصات، مراجعة الجوانب المالية والقانونية، وصياغة التوصيات. وترتبط الوكلاء بإدارة التسويق لتحليل الحملات والمحتوى والقنوات الرقمية.</p>
           </div>}
         </div>
       </details>;
