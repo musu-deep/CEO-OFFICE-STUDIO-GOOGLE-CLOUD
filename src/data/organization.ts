@@ -4,10 +4,7 @@ const node = (id: string, name: string, children?: OrgNode[], view?: string): Or
 export const organization: OrgNode[] = [
   node('ceo', 'الرئيس التنفيذي', [
     node('ai-advisor', 'مستشار الذكاء الاصطناعي', undefined, 'ai-advisor'),
-    node('secretariat', 'السكرتارية التنفيذية', undefined, 'secretariat'),
-    node('legal', 'المستشار القانوني', undefined, 'legal'),
     node('internal-audit', 'المراجعة الداخلية'),
-    node('governance', 'الحوكمة والجودة', undefined, 'governance'),
   ]),
   node('investment', 'اراك للاستثمار', [
     node('national', 'اراك الوطنية', [
@@ -23,8 +20,17 @@ export const organization: OrgNode[] = [
   ]),
   node('logistics', 'اراك اللوجستية', undefined, 'logistic'),
   node('support', 'الإدارات المساندة', [
-    node('procurement', 'إدارة المشتريات والعقود'),
-    node('hr', 'الموارد البشرية'), node('finance', 'الشؤون المالية'),
+    node('secretariat', 'السكرتارية التنفيذية'), node('legal', 'الشؤون القانونية'),
+    node('hr', 'الموارد البشرية'), node('archive-documents', 'الأرشفة والوثائق'),
+    node('governance', 'الحوكمة والجودة'), node('procurement', 'إدارة المشتريات والعقود'),
+    node('finance', 'الشؤون المالية'),
+    node('pricing', 'قسم التسعير المركزي', [
+      node('pricing-procurement', 'تكلفة المشتريات والمدخلات'),
+      node('pricing-finance', 'التكلفة والربحية والهوامش'),
+      node('pricing-projects', 'المقاولات والمشاريع'),
+      node('pricing-store-showroom', 'المتجر الإلكتروني والمعرض'),
+      node('pricing-factory', 'منتجات المصنع'),
+    ]),
     node('administration', 'الإدارية والخدمات'), node('maintenance', 'المتابعة والصيانة'),
     node('it', 'تقنية المعلومات', [node('digital-transformation', 'التحول الرقمي'), node('marketing-media', 'تسويق وإعلام')]),
     node('resource-development', 'تنمية الموارد', [node('marketing', 'التسويق'), node('public-relations', 'العلاقات العامة')]),
