@@ -426,7 +426,6 @@ export default function App() {
       { id: 'executive-departments', name: 'أراك للاستثمار', icon: Building2, orgRoot: 'investment' },
       { id: 'executive-departments', name: 'أراك للتنمية', icon: Globe, orgRoot: 'development' },
       { id: 'executive-departments', name: 'المشاريع الاستراتيجية', icon: TrendingUp, orgRoot: 'strategic-projects' },
-      { id: 'executive-departments', name: 'قيد التنفيذ', icon: TrendingUp, orgRoot: 'planned' },
       { id: 'executive-departments', name: 'أراك اللوجستية', icon: Map, orgRoot: 'logistics' },
     ]},
     { id: 'control', title: 'الرقابة والمتابعة', items: [
