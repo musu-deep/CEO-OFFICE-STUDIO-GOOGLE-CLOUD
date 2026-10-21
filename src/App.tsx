@@ -441,10 +441,6 @@ export default function App() {
     ]},
     { id: 'support', title: 'الإدارات المساندة', items: [
       { id: 'executive-departments', name: 'الإدارات المساندة', icon: Layers, orgRoot: 'support' },
-      { id: 'secretariat', name: 'السكرتارية التنفيذية', icon: FolderClosed },
-      { id: 'governance', name: 'الحوكمة والجودة', icon: ShieldCheck },
-      { id: 'legal', name: 'الشؤون القانونية', icon: Scale },
-      { id: 'documents', name: 'الأرشفة والوثائق', icon: FileText },
     ]},
     { id: 'agents', title: 'الوكلاء التنفيذيون', items: [
       { id: 'ai-advisor', name: 'المستشار التنفيذي الذكي', icon: Bot },
@@ -460,6 +456,7 @@ export default function App() {
     const filteredItems = group.items.filter(item => {
       if (item.id === 'dashboard') return true;
       if (currentUser?.role === 'admin' || currentUser?.role === 'ceo') return true;
+      if (item.orgRoot === 'support') return ['executive-departments', 'secretariat', 'governance', 'legal', 'documents'].some(view => currentUser?.allowedViews.includes(view));
       return currentUser?.allowedViews.includes(item.id);
     });
     return { ...group, items: filteredItems };
@@ -487,7 +484,7 @@ export default function App() {
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
-      case 'executive-departments': return <ExecutiveDepartmentsView userKey={currentUser?.email || currentUser?.id || 'local-user'} theme={theme} rootId={organizationRoot} selectedId={orgSelections[organizationRoot] || organizationRoot} onSelect={id => setOrgSelections(previous => ({ ...previous, [organizationRoot]: id }))} hideNavigation={true} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? [...rawMenuGroups.flatMap(g => g.items.map(i => i.id)), 'legal', 'governance', 'egypt', 'logistic', 'users'] : currentUser?.allowedViews || []} />;
+      case 'executive-departments': return <ExecutiveDepartmentsView userKey={currentUser?.email || currentUser?.id || 'local-user'} theme={theme} rootId={organizationRoot} selectedId={orgSelections[organizationRoot] || organizationRoot} onSelect={id => setOrgSelections(previous => ({ ...previous, [organizationRoot]: id }))} hideNavigation={true} onNavigate={setActiveView} allowedViews={currentUser?.role === 'admin' || currentUser?.role === 'ceo' ? [...rawMenuGroups.flatMap(g => g.items.map(i => i.id)), 'secretariat', 'legal', 'governance', 'egypt', 'logistic', 'users'] : currentUser?.allowedViews || []} />;
       case 'projects': return <ProjectsView projects={projects} setProjects={setProjects} theme={theme} />;
       case 'tasks': return <TasksView tasks={tasks} setTasks={setTasks} theme={theme} />;
       case 'secretariat': return <SecretariatView theme={theme} />;
@@ -573,7 +570,7 @@ export default function App() {
           {group.items.filter(item => !item.orgRoot).map(item => { const Icon = item.icon; return <button key={item.id} onClick={() => { setActiveView(item.id); setSidebarOpen(false); }} className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-right text-sm ${activeView === item.id ? 'bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]' : 'text-slate-400 hover:bg-white/5'}`}><Icon className="h-4 w-4"/>{item.name}</button>; })}
           {group.items.filter(item => item.orgRoot).map(item => {
             const root = item.orgRoot!;
-            if (group.id === 'support' && root === 'support') return <div key={root}><OrganizationSidebarTree nodes={organization.find(node => node.id === root)?.children || []} selectedId={organizationRoot === root ? orgSelections[root] : undefined} onSelect={id => { setOrgSelections(previous => ({ ...previous, [root]: id })); setOrganizationRoot(root); setActiveView('executive-departments'); setSidebarOpen(false); }}/></div>;
+            if (group.id === 'support' && root === 'support') return <div key={root}><OrganizationSidebarTree nodes={(organization.find(node => node.id === root)?.children || []).filter(node => canAccessView('executive-departments') || canAccessView(({ secretariat: 'secretariat', legal: 'legal', governance: 'governance', 'archive-documents': 'documents' } as Record<string, string>)[node.id] || 'executive-departments'))} selectedId={organizationRoot === root ? orgSelections[root] : undefined} onSelect={id => { const service = ({ secretariat: 'secretariat', legal: 'legal', governance: 'governance', 'archive-documents': 'documents' } as Record<string, string>)[id]; if (service && canAccessView(service)) { setActiveView(service); } else { setOrgSelections(previous => ({ ...previous, [root]: id })); setOrganizationRoot(root); setActiveView('executive-departments'); } setSidebarOpen(false); }}/></div>;
             const expanded = !!expandedOrgRoots[root];
             return <div key={root}>
               <button aria-expanded={expanded} onClick={() => setExpandedOrgRoots(previous => ({ ...previous, [root]: !previous[root] }))} className={`w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-right text-sm ${organizationRoot === root && activeView === 'executive-departments' ? 'text-[var(--theme-accent)]' : 'text-slate-400 hover:bg-white/5'}`}><span>{item.name}</span><ChevronLeft className={`h-4 w-4 ${expanded ? '-rotate-90' : ''}`}/></button>
