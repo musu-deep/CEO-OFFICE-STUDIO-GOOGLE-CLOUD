@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Building2, ChevronLeft, Network, Search } from 'lucide-react';
 import { organization, findOrgPath, type OrgNode } from '../data/organization';
 import type { PlatformTheme } from '../types';
+import ArakEgyptView from './ArakEgyptView';
 import ProcurementWorkspace from './ProcurementWorkspace';
 import EcommercePerformanceView from './EcommercePerformanceView';
 
@@ -25,6 +26,7 @@ export default function ExecutiveDepartmentsView({ theme, userKey = 'local-user'
     </div>;
   });
   if (['procurement','contracts-procurement'].includes(current.id)) return <ProcurementWorkspace userKey={userKey}/>;
+  if (current.id === 'cairo' && canOpen('egypt')) return <div dir="rtl" className="space-y-5"><div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">{path.map(n=><button key={n.id} onClick={()=>select(n.id)}>{n.name} /</button>)}</div><h2 className="text-2xl font-black">القاهرة · أراك مصر</h2><p className="text-xs text-amber-300">يتضمن هذا القسم بيانات تجريبية؛ لم يربط بالمصدر التشغيلي بعد.</p><ArakEgyptView theme={theme}/></div>;
   const services = [['projects','المشاريع والمبادرات'],['tasks','التكليفات والمهام'],['reports','التقارير والتحليلات'],['documents','الوثائق']];
   return <div dir="rtl" className="space-y-6 text-right">
     <header className="border-b border-white/10 pb-5"><p className="mb-2 flex items-center gap-2 text-xs text-[var(--theme-accent)]"><Network className="h-4 w-4"/>مجموعة اراك للتنمية · الهيكل التنظيمي 2026</p><h2 className="text-3xl font-black">{root.name}</h2><p className="mt-2 text-sm text-slate-400">مجلس الإدارة ← الرئيس التنفيذي · المصفوفة المؤرخة في 29 يوليو 2026</p></header>

@@ -50,10 +50,10 @@ export const organization: OrgNode[] = [
     ]),
   ]),
   node('development', 'اراك للتنمية', [
-    node('external-offices', 'المكاتب الخارجية', [node('london', 'لندن (مكتب افتراضي)'), node('khartoum', 'الخرطوم'), node('cairo', 'القاهرة'), node('istanbul', 'إسطنبول')]),
+    node('external-offices', 'المكاتب الخارجية', [node('london', 'لندن (مكتب افتراضي)'), node('khartoum', 'الخرطوم'), node('cairo', 'القاهرة', undefined, 'egypt'), node('istanbul', 'إسطنبول')]),
     node('platforms', 'منصات اراك', [node('academy', 'أكاديمية اراك')]),
     node('education', 'الحلول التعليمية', [node('education-platforms', 'منصات التعليم'), node('university-partnerships', 'الشراكات الجامعية')]),
-    node('consulting', 'الاستشارات والتطوير', [node('consulting-services', 'الخدمات الاستشارية'), node('research', 'الدراسات والأبحاث'), node('training', 'التدريب والتأهيل', undefined, 'egypt'), node('accreditation', 'المقاييس والاعتمادات')]),
+    node('consulting', 'الاستشارات والتطوير', [node('consulting-services', 'الخدمات الاستشارية'), node('research', 'الدراسات والأبحاث'), node('training', 'التدريب والتأهيل'), node('accreditation', 'المقاييس والاعتمادات')]),
   ]),
   node('strategic-projects', 'المشاريع الاستراتيجية', [
     { id: 'university', name: 'جامعة أراك', status: 'قيد استكمال التراخيص', description: 'مشروع الجامعة ومتابعة متطلبات الترخيص', website: 'https://araak-university.org' },

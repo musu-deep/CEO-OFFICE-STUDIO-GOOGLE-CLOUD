@@ -429,7 +429,6 @@ export default function App() {
       { id: 'executive-departments', name: 'المشاريع الاستراتيجية', icon: TrendingUp, orgRoot: 'strategic-projects' },
       { id: 'executive-departments', name: 'قيد التنفيذ', icon: TrendingUp, orgRoot: 'planned' },
       { id: 'executive-departments', name: 'أراك اللوجستية', icon: Map, orgRoot: 'logistics' },
-      { id: 'egypt', name: 'أراك مصر', icon: MapPin },
     ]},
     { id: 'control', title: 'الرقابة والمتابعة', items: [
       { id: 'reports', name: 'التقارير ومؤشرات الأداء', icon: BarChart3 },
