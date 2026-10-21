@@ -12,6 +12,7 @@ export const organization: OrgNode[] = [
         node('technical-office', 'المكتب الفني'), node('sites', 'المواقع'),
         node('planning-quality', 'التخطيط والجودة'), node('operations-control', 'العمليات والرقابة'),
         node('contracts-procurement', 'العقود والمشتريات'),
+        node('pricing-project-link', 'التنسيق مع قسم التسعير المركزي'),
       ]),
       node('trading', 'اراك التجارية', [node('showroom', 'المعرض'), node('warehouse', 'المستودع'), node('wholesale', 'الجملة والصفقات'), node('branches', 'الفروع')]),
     ]),
@@ -22,8 +23,9 @@ export const organization: OrgNode[] = [
   node('support', 'الإدارات المساندة', [
     node('secretariat', 'السكرتارية التنفيذية'), node('legal', 'الشؤون القانونية'),
     node('hr', 'الموارد البشرية'), node('archive-documents', 'الأرشفة والوثائق'),
-    node('governance', 'الحوكمة والجودة'), node('procurement', 'إدارة المشتريات والعقود'),
-    node('finance', 'الشؤون المالية'),
+    node('governance', 'الحوكمة والجودة'),
+    node('procurement', 'إدارة المشتريات والعقود', [node('pricing-procurement-link', 'التنسيق مع التسعير المركزي')]),
+    node('finance', 'الشؤون المالية', [node('pricing-finance-link', 'التنسيق مع التسعير المركزي')]),
     node('pricing', 'قسم التسعير المركزي', [
       node('pricing-procurement', 'تكلفة المشتريات والمدخلات'),
       node('pricing-finance', 'التكلفة والربحية والهوامش'),
