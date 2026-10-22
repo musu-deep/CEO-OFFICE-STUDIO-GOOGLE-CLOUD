@@ -53,7 +53,7 @@ export const organization: OrgNode[] = [
   node('digital', 'أراك الرقمية', [
     node('araak-stores', 'اراك ستور'), node('grow-on', 'جرون'),
     node('araak-home', 'اراك هوم'), node('araak-ai', 'اراك AI'),
-    node('academy', 'أكاديمية اراك'), node('education-platforms', 'منصات التعليم'),
+    node('academy', 'أكاديمية اراك'),
   ]),
   node('strategic-projects', 'المشاريع الاستراتيجية', [
     { id: 'university', name: 'جامعة أراك', status: 'قيد استكمال التراخيص', description: 'مشروع الجامعة ومتابعة متطلبات الترخيص', website: 'https://araak-university.org' },
