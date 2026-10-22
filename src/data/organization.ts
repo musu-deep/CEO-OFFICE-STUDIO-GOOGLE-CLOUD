@@ -56,6 +56,8 @@ export const organization: OrgNode[] = [
     node('academy', 'أكاديمية اراك'),
   ]),
   node('strategic-projects', 'المشاريع الاستراتيجية', [
+    node('development-council', 'مجلس التنمية'),
+    node('development-waqf-company', 'شركة وقف التنمية'),
     { id: 'university', name: 'جامعة أراك', status: 'قيد استكمال التراخيص', description: 'مشروع الجامعة ومتابعة متطلبات الترخيص', website: 'https://araak-university.org' },
     { id: 'volunteering', name: 'منصة أراك للتطوع', status: 'مشروع تنموي', description: 'منصة للتطوع في مجالات التنمية' },
     { id: 'tanmyat', name: 'مجتمع تنميات', status: 'مجتمع متخصص', description: 'للمهتمين بقطاع التنمية من خبراء وعاملين ومؤسسات وشركات وكيانات' },
