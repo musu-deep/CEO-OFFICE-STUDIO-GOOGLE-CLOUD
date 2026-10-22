@@ -12,9 +12,9 @@ export const organization: OrgNode[] = [
       ]),
       node('trading', 'اراك التجارية', [node('showroom', 'المعرض'), node('warehouse', 'المستودع'), node('wholesale', 'الجملة والصفقات'), node('branches', 'الفروع')]),
     ]),
+    node('logistics', 'اراك اللوجستية', undefined, 'logistic'),
     node('industrial', 'اراك الصناعية', [node('steel-factory', 'اراك الحديد'), node('food', 'اراك الغذائية')]),
   ]),
-  node('logistics', 'اراك اللوجستية', undefined, 'logistic'),
   node('support', 'الإدارات المساندة', [
     node('internal-audit', 'المراجعة الداخلية'),
     node('secretariat', 'السكرتارية التنفيذية'), node('legal', 'الشؤون القانونية'),
