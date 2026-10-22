@@ -4,6 +4,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
+import { createUnitWorkspaceRouter } from './src/server/unitWorkspaceRoutes';
 import { createNamaRouter } from './src/server/namaRoutes';
 
 dotenv.config();
@@ -21,6 +22,7 @@ async function startServer() {
     res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self'; connect-src 'self' https://generativelanguage.googleapis.com https://api.openai.com");
     next();
   });
+  app.use('/api/unit-workspace', (req, res, next) => { requireAuth(req, res, next); }, createUnitWorkspaceRouter());
   app.use(express.json({ limit: '512kb' }));
 
   const sessionSecret = process.env.SESSION_SECRET || '';
