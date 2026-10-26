@@ -1,3 +1,4 @@
+import ExecutiveLiveFeed from './ExecutiveLiveFeed';
 import { useMemo, useState } from 'react';
 import {
   ArrowRight,
@@ -94,6 +95,8 @@ export default function ExecutiveWorkspaceHome({
         <Search className="h-4 w-4"/>اطلب ما تحتاجه
       </button>
     </header>
+
+    <ExecutiveLiveFeed onOpenOrganization={onOpenOrganization}/>
 
     <nav aria-label="مستوى لوحة الأداء" className="flex flex-wrap items-center gap-2 text-sm">
       <button onClick={() => setScopeId(null)} className={!currentScope ? 'font-black text-[var(--theme-accent)]' : 'text-slate-400 hover:text-white'}>المجموعة</button>

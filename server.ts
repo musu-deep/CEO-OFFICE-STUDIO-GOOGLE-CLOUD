@@ -5,6 +5,7 @@ import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import { createUnitWorkspaceRouter } from './src/server/unitWorkspaceRoutes';
+import { buildExecutiveFeed } from './src/lib/executiveFeed';
 import { createNamaRouter } from './src/server/namaRoutes';
 
 dotenv.config();
@@ -125,6 +126,11 @@ async function startServer() {
   });
 
   // ARAAK NAMA AI: supervised content and academy operations.
+  app.get('/api/executive-feed', requireAuth, (_req, res) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.json(buildExecutiveFeed());
+  });
+
   app.use('/api/nama', requireAuth, createNamaRouter());
 
   // API Route for AI Executive Advisor (Chief of Staff AI / Legal AI / Strategic AI)
