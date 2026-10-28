@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
@@ -5,6 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import { createUnitWorkspaceRouter } from './src/server/unitWorkspaceRoutes';
+import { createExecutiveRouter } from './src/server/executiveRoutes';
 import { buildExecutiveFeed } from './src/lib/executiveFeed';
 import { createNamaRouter } from './src/server/namaRoutes';
 
@@ -65,10 +67,12 @@ async function startServer() {
   };
   const requireAuth = (req: Request, res: Response, next: () => void) => {
     const session = readSession(req);
-    if (!session) return res.status(401).json({ error: 'Authentication required' });
-    (req as Request & { auth?: unknown }).auth = session;
+    if (!session || !authUsers[session.email]) return res.status(401).json({ error: 'Authentication required' });
+    (req as Request & { auth?: unknown }).auth = { ...session, role: authUsers[session.email].role };
     next();
   };
+
+  app.use('/api/executive', requireAuth, createExecutiveRouter());
 
   app.get('/health', (_req, res) => res.status(200).json({ status: 'ok', service: 'araak-ceo-office' }));
   app.get('/ready', (_req, res) => {

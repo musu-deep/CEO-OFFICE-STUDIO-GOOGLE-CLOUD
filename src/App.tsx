@@ -178,6 +178,7 @@ import GovernanceView from './components/GovernanceView';
 import LegalView from './components/LegalView';
 import AiAdvisorView from './components/AiAdvisorView';
 import VoiceAssistantView from './components/VoiceAssistantView';
+import ExecutiveDashboard from './components/ExecutiveDashboard';
 import ExecutiveWorkspaceHome from './components/ExecutiveWorkspaceHome';
 import ReportsView from './components/ReportsView';
 import ArakEgyptView from './components/ArakEgyptView';
@@ -479,7 +480,7 @@ export default function App() {
 
   const renderActiveView = () => {
     switch (activeView) {
-      case 'dashboard': return <ExecutiveWorkspaceHome user={safeCurrentUser} onNavigate={runCommand} onCommand={()=>setShowCommandBar(true)} canAccess={canAccessView} onOpenOrganization={(root, orgId) => { setOrganizationRoot(root); setOrgSelections(previous => ({ ...previous, [root]: orgId })); setExpandedOrgRoots(previous => ({ ...previous, [root]: true })); setActiveView('executive-departments'); }}/>;
+      case 'dashboard': return <ExecutiveDashboard userKey={currentUser?.email || currentUser?.id || 'user'} onOpen={(root,orgId)=>{setOrganizationRoot(root);setOrgSelections(previous=>({...previous,[root]:orgId}));setActiveView('executive-departments');}}/>;
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;

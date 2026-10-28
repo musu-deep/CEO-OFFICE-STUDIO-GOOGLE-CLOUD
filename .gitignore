@@ -30,3 +30,5 @@ Thumbs.db
 # Cache
 .cache/
 .eslintcache
+# Shared executive records and uploaded reports
+data/executive/

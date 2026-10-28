@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Building2, ChevronLeft, Network, Search } from 'lucide-react';
 import { organization, findOrgPath, type OrgNode } from '../data/organization';
 import type { PlatformTheme } from '../types';
+import { resolveEntity } from '../lib/executiveModel';
 import UnitWorkspace from './UnitWorkspace';
 import ArakEgyptView from './ArakEgyptView';
 import ProcurementWorkspace from './ProcurementWorkspace';
@@ -9,11 +10,11 @@ import EcommercePerformanceView from './EcommercePerformanceView';
 
 type Props = { theme: PlatformTheme; userKey?: string; rootId?: string; selectedId?: string; onSelect?: (id: string) => void; hideNavigation?: boolean; onNavigate?: (view: string) => void; allowedViews?: string[] };
 export default function ExecutiveDepartmentsView(props: Props) {
-  const unit = findOrgPath(props.selectedId || props.rootId || 'investment').at(-1) || organization[0];
+  const unit = resolveEntity(props.selectedId || props.rootId || 'investment') || organization[0];
   const service = ({ secretariat: 'secretariat', legal: 'legal', governance: 'governance', 'archive-documents': 'documents' } as Record<string,string>)[unit.id];
   return <UnitWorkspace key={`${props.userKey}:${unit.id}`} unit={unit} userKey={props.userKey || 'local-user'} canUseAgent={!!props.allowedViews?.includes('ai-advisor')}>
     {service && props.allowedViews?.includes(service) && <button className="mb-5 rounded-xl border border-white/10 px-4 py-3 text-sm" onClick={()=>props.onNavigate?.(service)}>فتح خدمات {unit.name}</button>}
-    <UnitDetails {...props}/>
+    {!unit.id.includes('::') && <UnitDetails {...props}/>}
   </UnitWorkspace>;
 }
 function UnitDetails({ theme, userKey = 'local-user', rootId = 'investment', selectedId, onSelect, hideNavigation = false, onNavigate, allowedViews = [] }: Props) {
