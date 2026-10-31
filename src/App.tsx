@@ -1,4 +1,5 @@
-﻿import { useState, useEffect, type CSSProperties } from 'react';
+import PerformanceReportsView from './components/PerformanceReportsView';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { 
   Building2, 
   CheckSquare, 
@@ -258,6 +259,8 @@ export default function App() {
         )) {
           setCurrentUser(null);
           setCeoAdminMode(false);
+        } else if (!cancelled) {
+          setCurrentUser(previous => previous ? { ...previous, allowedViews: [...new Set([...previous.allowedViews, 'performance-reports'])] } : null);
         }
       })
       .catch(() => {
@@ -430,6 +433,7 @@ export default function App() {
       { id: 'executive-departments', name: 'المشاريع الاستراتيجية', icon: TrendingUp, orgRoot: 'strategic-projects' },
     ]},
     { id: 'control', title: 'الرقابة والمتابعة', items: [
+      { id: 'performance-reports', name: 'تقارير الأداء والمرفقات', icon: FileText },
       { id: 'reports', name: 'التقارير ومؤشرات الأداء', icon: BarChart3 },
       { id: 'tasks', name: 'التكليفات', icon: CheckSquare },
       { id: 'projects', name: 'المشاريع', icon: Building2 },
@@ -466,9 +470,9 @@ export default function App() {
   useEffect(() => {
     if (!currentUser) return;
     const allAllowedViewIds = currentUser.role === 'ceo'
-      ? ['dashboard', 'executive-cv', 'reports', 'ai-advisor', 'voice-assistant', 'executive-departments', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
+      ? ['dashboard', 'performance-reports', 'executive-cv', 'reports', 'ai-advisor', 'voice-assistant', 'executive-departments', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
       : currentUser.role === 'admin'
-        ? ['dashboard', 'reports', 'ai-advisor', 'voice-assistant', 'executive-departments', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
+        ? ['dashboard', 'performance-reports', 'reports', 'ai-advisor', 'voice-assistant', 'executive-departments', 'projects', 'tasks', 'secretariat', 'messages', 'calendar', 'meetings', 'meeting-requests', 'governance', 'legal', 'documents', 'egypt', 'logistic', 'users']
         : ['dashboard', ...currentUser.allowedViews.filter(viewId => viewId !== 'dashboard')];
       
     if (!allAllowedViewIds.includes(activeView)) {
@@ -480,7 +484,8 @@ export default function App() {
 
   const renderActiveView = () => {
     switch (activeView) {
-      case 'dashboard': return <ExecutiveDashboard userKey={currentUser?.email || currentUser?.id || 'user'} onOpen={(root,orgId)=>{setOrganizationRoot(root);setOrgSelections(previous=>({...previous,[root]:orgId}));setActiveView('executive-departments');}}/>;
+      case 'dashboard': return <ExecutiveDashboard userKey={currentUser?.email || currentUser?.id || 'user'} onReports={()=>setActiveView('performance-reports')} onOpen={(root,orgId)=>{setOrganizationRoot(root);setOrgSelections(previous=>({...previous,[root]:orgId}));setActiveView('executive-departments');}}/>;
+      case 'performance-reports': return <PerformanceReportsView/>;
       case 'reports': return <ReportsView theme={theme} />;
       case 'ai-advisor': return <AiAdvisorView theme={theme} />;
       case 'voice-assistant': return <VoiceAssistantView theme={theme} />;
@@ -520,7 +525,7 @@ export default function App() {
         users={users} 
         onLoginSuccess={(user) => {
           setCurrentUser(user);
-          setActiveView('dashboard');
+          setActiveView(user.role === 'head' && user.allowedViews.includes('performance-reports') ? 'performance-reports' : 'dashboard');
         }} 
         theme={theme} 
       />
@@ -596,6 +601,7 @@ export default function App() {
           <div className="flex items-center justify-between text-xs text-slate-500">
             <button 
               onClick={() => {
+                void fetch('/api/auth/logout', {method:'POST'});
                 setCurrentUser(null);
                 setCeoAdminMode(false);
                 setActiveView('dashboard');
@@ -790,6 +796,7 @@ export default function App() {
                     </button>
                     <button 
                       onClick={() => {
+                        void fetch('/api/auth/logout', {method:'POST'});
                         setCurrentUser(null);
                         setCeoAdminMode(false);
                         setActiveView('dashboard');

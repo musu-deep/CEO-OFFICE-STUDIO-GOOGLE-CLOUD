@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 import crypto from 'crypto';
 import { createUnitWorkspaceRouter } from './src/server/unitWorkspaceRoutes';
 import { createExecutiveRouter } from './src/server/executiveRoutes';
+import { ManagerAccounts, createRegistrationRouter, createAccountAdministrationRouter } from './src/server/managerAccounts';
+import { createPerformanceReportRouter } from './src/server/performanceReports';
 import { buildExecutiveFeed } from './src/lib/executiveFeed';
 import { createNamaRouter } from './src/server/namaRoutes';
 
@@ -26,6 +28,8 @@ async function startServer() {
     next();
   });
   app.use('/api/unit-workspace', (req, res, next) => { requireAuth(req, res, next); }, createUnitWorkspaceRouter());
+  // Report uploads use a larger, authenticated parser before the general API parser.
+  app.use('/api/performance-reports', (req, res, next) => requireAuth(req, res, next), createPerformanceReportRouter());
   app.use(express.json({ limit: '512kb' }));
 
   const sessionSecret = process.env.SESSION_SECRET || '';
@@ -43,6 +47,18 @@ async function startServer() {
 
   if (!sessionSecret) console.warn('SESSION_SECRET is not configured.');
   if (!Object.keys(authUsers).length) console.warn('ARAAK_AUTH_USERS has no valid accounts.');
+
+  const managers = new ManagerAccounts();
+  const accountOf = (email: string) => {
+    const manager = managers.active(email);
+    return authUsers[email] || (manager ? { ...manager, role: 'head', password: '' } : undefined);
+  };
+  const profileOf = (email: string) => {
+    const account = accountOf(email);
+    if (!account) return undefined;
+    const manager = managers.active(email);
+    return { id: email, email, role: account.role, name: manager?.name || email, title: manager?.title || (account.role === 'ceo' ? 'الرئيس التنفيذي' : 'مستخدم المنصة'), avatar: manager?.name.charAt(0) || 'أ', status: 'نشط', managerAccount: !!manager, allowedViews: ['performance-reports'], color: 'bg-slate-700' };
+  };
 
   const loginAttempts = new Map<string, { count: number; resetAt: number }>();
   const safeEqual = (left: string, right: string) => {
@@ -67,11 +83,19 @@ async function startServer() {
   };
   const requireAuth = (req: Request, res: Response, next: () => void) => {
     const session = readSession(req);
-    if (!session || !authUsers[session.email]) return res.status(401).json({ error: 'Authentication required' });
-    (req as Request & { auth?: unknown }).auth = { ...session, role: authUsers[session.email].role };
+    if (!session || !accountOf(session.email)) return res.status(401).json({ error: 'Authentication required' });
+    (req as Request & { auth?: unknown }).auth = { ...session, role: accountOf(session.email)!.role };
     next();
   };
 
+  // Self-registered managers use scoped workspaces and reports, not unrelated group-wide operations.
+  const requireGeneralAccess = (req: Request, res: Response, next: () => void) => {
+    const email = (req as Request & { auth?: { email: string } }).auth?.email;
+    return email && authUsers[email] ? next() : res.status(403).json({ error: 'هذه الخدمة خارج نطاق صلاحيات حساب المدير.' });
+  };
+
+  app.use('/api/auth', createRegistrationRouter(managers, authUsers));
+  app.use('/api/manager-accounts', requireAuth, createAccountAdministrationRouter(managers));
   app.use('/api/executive', requireAuth, createExecutiveRouter());
 
   app.get('/health', (_req, res) => res.status(200).json({ status: 'ok', service: 'araak-ceo-office' }));
@@ -84,14 +108,14 @@ async function startServer() {
     });
   });
 
-  app.post('/api/auth/login', (req, res) => {
+  app.post('/api/auth/login', async (req, res) => {
     const key = req.ip || 'unknown';
     const now = Date.now();
     const current = loginAttempts.get(key);
     const attempt = !current || current.resetAt < now ? { count: 0, resetAt: now + 15 * 60_000 } : current;
     if (attempt.count >= 10) return res.status(429).json({ error: 'Too many login attempts' });
 
-    if (!sessionSecret || !Object.keys(authUsers).length) {
+    if (!sessionSecret) {
       return res.status(503).json({
         error: 'AUTH_NOT_CONFIGURED',
         sessionConfigured: Boolean(sessionSecret),
@@ -101,10 +125,11 @@ async function startServer() {
 
     const email = String(req.body?.email || '').trim().toLowerCase();
     const password = String(req.body?.password || '');
-    const account = authUsers[email];
-    if (!account || !password || !safeEqual(password, String(account.password || ''))) {
-      attempt.count += 1;
-      loginAttempts.set(key, attempt);
+    if (password.length > 128) return res.status(400).json({ error: 'INVALID_CREDENTIALS' });
+    attempt.count += 1; loginAttempts.set(key, attempt);
+    const manager = authUsers[email] ? undefined : await managers.verify(email, password);
+    const account = authUsers[email] || (manager ? { role: 'head' } : undefined);
+    if (!account || !password || (authUsers[email] && !safeEqual(password, String(authUsers[email].password || '')))) {
       return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
     }
 
@@ -116,12 +141,14 @@ async function startServer() {
     })).toString('base64url');
     const token = encodeURIComponent(`${payload}.${signSession(payload)}`);
     res.setHeader('Set-Cookie', `araak_session=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=28800`);
-    return res.json({ ok: true, email, role: account.role });
+    return res.json({ ok: true, email, role: account.role, user: profileOf(email) });
   });
 
   app.get('/api/auth/me', (req, res) => {
     const session = readSession(req);
-    return session ? res.json({ authenticated: true, user: session }) : res.status(401).json({ authenticated: false });
+    const user = session && profileOf(session.email);
+    res.setHeader('Cache-Control', 'no-store');
+    return user ? res.json({ authenticated: true, user }) : res.status(401).json({ authenticated: false });
   });
 
   app.post('/api/auth/logout', (_req, res) => {
@@ -135,10 +162,10 @@ async function startServer() {
     res.json(buildExecutiveFeed());
   });
 
-  app.use('/api/nama', requireAuth, createNamaRouter());
+  app.use('/api/nama', requireAuth, requireGeneralAccess, createNamaRouter());
 
   // API Route for AI Executive Advisor (Chief of Staff AI / Legal AI / Strategic AI)
-  app.post('/api/advisor', requireAuth, async (req: Request, res: Response) => {
+  app.post('/api/advisor', requireAuth, requireGeneralAccess, async (req: Request, res: Response) => {
     const { message, history, agentType, platformData } = req.body;
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -249,7 +276,7 @@ async function startServer() {
   });
 
   // Unified General Gemini Chat API
-  app.post('/api/gemini/chat', requireAuth, async (req: Request, res: Response) => {
+  app.post('/api/gemini/chat', requireAuth, requireGeneralAccess, async (req: Request, res: Response) => {
     const { message } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
@@ -301,7 +328,7 @@ async function startServer() {
   });
 
   // API Route for Voice Command Transcriber & Processor (Whisper + Gemini simulated)
-  app.post('/api/voice-transcribe', requireAuth, async (req: Request, res: Response) => {
+  app.post('/api/voice-transcribe', requireAuth, requireGeneralAccess, async (req: Request, res: Response) => {
     const { simulatedAudioDuration } = req.body;
     void simulatedAudioDuration;
     

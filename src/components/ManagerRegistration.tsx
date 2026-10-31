@@ -1,0 +1,14 @@
+import { useEffect, useState, type FormEvent } from 'react';
+const field = 'w-full rounded-xl border border-white/20 bg-slate-950/80 p-3 text-sm text-white';
+export default function ManagerRegistration() {
+  const [entities, setEntities] = useState<{id:string;name:string}[]>([]);
+  const [form, setForm] = useState({ name:'', title:'', email:'', password:'', unitId:'' });
+  const [busy,setBusy] = useState(false), [error,setError] = useState(''), [message,setMessage] = useState('');
+  useEffect(() => { fetch('/api/auth/registration-options').then(async r => { if(!r.ok)throw Error();setEntities((await r.json()).entities); }).catch(()=>setError('تعذر تحميل الجهات. أعد فتح التسجيل.')); }, []);
+  const submit = async (e:FormEvent) => {
+    e.preventDefault(); setBusy(true);setError('');setMessage('');
+    try { const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});const d=await r.json();if(!r.ok)throw Error(d.error);setMessage(d.message);setForm({...form,password:''}); }
+    catch(e:any){setError(e.message||'تعذر الاتصال بالخادم.');}finally{setBusy(false);}
+  };
+  return <form onSubmit={submit} className="space-y-4"><h3 className="text-xl font-bold">طلب تسجيل مدير إدارة أو مؤسسة</h3><p className="text-sm leading-7 text-slate-300">يُراجع مكتب الرئيس التنفيذي طلبك ويحدد الجهات المصرح بها قبل تفعيل الدخول.</p>{[['name','الاسم الكامل','text'],['title','المسمى الوظيفي','text'],['email','البريد الإلكتروني الرسمي','email'],['password','كلمة المرور — 12 حرفًا على الأقل','password']].map(([key,label,type])=><label key={key} className="block text-sm">{label}<input required type={type} autoComplete={key==='password'?'new-password':key==='email'?'email':'off'} minLength={key==='password'?12:1} maxLength={key==='password'?128:key==='name'?120:key==='title'?160:254} value={form[key as keyof typeof form]} onChange={e=>setForm({...form,[key]:e.target.value})} className={`${field} mt-2`}/></label>)}<label className="block text-sm">الإدارة أو المؤسسة<select required value={form.unitId} onChange={e=>setForm({...form,unitId:e.target.value})} className={`${field} mt-2`}><option value="">اختر الجهة</option>{entities.map(e=><option key={e.id} value={e.id}>{e.name}</option>)}</select></label><button disabled={busy||!entities.length} className="w-full rounded-xl bg-emerald-600 p-3 font-bold disabled:opacity-50">{busy?'جارٍ إرسال الطلب…':'إرسال طلب التسجيل'}</button>{error&&<p role="alert" className="text-sm text-rose-300">{error}</p>}{message&&<p role="status" className="text-sm leading-7 text-emerald-300">{message}</p>}</form>;
+}

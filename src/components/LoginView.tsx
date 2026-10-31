@@ -1,3 +1,4 @@
+import ManagerRegistration from './ManagerRegistration';
 import React, { useState } from 'react';
 import {
   AlertCircle,
@@ -86,6 +87,8 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [registering, setRegistering] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const t = themeTokens[theme] || themeTokens.vision_2030;
 
@@ -98,12 +101,8 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
       return;
     }
 
-    const matchedUser = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
-    if (!matchedUser || matchedUser.status === 'محجوب') {
-      setError('تعذر تسجيل الدخول. يرجى مراجعة مدير النظام.');
-      return;
-    }
-
+    if (busy) return;
+    setBusy(true);
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -113,7 +112,7 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
       });
       const result = await response.json().catch(() => ({}));
 
-      if (!response.ok || result.email !== matchedUser.email.toLowerCase() || result.role !== matchedUser.role) {
+      if (!response.ok || !result.user) {
         if (response.status === 503 && result.error === 'AUTH_NOT_CONFIGURED') {
           setError(`إعداد المصادقة غير مكتمل في الخادم (الجلسة: ${result.sessionConfigured ? 'مفعلة' : 'غير مفعلة'}، الحسابات: ${result.configuredUsers ?? 0}).`);
         } else if (response.status === 429) {
@@ -124,10 +123,11 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
         return;
       }
 
-      onLoginSuccess({ ...matchedUser, password: undefined });
+      const known = !result.user.managerAccount && users.find(u => u.email.toLowerCase() === result.email && u.role === result.role);
+      onLoginSuccess({ ...(known || {}), ...result.user, name: known?.name || result.user.name, title: known?.title || result.user.title, avatar: known?.avatar || result.user.avatar, allowedViews: [...new Set<string>([...(known?.allowedViews || result.user.allowedViews), 'performance-reports'])], password: undefined });
     } catch {
       setError('تعذر الاتصال بخدمة المصادقة. حاول مرة أخرى.');
-    }
+    } finally { setBusy(false); }
   };
 
   /**
@@ -311,9 +311,7 @@ after:pointer-events-none
               <div>
                 <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">تسجيل الدخول لمكتب الرئيس التنفيذي</h2>
                 <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-300/90">
-                  يرجى تسجيل الدخول أو التواصل مع الموارد البشرية 
-                  <br className="hidden sm:block" />
-                  للحصول على آلية التسجيل.
+                  سجّل دخولك أو قدّم طلب تسجيل لمديري الإدارات ومؤسسات المجموعة.
                 </p>
               </div>
             </div>
@@ -325,7 +323,8 @@ after:pointer-events-none
               </div>
             )}
 
-            <form onSubmit={handleFormSubmit} className="space-y-4">
+            <div className="flex gap-3"><button type="button" onClick={()=>{setRegistering(false);setError('');}} aria-pressed={!registering} className="flex-1 rounded-xl border border-white/20 p-3 text-sm">تسجيل الدخول</button><button type="button" onClick={()=>{setRegistering(true);setError('');}} aria-pressed={registering} className="flex-1 rounded-xl border border-emerald-400/40 p-3 text-sm text-emerald-200">تسجيل مدير جديد</button></div>
+            {registering ? <ManagerRegistration/> : <form onSubmit={handleFormSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-slate-200">البريد الإلكتروني الرسمي للشركة</label>
                 <div className="relative">
@@ -368,7 +367,7 @@ after:pointer-events-none
               </div>
 
               <button
-                type="submit"
+                type="submit" disabled={busy}
                 className={`group relative w-full overflow-hidden rounded-xl ${t.button} ${t.buttonText} py-4 text-base font-black shadow-2xl ${t.glow} transition-all active:scale-[.99]`}
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/18 to-transparent translate-x-full group-hover:-translate-x-full transition-transform duration-700" />
@@ -377,13 +376,13 @@ after:pointer-events-none
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
                 </span>
               </button>
-            </form>
+            </form>}
           </div>
 
           <div className="relative mt-7 space-y-5">
             <div className="flex items-center justify-center gap-2 text-xs text-slate-300/90">
               <CheckCircle2 className={`h-4 w-4 ${t.text}`} />
-              <span>اتصال آمن ومشفّر وفق أعلى معايير حماية البيانات (AES-256)</span>
+              <span>الدخول والصلاحيات معتمدة من مكتب الرئيس التنفيذي</span>
             </div>
             <div className="grid grid-cols-3 gap-2 border-t border-white/10 pt-4 text-center text-xs text-slate-300/80">
               <span className="flex items-center justify-center gap-1.5"><Lock className="h-4 w-4" /> شروط الاستخدام</span>

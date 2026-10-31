@@ -1,3 +1,4 @@
+import type { PerformanceReport } from './performanceReports';
 import { organization, findOrgPath, type OrgNode } from '../data/organization';
 import { achievement, type Metric, type UnitSnapshot } from './unitWorkspace';
 export const dimensions = [
@@ -32,7 +33,7 @@ export type Revision = {id:string; snapshot:ExecutiveSnapshot; state:'draft'|'re
 export type Directive = {id:string;title:string;owner:string;due:string;status:'open'|'working'|'closed';createdAt:string;author:string};
 export type UnitRecord = {version:number; approved?:Revision; pending?:Revision; history:Revision[]; documents:{id:string;name:string;mimeType:string;at:string;author:string}[];directives:Directive[]};
 export type Objective = {id:string;title:string;target:string;owner:string};
-export type ExecutiveState = {units:Record<string,UnitRecord>;objectives:Objective[];grants:Record<string,Grant>;audit:{id:string;at:string;actor:string;unitId?:string;action:string}[]};
+export type ExecutiveState = {reports?:PerformanceReport[];units:Record<string,UnitRecord>;objectives:Objective[];grants:Record<string,Grant>;audit:{id:string;at:string;actor:string;unitId?:string;action:string}[]};
 export const emptyRecord=():UnitRecord=>({version:0,history:[],documents:[],directives:[]});
 export function hasPermission(email:string,role:string,grants:Record<string,Grant>,unitId:string,action:Action){
  if(role==='ceo'||role==='admin')return true;

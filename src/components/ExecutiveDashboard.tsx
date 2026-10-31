@@ -1,10 +1,11 @@
+import ManagerAccountAdministration from './ManagerAccountAdministration';
 import { useEffect,useState } from 'react';
 import { dimensions,functions,comparable,score,actions,type ExecutiveMetric,type Grant,type UnitRecord } from '../lib/executiveModel';
 import { executiveRequest,type ExecutiveResponse } from '../services/executiveClient';
 import UnitWorkspace from './UnitWorkspace';
 import ExecutiveLiveFeed from './ExecutiveLiveFeed';
 const field='rounded-xl border border-white/15 bg-black/10 p-3 text-sm';
-export default function ExecutiveDashboard({userKey,onOpen}:{userKey:string;onOpen:(root:string,id:string)=>void}){
+export default function ExecutiveDashboard({userKey,onOpen,onReports}:{userKey:string;onReports:()=>void;onOpen:(root:string,id:string)=>void}){
  const [data,setData]=useState<ExecutiveResponse|null>(null),[error,setError]=useState(''),[mode,setMode]=useState('group'),[selected,setSelected]=useState(''),[dimension,setDimension]=useState('plan'),[period,setPeriod]=useState(''),[chosen,setChosen]=useState<string[]>([]),[demo,setDemo]=useState(false);
  const load=async()=>{try{setData(await executiveRequest('/state'));setError('');}catch(e:any){setError(e.message);}};
  useEffect(()=>{load();const t=setInterval(()=>{if(!document.hidden)load();},30000);return()=>clearInterval(t);},[]);
@@ -18,7 +19,7 @@ export default function ExecutiveDashboard({userKey,onOpen}:{userKey:string;onOp
  const rows=candidates.map(c=>({...c,metric:c.metrics.length===1?c.metrics[0]:undefined}));
  const comparableRows=!!anchor&&rows.length>=2&&rows.every(r=>r.metric&&comparable(anchor,r.metric));
  const periods=[...new Set(companyMetrics.map(x=>x.metric.period).concat(Object.values<UnitRecord>(data.units).flatMap(r=>r.approved?.snapshot.metrics.map(m=>m.period)||[])).filter(Boolean))];
- return <div dir="rtl" className="space-y-6"><header className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs text-[var(--theme-accent)]">مكتب الرئيس التنفيذي</p><h1 className="mt-2 text-3xl font-black">لوحة القيادة</h1><p className="mt-2 text-sm text-slate-400">أداء المجموعة والجهات والقرارات المطلوبة</p></div><button onClick={load} className={field}>تحديث البيانات</button></header>
+ return <div dir="rtl" className="space-y-6"><header className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs text-[var(--theme-accent)]">مكتب الرئيس التنفيذي</p><h1 className="mt-2 text-3xl font-black">لوحة القيادة</h1><p className="mt-2 text-sm text-slate-400">أداء المجموعة والجهات والقرارات المطلوبة</p></div><div className="flex flex-wrap gap-3"><button onClick={onReports} className={`${field} bg-emerald-600 text-white`}>{data.manage?'وارد تقارير الأداء':'إرسال تقرير أداء'}</button><button onClick={load} className={field}>تحديث البيانات</button></div></header>
  {error&&<p role="alert" className="text-red-400">{error}</p>}
  {!data.storage.persistentConfigured&&data.manage&&<p className="rounded-xl border border-amber-500/20 p-3 text-xs text-amber-400">السجل مشترك على الخادم. لم يُضبط مسار تخزين دائم؛ احتفظ بنسخة احتياطية قبل إعادة النشر. <a href="/api/executive/backup" className="underline">تنزيل السجل</a></p>}
  <nav aria-label="طرق عرض لوحة القيادة" className="flex flex-wrap gap-2">{[['group','المجموعة'],['entities','الجهات'],['compare','المقارنة']].map(([id,name])=><button key={id} aria-pressed={mode===id} onClick={()=>setMode(id)} className={`${field} ${mode===id?'bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]':''}`}>{name}</button>)}</nav>
@@ -31,7 +32,7 @@ export default function ExecutiveDashboard({userKey,onOpen}:{userKey:string;onOp
  {!comparableRows&&<p role="status" className="text-sm text-amber-400">اختر جهتين أو أكثر وفترة موحدة. يلزم مؤشر واحد لكل جهة في المحور المختار، بنفس تعريف القياس والوحدة واتجاه التحسن. البيانات غير المتوافقة لا تُرتب.</p>}
  <div className="overflow-x-auto"><table className="w-full text-right text-sm"><thead><tr className="text-slate-400">{['الجهة','المؤشر','القيمة','المستهدف','تحقيق المستهدف','الحالة'].map(t=><th key={t} className="p-3">{t}</th>)}</tr></thead><tbody>{rows.map(r=><tr key={r.entity.id} className="border-t border-white/10"><td className="p-3">{r.entity.name}</td><td className="p-3">{r.metric?.label||'غير متاح / متعدد'}</td><td className="p-3">{r.metric?`${r.metric.value.toLocaleString('ar-SA')} ${r.metric.unit}`:'—'}</td><td className="p-3">{r.metric?.target??'—'}</td><td className="p-3">{r.metric&&score(r.metric)!==undefined?`${Math.round(score(r.metric)!)}٪`:'—'}</td><td className="p-3">{comparableRows?'متوافق':'غير قابل للمقارنة'}</td></tr>)}</tbody></table></div>
  {comparableRows&&rows.every(r=>r.metric!.value>=0)&&<div className="space-y-4">{[...rows].sort((a,b)=>anchor!.direction==='up'?b.metric!.value-a.metric!.value:a.metric!.value-b.metric!.value).map(r=><div key={r.entity.id}><p className="mb-1 text-xs">{r.entity.name} · {r.metric!.value} {r.metric!.unit}</p><div className="h-3 rounded-full bg-white/10"><div style={{width:`${Math.max(1,Math.min(100,Math.abs(r.metric!.value)/Math.max(...rows.map(x=>Math.abs(x.metric!.value)),1)*100))}%`}} className="h-full rounded-full bg-[var(--theme-accent)]"/></div></div>)}</div>}</section>}
- {data.manage&&<Administration data={data} reload={load}/>}
+ {data.manage&&<><ManagerAccountAdministration entities={data.entities}/><Administration data={data} reload={load}/></>}
  <details className="rounded-xl border border-white/10 p-4"><summary className="cursor-pointer text-sm" onClick={()=>setDemo(true)}>المحاكاة</summary><p className="my-3 text-xs text-amber-400">أرقام وأحداث افتراضية منفصلة عن السجلات المعتمدة أعلاه.</p>{demo&&<ExecutiveLiveFeed onOpenOrganization={(root,id)=>{setSelected(id);setMode('entities');}}/>}</details>
  </div>;
 }
