@@ -278,10 +278,10 @@ after:pointer-events-none
               </div>
             </div>
 
-            <h1 className="text-4xl sm:text-[3.35rem] font-black leading-tight tracking-tight text-lime-400 drop-shadow-[0_6px_18px_rgba(132,204,22,.25)]">
+            <h1 className="text-2xl sm:text-[2rem] font-black leading-tight tracking-tight text-lime-400 drop-shadow-[0_6px_18px_rgba(132,204,22,.25)]">
               مجموعة أراك للتنمية
             </h1>
-            <h2 className="mt-5 text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h2 className="mt-5 text-xl sm:text-2xl font-extrabold text-white tracking-tight">
               مكتب الرئيس التنفيذي
             </h2>
 
@@ -307,7 +307,7 @@ after:pointer-events-none
                 <ShieldCheck className={`h-8 w-8 ${t.text}`} />
               </div>
               <div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">تسجيل الدخول لمكتب الرئيس التنفيذي</h2>
+                <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">تسجيل الدخول لمكتب الرئيس التنفيذي</h2>
                 <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-300/90">
                   سجّل دخولك أو قدّم طلب تسجيل للانضمام إلى مساحة جهتك.
                 </p>

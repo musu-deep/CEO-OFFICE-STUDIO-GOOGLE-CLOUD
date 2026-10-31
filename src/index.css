@@ -472,3 +472,18 @@ h1, h2, h3, h4, h5, h6, button,
 input, select, textarea {
   font-family: var(--font-sans);
 }
+
+
+/* Compact heading hierarchy across operational pages. */
+[data-theme] main h1 {
+  font-size: clamp(1.25rem, 1rem + 0.7vw, 1.5rem);
+  line-height: 1.5;
+}
+[data-theme] main h2 {
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+[data-theme] main h3 {
+  font-size: 1rem;
+  line-height: 1.6;
+}
