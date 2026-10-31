@@ -309,7 +309,7 @@ after:pointer-events-none
               <div>
                 <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">تسجيل الدخول لمكتب الرئيس التنفيذي</h2>
                 <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-300/90">
-                  سجّل دخولك أو قدّم طلب تسجيل لمديري الإدارات ومؤسسات المجموعة.
+                  سجّل دخولك أو قدّم طلب تسجيل للانضمام إلى مساحة جهتك.
                 </p>
               </div>
             </div>
@@ -321,8 +321,8 @@ after:pointer-events-none
               </div>
             )}
 
-            <div className="flex gap-3"><button type="button" onClick={()=>{setRegistering(false);setError('');}} aria-pressed={!registering} className="flex-1 rounded-xl border border-white/20 p-3 text-sm">تسجيل الدخول</button><button type="button" onClick={()=>{setRegistering(true);setError('');}} aria-pressed={registering} className="flex-1 rounded-xl border border-emerald-400/40 p-3 text-sm text-emerald-200">تسجيل مدير جديد</button></div>
-            {registering ? <ManagerRegistration/> : <form onSubmit={handleFormSubmit} className="space-y-4">
+            <button type="button" onClick={()=>{setRegistering(true);setError('');}} aria-expanded={registering} aria-controls="new-user-registration" className="w-full rounded-xl border border-emerald-400/40 bg-emerald-500/10 p-3.5 text-sm font-bold text-emerald-200 hover:bg-emerald-500/20">تسجيل مستخدم جديد</button>
+            {registering ? <div id="new-user-registration" className="space-y-4"><ManagerRegistration/><button type="button" onClick={()=>{setRegistering(false);setError('');}} className="block w-full py-2 text-center text-xs text-slate-300 underline underline-offset-4">لديك حساب؟ العودة إلى الدخول</button></div> : <form onSubmit={handleFormSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-slate-200">البريد الإلكتروني الرسمي للشركة</label>
                 <div className="relative">

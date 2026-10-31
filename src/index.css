@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Noto Sans Arabic", system-ui, sans-serif;
+  --font-display: "Cairo", "Noto Sans Arabic", system-ui, sans-serif;
+}
+
 /* Genuine daylight mode: components historically used dark utility colors.
    These scoped overrides preserve accent colors while converting structural surfaces. */
 [data-theme="spring"] {
@@ -345,7 +350,7 @@
 
 /* Platform-wide Arabic readability — executive UI */
 html, body, #root {
-  font-family: "Cairo", "Noto Sans Arabic", "Tajawal", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -379,8 +384,7 @@ body {
 
 [data-theme] main input,
 [data-theme] main select,
-[data-theme] main textarea,
-[data-theme] main button {
+[data-theme] main textarea {
   font-family: inherit;
 }
 
@@ -457,4 +461,14 @@ select option:disabled {
 }
 [data-theme="spring"] select option:disabled {
   color: #64748b !important;
+}
+
+
+/* Headings and actions use Cairo; reading text and field entries use Noto. */
+h1, h2, h3, h4, h5, h6, button,
+[data-theme] main button {
+  font-family: var(--font-display);
+}
+input, select, textarea {
+  font-family: var(--font-sans);
 }
