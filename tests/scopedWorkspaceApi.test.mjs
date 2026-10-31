@@ -16,15 +16,22 @@ test('domain records, assignment-only accounts, cross-unit isolation and retired
  try{
   await start();const ceo=await login('ceo@test.com'),finance=await login('finance@test.com'),hr=await login('hr@test.com');
   assert.equal((await request('/api/auth/me',undefined,ceo)).data.user.name,'مكتب الرئيس');
+  const options=(await request('/api/auth/registration-options')).data.entities;
+  assert.equal(options.some(e=>e.id.includes('::')),false);assert.equal(options.filter(e=>e.id==='finance').length,1);assert.equal(options.find(e=>e.id==='warehouse').group,'support');
+  await request('/api/executive/grants',{email:'hr@test.com',grant:{units:['national'],actions:['read']}},ceo);
+  assert.equal((await request('/api/executive/units/finance',undefined,hr)).status,403);
+  assert.equal((await request('/api/executive/units/warehouse',undefined,hr)).status,403);
   assert.equal((await request('/api/workspace')).status,401);
   for(const [email,unit] of [['finance@test.com','finance'],['hr@test.com','hr']])await request('/api/executive/grants',{email,grant:{units:[unit],actions:['read','edit','upload']}},ceo);
-  const financial={title:'بيان مالي فعلي',values:{period:'2026-10',currency:'SAR',budget:10000,actual:8000,cash:0,source:'تقرير الإدارة'}};
+  const financial={title:'بيان مالي فعلي',companyId:'national',values:{period:'2026-10',currency:'SAR',budget:10000,actual:8000,cash:0,source:'تقرير الإدارة'}};
   assert.equal((await request('/api/workspace/units/finance/records',undefined,hr)).status,403);
   assert.equal((await request('/api/workspace/units/finance/records',financial,hr)).status,403);
   assert.equal((await request('/api/workspace/units/finance/records',{...financial,values:{...financial.values,salary:100}},finance)).status,400);
   assert.equal((await request('/api/workspace/units/finance/records',{...financial,values:{...financial.values,actual:-1}},finance)).status,400);
   assert.equal((await request('/api/workspace/units/finance/records',{...financial,values:{...financial.values,budget:''}},finance)).status,400);
-  const created=await request('/api/workspace/units/finance/records',financial,finance);assert.equal(created.status,201);const record=created.data.record;assert.equal(record.profileId,'finance');assert.equal(record.values.cash,0);
+  assert.equal((await request('/api/workspace/units/finance/records',{...financial,companyId:'hr'},finance)).status,400);
+  const created=await request('/api/workspace/units/finance/records',financial,finance);assert.equal(created.status,201);const record=created.data.record;assert.equal(record.profileId,'finance');assert.equal(record.companyId,'national');
+  assert.equal((await request('/api/workspace/units/national/records',undefined,finance)).status,403);assert.equal(record.values.cash,0);
   assert.equal((await request('/api/workspace/units/finance/records',undefined,finance)).data.records.length,1);
   const hrProfile=(await request('/api/workspace/units/hr/records',undefined,hr)).data.profile;
   assert.equal(hrProfile.id,'hr');assert.equal(hrProfile.fields.some(f=>f.id==='budget'),false);assert.equal(hrProfile.fields.some(f=>f.id==='hires'),true);
@@ -49,9 +56,10 @@ test('domain records, assignment-only accounts, cross-unit isolation and retired
   assert.equal((await request('/api/workspace/tasks/'+other.data.task.id+'/status',{status:'closed',expectedStatus:'open'},taskCookie)).status,404);
   assert.equal((await request('/api/workspace/tasks/'+task.id+'/status',{status:'working',expectedStatus:'open'},taskCookie)).status,200);
   assert.equal((await request('/api/workspace/tasks/'+task.id+'/status',{status:'closed',expectedStatus:'open'},taskCookie)).status,409);
-  const report={unitId:'finance',taskId:task.id,title:'تقرير إنجاز المهمة',period:'2026-10',summary:'الملحق جاهز',attachments:[]};
+  const report={unitId:'finance',companyId:'national',taskId:task.id,title:'تقرير إنجاز المهمة',period:'2026-10',summary:'الملحق جاهز',attachments:[]};
   assert.equal((await request('/api/performance-reports',{...report,taskId:other.data.task.id},taskCookie)).status,403);
   assert.equal((await request('/api/performance-reports',{...report,taskId:undefined},taskCookie)).status,403);
+  assert.equal((await request('/api/performance-reports',{...report,companyId:'not-a-company'},taskCookie)).status,400);
   assert.equal((await request('/api/performance-reports',report,taskCookie)).status,201);
   assert.equal((await request('/api/performance-reports',undefined,taskCookie)).data.reports[0].taskId,task.id);
   assert.equal((await request('/api/performance-reports',undefined,finance)).data.reports.length,0);

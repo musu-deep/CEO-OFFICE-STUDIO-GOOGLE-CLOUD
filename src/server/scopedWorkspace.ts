@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import crypto from 'node:crypto';
 import { executiveStore, actorOf } from './executiveRoutes';
-import { entities, emptyRecord, resolveEntity, type Directive } from '../lib/executiveModel';
+import { entities, emptyRecord, resolveEntity, validateServiceCompany, type Directive } from '../lib/executiveModel';
 import { profileFor, validateDomainValues, type DomainRecord } from '../lib/workspaceProfiles';
 export type WorkspaceTask=Directive&{unitId:string;unitName:string};
 export const assignedTask=(email:string,taskId:string,unitId:string)=>executiveStore.read().units[unitId]?.directives.find(d=>d.id===taskId&&d.assigneeEmail===email);
@@ -45,6 +45,7 @@ export function createScopedWorkspaceRouter(recipients:()=>{email:string;name:st
   if(!executiveStore.can(actor,unitId,'edit'))return res.status(403).json({error:'لا تملك صلاحية تعديل سجلات هذه الجهة.'});
   if(process.env.NODE_ENV==='production'&&!process.env.EXECUTIVE_DATA_DIR)return res.status(503).json({error:'يجب تفعيل التخزين الدائم قبل حفظ السجلات.'});
   const {title,values,id,version}=req.body||{};
+  const companyId=validateServiceCompany(unitId,req.body?.companyId);
   if(typeof title!=='string'||!title.trim()||title.length>200)throw Error('أدخل عنوانًا للسجل بحد أقصى 200 حرف.');
   const normalized=validateDomainValues(unitId,values);let record:DomainRecord;
   executiveStore.update(s=>{
@@ -52,7 +53,7 @@ export function createScopedWorkspaceRouter(recipients:()=>{email:string;name:st
    const existing=id?list.find(r=>r.id===id):undefined;
    if(id&&!existing)throw Object.assign(Error('السجل غير موجود.'),{status:404});
    if(existing&&version!==existing.version)throw Object.assign(Error('تغير السجل. حدّث الصفحة قبل الحفظ.'),{status:409});
-   record={id:existing?.id||crypto.randomUUID(),unitId,profileId:profileFor(unitId).id,title:title.trim(),values:normalized,version:(existing?.version||0)+1,author:existing?.author||actor.email,createdAt:existing?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+   record={id:existing?.id||crypto.randomUUID(),unitId,...(companyId?{companyId}:{}),profileId:profileFor(unitId).id,title:title.trim(),values:normalized,version:(existing?.version||0)+1,author:existing?.author||actor.email,createdAt:existing?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
    if(existing)list[list.indexOf(existing)]=record;else list.unshift(record);
    executiveStore.audit(s,actor.email,`${existing?'تحديث':'إضافة'} ${profileFor(unitId).recordLabel}`,unitId);
   });res.status(id?200:201).json({record:record!});

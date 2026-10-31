@@ -39,7 +39,7 @@ export function profileFor(unitId:string):WorkspaceProfile {
  const inherited=[...findOrgPath(unitId)].reverse().find(n=>domainIds[n.id]);
  return workspaceProfiles[inherited?domainIds[inherited.id]:'administration'];
 }
-export type DomainRecord={id:string;unitId:string;profileId:string;title:string;values:Record<string,string|number>;version:number;author:string;createdAt:string;updatedAt:string};
+export type DomainRecord={id:string;unitId:string;companyId?:string;profileId:string;title:string;values:Record<string,string|number>;version:number;author:string;createdAt:string;updatedAt:string};
 export function validateDomainValues(unitId:string,input:unknown):Record<string,string|number> {
  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('بيانات النموذج غير صالحة.');
  const profile=profileFor(unitId),source=input as Record<string,unknown>,values:Record<string,string|number>={};

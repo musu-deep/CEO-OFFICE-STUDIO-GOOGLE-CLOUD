@@ -3,16 +3,24 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { hasPermission,comparable,resolveEntity } from '../src/lib/executiveModel';
+import { hasPermission,comparable,resolveEntity,entities,registrationEntities } from '../src/lib/executiveModel';
 import { ExecutiveStore } from '../src/server/executiveStore';
-test('company scope includes its departments, never another company',()=>{
+test('companies retain operational units but never inherit shared departments',()=>{
  const grants={'a@test.com':{units:['national'],actions:['read','upload'] as any}};
- assert.equal(hasPermission('a@test.com','head',grants,'national::finance','read'),true);
  assert.equal(hasPermission('a@test.com','head',grants,'trading','read'),true);
- assert.equal(hasPermission('a@test.com','head',grants,'digital::finance','read'),false);
+ assert.equal(hasPermission('a@test.com','head',grants,'sites','read'),true);
+ for(const id of ['finance','legal','warehouse','it','national::finance','digital::finance'])assert.equal(hasPermission('a@test.com','head',grants,id,'read'),false);
  assert.equal(hasPermission('a@test.com','head',grants,'national','approve'),false);
  assert.equal(hasPermission('b@test.com','head',grants,'national','read'),false);
- assert.ok(resolveEntity('national::legal'));assert.equal(resolveEntity('national::unknown'),undefined);
+ assert.equal(resolveEntity('national::legal'),undefined);
+ assert.equal(resolveEntity('warehouse')?.root,'support');
+ assert.equal(entities().some(e=>e.id.includes('::')),false);
+ const options=registrationEntities();
+ assert.equal(options.filter(e=>e.id==='finance').length,1);
+ assert.equal(options.filter(e=>e.id==='warehouse').length,1);
+ assert.equal(options.some(e=>['support','sites','pricing-project-link','contracts-procurement'].includes(e.id)),false);
+ const oldGrant={'a@test.com':{units:['national::finance'],actions:['read'] as any}};
+ assert.equal(hasPermission('a@test.com','head',oldGrant,'finance','read'),false);
 });
 test('comparison refuses missing definitions, periods, currencies and direction mismatches',()=>{
  const a:any={definition:'net sales',dimension:'revenue',period:'2026-Q4',unit:'SAR',direction:'up'};

@@ -2,7 +2,7 @@
 
 The dashboard has Group, Entities, and Comparison views. Only approved revisions enter group indicators and comparisons. Missing numbers remain absent. Comparison requires one metric per selected axis and entity with matching measurement definition, unit, period and improvement direction. It does not average companies or sum overlapping parent/child results.
 
-Each company has functional reporting scopes (`company-id::finance`, etc.). These are reporting scopes, not assertions that every company has those departments staffed. The existing organizational matrix is preserved.
+Support departments are shared group-wide services and exist once under `support`. No per-company functional departments are generated. Finance, legal, HR, IT, procurement and warehouses keep separate, explicit central grants; company grants include actual operating descendants only.
 
 ## Server records and persistence
 
@@ -10,13 +10,13 @@ Records, revisions, objectives, grants and audit entries are written atomically 
 
 For production, mount a Render persistent disk at `/var/data` and set `EXECUTIVE_DATA_DIR=/var/data/executive`. Keep a single server instance for this file-backed implementation; use a transactional database before scaling to multiple instances. The dashboard explicitly reports when the persistent path is unconfigured. Records can be exported through the administrator backup link; that JSON export includes metadata, not document bytes. Back up the whole data directory to include attachments.
 
-Odoo is not connected by this change. Inputs are authenticated manual submissions, document uploads, and Gemini extraction (if GEMINI_API_KEY is configured). No fake AI answer is used when the provider is unavailable. The existing live demo remains an explicit separate mode and never enters approved comparisons.
+Odoo is not connected by this change. Inputs are authenticated manual submissions, document uploads, and Gemini extraction (if GEMINI_API_KEY is configured). No fake AI answer is used when the provider is unavailable. Temporary simulation endpoints have been retired; no generated demo enters the operational interface or approved comparisons.
 
 ## Accounts and authorization
 
-Existing bootstrap accounts continue to come from ARAAK_AUTH_USERS. New department and institution managers can submit registration requests; see the manager workflow below. Roles `ceo` and `admin` have access to all executive records. Other roles have no executive record permissions until an administrator grants units and actions via “إعداد الخطة والصلاحيات”. Grants refer to an existing login email and do not create an account. Company scope includes its organizational descendants and functional reporting scopes. Every data, document and AI route checks the authenticated account on the server; front-end role changes do not grant access.
+Existing bootstrap accounts continue to come from ARAAK_AUTH_USERS. New department and institution managers can submit registration requests; see the manager workflow below. Roles `ceo` and `admin` have access to all executive records. Other roles have no executive record permissions until an administrator grants units and actions via “إعداد الخطة والصلاحيات”. Grants refer to an existing login email and do not create an account. Company scope includes its actual organizational descendants, and excludes central support departments. Every data, document and AI route checks the authenticated account on the server; front-end role changes do not grant access.
 
-Actions: read, upload, edit, review, approve, direct. Upload-only partners can submit documents and drafts without reading existing records. Review is required before approval. Saving a new draft requires the latest record version to prevent lost updates. Earlier approved records remain in revision history. Documents are downloaded through a scoped authenticated route. Local snapshots from older releases can only be imported explicitly as a draft, never silently approved.
+Actions: read, upload, edit, review, approve, direct. Upload-only partners can submit documents and drafts without reading existing records. Review is required before approval. Saving a new draft requires the latest record version to prevent lost updates. Earlier approved records remain in revision history. Documents are downloaded through a scoped authenticated route. Older local snapshots are not automatically loaded into the operational interface.
 
 ## Verification
 
@@ -27,8 +27,8 @@ Actions: read, upload, edit, review, approve, direct. Upload-only partners can s
 
 ## Manager registration and performance report inbox
 
-- The login screen includes **تسجيل مدير جديد**. A request records the manager’s name, title, official email and requested organizational entity. The server assigns the `head` role; client-supplied roles or account status are ignored. Passwords are stored only as salted scrypt hashes in `EXECUTIVE_DATA_DIR/manager-accounts.json` (file mode 0600), separate from the executive JSON export.
-- The CEO/admin dashboard includes **تسجيل المديرين وصلاحيات الجهات**. Approval chooses one or more actual entities and grants `read`, `upload`, `edit`. Company scopes include their descendants. Pending/rejected/suspended accounts cannot authenticate. Suspension invalidates existing sessions on the next API request. Existing bootstrap accounts cannot be overwritten by registration.
+- The login screen includes **تسجيل مستخدم جديد**. A request records the manager’s name, title, official email and requested organizational entity. The server assigns the `head` role; client-supplied roles or account status are ignored. Passwords are stored only as salted scrypt hashes in `EXECUTIVE_DATA_DIR/manager-accounts.json` (file mode 0600), separate from the executive JSON export.
+- The CEO/admin dashboard includes **طلبات المستخدمين وصلاحيات الجهات**. Approval chooses one or more actual entities and grants `read`, `upload`, `edit`. Company scopes include their actual operating descendants only. Pending/rejected/suspended accounts cannot authenticate. Suspension invalidates existing sessions on the next API request. Existing bootstrap accounts cannot be overwritten by registration.
 - **تقارير الأداء والمرفقات** opens the real report submission page. The manager submits a title, reporting period, performance summary, and up to five optional attachments (4 MiB each): PDF, DOC/DOCX, XLS/XLSX, PNG/JPEG, TXT, CSV. These are stored as attachments and downloaded; Word/Excel content is not automatically parsed by this workflow.
 - Reports are stored in the existing `state.json` alongside the executive audit log. A manager can list/download their own reports only while retaining read access to the report’s entity. The CEO/admin sees the complete inbox and can mark reports reviewed or return them with a required note. Returned reports remain immutable submissions; the manager sends a new corrected report referencing the earlier title. Reviewing a report does not automatically approve its contents as dashboard metrics.
 - Attachments are authenticated downloads with server-generated storage IDs, validated extensions, strict base64 and decoded size checks, and forced download responses. They are never served as inline HTML or exposed under public asset URLs.
@@ -49,7 +49,7 @@ The server-backed session determines the role. The sidebar, home screen and enti
 
 ### Domain models
 
-`src/lib/workspaceProfiles.ts` maps organizational IDs and functional scopes to 18 domain profiles. Functional departments override the parent company's profile. Forms start blank and missing numbers remain missing. Entries are stored under `businessRecords[unitId]`, versioned to prevent stale updates, and validated against the server's domain schema. They are operational submissions; they do not become approved dashboard metrics automatically.
+`src/lib/workspaceProfiles.ts` maps actual organizational IDs to 18 domain profiles. Shared departments use their own domain independently of the companies they serve. Forms start blank and missing numbers remain missing. Entries are stored under `businessRecords[unitId]`, versioned to prevent stale updates, and validated against the server's domain schema. They are operational submissions; they do not become approved dashboard metrics automatically.
 
 | Domain | Fields and workflow | Layout |
 | --- | --- | --- |
@@ -77,3 +77,14 @@ The server-backed session determines the role. The sidebar, home screen and enti
 During manager approval the office can choose **حساب للمهام المسندة فقط**. This activates the account with no entity-wide grant. The office assigns tasks through **التكليفات والمتابعة**, selecting the actual active recipient account and entity. Existing free-text directive owners are not guessed to match an account. Only an exact `assigneeEmail` assignment gives task access. A task-only account sees its assigned tasks and can update their execution status and submit a report referencing that task. It cannot read entity metrics, operational records, documents, objectives or other users' tasks. The related report and attachments are private to their author and the CEO/admin inbox. Company scope still explicitly includes organizational descendants when granted.
 
 Additional validation: `node --test tests/scopedWorkspaceApi.test.mjs` after the build, and `tests/workspaceProfiles.test.ts` in the TypeScript test suite. These cover domain validation, cross-unit denial, task-only access, unrelated task/report denial, conflict checks, objective filtering, retired simulation APIs and persistence after restart.
+
+
+## Shared support departments
+
+The registration dropdown has two groups: **الإدارات المساندة الموحدة** and **شركات ومؤسسات المجموعة**. It lists central support departments and actual companies/institutions only; it excludes structural containers, coordination links, operating subunits and the former generated `company::function` copies. Administrators may still grant an actual operational subunit explicitly when necessary.
+
+Warehouses (`warehouse`) now belong to central support. The duplicated projects procurement node is removed; procurement is provided by the central `procurement` department. No company scope inherits finance, legal, IT, HR, procurement or warehouse access. The existing 18 domain templates remain available for actual organizational entities.
+
+A central department can optionally tag an operational record or a performance report with `companyId` to identify the company benefiting from its service. The tag is validated against actual company IDs and never grants access to the company's records. Central records can be filtered by beneficiary without creating duplicate departments. A missing tag means a group-level record.
+
+Legacy stored data is not deleted or automatically merged across departments. Obsolete per-company functional grants are not mapped to group-wide departments: doing so would widen access. If such grants exist, the office must replace them explicitly through **طلبات المستخدمين وصلاحيات الجهات**. Existing source records remain in the administrative backup for review.

@@ -1,3 +1,4 @@
+import { validateServiceCompany } from '../lib/executiveModel';
 import { assignedTask } from './scopedWorkspace';
 import express, { Router } from 'express';
 import crypto from 'node:crypto';
@@ -22,6 +23,7 @@ export function createPerformanceReportRouter() {
     if (!text(body.title, 200) || !text(body.period, 100) || !text(body.summary, 10000) || !Array.isArray(body.attachments) || body.attachments.length > 5) return res.status(400).json({ error: 'أكمل عنوان التقرير وفترته وملخصه. الحد الأقصى خمسة مرفقات.' });
     const saved: string[] = [];
     try {
+      const companyId=validateServiceCompany(body.unitId,body.companyId);
       const validated = body.attachments.map((a: any) => {
         const ext = typeof a?.name === 'string' ? a.name.split('.').pop()?.toLowerCase() : '';
         const mimeType = attachmentTypes[ext || ''];
@@ -31,7 +33,7 @@ export function createPerformanceReportRouter() {
         return { name: a.name, mimeType, data: a.data, size: bytes.length };
       });
       const attachments = validated.map((a: any) => { const doc = executiveStore.document(a); saved.push(doc.id); return { ...doc, size: a.size }; });
-      const report: PerformanceReport = { id: crypto.randomUUID(), unitId: body.unitId, ...(body.taskId ? {taskId:body.taskId} : {}), title: body.title.trim(), period: body.period.trim(), summary: body.summary.trim(), author: actor.email, createdAt: new Date().toISOString(), status: 'submitted', attachments };
+      const report: PerformanceReport = { id: crypto.randomUUID(), unitId: body.unitId, ...(companyId?{companyId}:{}), ...(body.taskId ? {taskId:body.taskId} : {}), title: body.title.trim(), period: body.period.trim(), summary: body.summary.trim(), author: actor.email, createdAt: new Date().toISOString(), status: 'submitted', attachments };
       executiveStore.update(s => { (s.reports ||= []).unshift(report); executiveStore.audit(s, actor.email, `إرسال تقرير أداء ${report.id}`, report.unitId); });
       res.status(201).json({ report });
     } catch (e: any) {

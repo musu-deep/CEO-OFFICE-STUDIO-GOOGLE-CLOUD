@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {entities} from '../src/lib/executiveModel';
 import {profileFor,validateDomainValues,workspaceProfiles} from '../src/lib/workspaceProfiles';
 
-test('all entities have a domain and functional departments override their parent company',()=>{
+test('all actual entities have a domain and shared departments have dedicated profiles',()=>{
  for(const e of entities())assert.ok(workspaceProfiles[profileFor(e.id).id]);
- assert.equal(profileFor('national::finance').id,'finance');
- assert.equal(profileFor('industrial::hr').id,'hr');
+ assert.equal(profileFor('finance').id,'finance');
+ assert.equal(profileFor('hr').id,'hr');
  assert.equal(profileFor('marketing-social').id,'marketing');
  assert.equal(profileFor('warehouse').id,'logistics');
  assert.equal(profileFor('pricing-projects').id,'pricing');

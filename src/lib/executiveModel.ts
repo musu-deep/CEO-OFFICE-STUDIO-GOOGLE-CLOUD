@@ -21,10 +21,18 @@ export function entities(): Entity[] {
  const result: Entity[]=[];
  function walk(nodes: OrgNode[],root:string,parentId?:string){for(const n of nodes){result.push({...n,root,parentId,kind:companyIds.has(n.id)?'company':'department'});walk(n.children||[],root,n.id);}}
  for(const root of organization) walk([root],root.id);
- for(const company of result.filter(e=>e.kind==='company')) for(const f of functions) result.push({id:`${company.id}::${f.id}`,name:`${company.name} · ${f.name}`,root:company.root,parentId:company.id,kind:'department',functionId:f.id});
  return result;
 }
 export function resolveEntity(id:string){return entities().find(e=>e.id===id);}
+// Shared departments exist once under support; a company is a service recipient, not their parent.
+export const isSharedDepartment=(id:string)=>resolveEntity(id)?.root==='support'&&id!=='support';
+export const companyOptions=()=>entities().filter(e=>e.kind==='company').map(e=>({id:e.id,name:e.name}));
+export const registrationEntities=()=>entities().filter(e=>(e.root==='support'&&e.parentId==='support')||e.kind==='company').map(e=>({id:e.id,name:e.name,group:e.root==='support'?'support':'company'}));
+export function validateServiceCompany(unitId:string,companyId:unknown):string|undefined {
+ if(companyId===undefined||companyId==='')return undefined;
+ if(!isSharedDepartment(unitId)||typeof companyId!=='string'||resolveEntity(companyId)?.kind!=='company')throw Error('الشركة المستفيدة غير صالحة لهذه الجهة.');
+ return companyId;
+}
 export const actions = ['read','upload','edit','review','approve','direct'] as const;
 export type Action = typeof actions[number];
 export type Grant = {units:string[];actions:Action[]};
@@ -37,9 +45,10 @@ export type Objective = {id:string;title:string;target:string;owner:string};
 export type ExecutiveState = {businessRecords?:Record<string,DomainRecord[]>;reports?:PerformanceReport[];units:Record<string,UnitRecord>;objectives:Objective[];grants:Record<string,Grant>;audit:{id:string;at:string;actor:string;unitId?:string;action:string}[]};
 export const emptyRecord=():UnitRecord=>({version:0,history:[],documents:[],directives:[]});
 export function hasPermission(email:string,role:string,grants:Record<string,Grant>,unitId:string,action:Action){
+ if(!resolveEntity(unitId))return false;
  if(role==='ceo'||role==='admin')return true;
  const grant=grants[email];if(!grant?.actions.includes(action))return false;
- return grant.units.some(scope=>scope===unitId || (unitId.includes('::') && scope===unitId.split('::')[0]) || findOrgPath(unitId.split('::')[0]).some(n=>n.id===scope));
+ return grant.units.some(scope=>scope===unitId || findOrgPath(unitId).some(n=>n.id===scope));
 }
 export function comparable(a:ExecutiveMetric,b:ExecutiveMetric){return !!a.definition?.trim() && !!a.period?.trim() && !!a.unit?.trim() && a.dimension===b.dimension && a.definition.trim()===b.definition?.trim() && a.period.trim()===b.period?.trim() && a.unit.trim()===b.unit?.trim() && a.direction===b.direction;}
 export function score(m:ExecutiveMetric){return achievement(m);}

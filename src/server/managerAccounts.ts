@@ -3,7 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { promisify } from 'node:util';
 import { Router } from 'express';
-import { entities, resolveEntity } from '../lib/executiveModel';
+import { entities, resolveEntity, registrationEntities } from '../lib/executiveModel';
 import { executiveStore, actorOf } from './executiveRoutes';
 
 const scrypt = promisify(crypto.scrypt);
@@ -36,7 +36,7 @@ export class ManagerAccounts {
     const email = String(input.email || '').trim().toLowerCase();
     const name = String(input.name || '').trim(), title = String(input.title || '').trim();
     const password = String(input.password || ''), unitId = String(input.unitId || '');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || !name || name.length > 120 || !title || title.length > 160 || !resolveEntity(unitId)) throw fail('أكمل الاسم والمسمى الوظيفي والبريد والجهة بصورة صحيحة.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || !name || name.length > 120 || !title || title.length > 160 || !registrationEntities().some(e=>e.id===unitId)) throw fail('أكمل الاسم والمسمى الوظيفي والبريد والجهة بصورة صحيحة.');
     if (password.length < 12 || password.length > 128) throw fail('يجب أن تكون كلمة المرور بين 12 و128 حرفًا.');
     const salt = crypto.randomBytes(24).toString('hex');
     const hash = (await scrypt(password, salt, 64) as Buffer).toString('hex');
@@ -65,7 +65,7 @@ export class ManagerAccounts {
 export function createRegistrationRouter(accounts: ManagerAccounts, bootstrap: Record<string, BootstrapAccount>) {
   const router = Router();
   const attempts = new Map<string, { count: number; until: number }>();
-  router.get('/registration-options', (_req, res) => res.json({ entities: entities().map(e => ({ id: e.id, name: e.name })) }));
+  router.get('/registration-options', (_req, res) => res.json({ entities: registrationEntities() }));
   router.post('/register', async (req, res) => {
     if (process.env.NODE_ENV === 'production' && !process.env.EXECUTIVE_DATA_DIR) return res.status(503).json({ error: 'يجب تفعيل التخزين الدائم للحسابات لدى مشرف المنصة قبل استقبال طلبات التسجيل.' });
     const key = req.ip || 'unknown', now = Date.now();

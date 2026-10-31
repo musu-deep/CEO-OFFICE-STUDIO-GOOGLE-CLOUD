@@ -28,7 +28,9 @@ test('backups round-trip without manufactured results and reject corrupt schemas
   assert.equal(validState({...state,rows:{...state.rows,suppliers:[{id:'1'},{id:'1'}]}}),false);
   assert.equal(validState({...state,checks:{a:'yes'}}),false);
 });
-test('central procurement belongs to support and existing projects access is retained',()=>{
+test('procurement and warehouses are group-wide while project operations remain in their company',()=>{
   assert.deepEqual(findOrgPath('procurement').map(n=>n.id),['support','procurement']);
-  assert.deepEqual(findOrgPath('contracts-procurement').map(n=>n.id),['investment','national','national-projects','contracts-procurement']);
+  assert.deepEqual(findOrgPath('contracts-procurement'),[]);
+  assert.deepEqual(findOrgPath('warehouse').map(n=>n.id),['support','warehouse']);
+  assert.deepEqual(findOrgPath('technical-office').map(n=>n.id),['investment','national','national-projects','technical-office']);
 });

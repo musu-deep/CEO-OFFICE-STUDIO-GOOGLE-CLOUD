@@ -14,7 +14,7 @@ test('manager approval, scoped reports, private attachments, review, suspension 
  const stop=async()=>{const stopped=new Promise(resolve=>p.once('exit',resolve));p.kill();await stopped;};
  const request=async(route,body,cookie)=>{const r=await fetch(`http://127.0.0.1:${port}${route}`,{headers:{'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},...(body!==undefined?{method:'POST',body:JSON.stringify(body)}:{})});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]};};
  const login=email=>request('/api/auth/login',{email,password:email==='ceo@test.com'?'test':'A-long-manager-password-2026'});
- const register=email=>request('/api/auth/register',{email,name:'مدير الاختبار',title:'مدير إدارة',unitId:'national::finance',password:'A-long-manager-password-2026',role:'ceo',status:'active'});
+ const register=email=>request('/api/auth/register',{email,name:'مدير الاختبار',title:'مدير إدارة',unitId:'finance',password:'A-long-manager-password-2026',role:'ceo',status:'active'});
  try{
   await start();
   assert.equal((await request('/api/auth/registration-options')).status,200);
@@ -26,7 +26,7 @@ test('manager approval, scoped reports, private attachments, review, suspension 
   const list=(await request('/api/manager-accounts',undefined,ceo)).data.accounts;
   assert.equal(list.length,1);assert.equal(list[0].status,'pending');assert.equal(list[0].hash,undefined);assert.equal(list[0].salt,undefined);
   assert.equal((await request('/api/manager-accounts/manager%40test.com/decision',{action:'approve',units:['not-a-unit']},ceo)).status,400);
-  assert.equal((await request('/api/manager-accounts/manager%40test.com/decision',{action:'approve',units:['national::finance']},ceo)).status,200);
+  assert.equal((await request('/api/manager-accounts/manager%40test.com/decision',{action:'approve',units:['finance']},ceo)).status,200);
   const authenticated=await login('manager@test.com'),manager=authenticated.cookie;
   assert.equal(authenticated.status,200);assert.equal(authenticated.data.user.role,'head');assert.equal(authenticated.data.user.name,'مدير الاختبار');assert.deepEqual(authenticated.data.user.allowedViews,['workspace','tasks','performance-reports']);
   assert.equal((await request('/api/manager-accounts',undefined,manager)).status,403);
@@ -36,9 +36,9 @@ test('manager approval, scoped reports, private attachments, review, suspension 
   assert.equal((await request('/api/voice-transcribe',{},manager)).status,403);
   assert.equal((await request('/api/manager-accounts/manager%40test.com/decision',{action:'approve',units:['digital']},manager)).status,403);
   const scope=(await request('/api/executive/state',undefined,manager)).data;
-  assert.deepEqual(scope.entities.map(e=>e.id),['national::finance']);
-  assert.deepEqual(scope.permissions['national::finance'],['read','upload','edit']);
-  const payload={unitId:'national::finance',title:'تقرير أكتوبر',period:'2026-10',summary:'أداء الإدارة والمخاطر واحتياجات القرار',author:'ceo@test.com',status:'reviewed',attachments:[{name:'report.docx',data:Buffer.from('sample word bytes').toString('base64')}]};
+  assert.deepEqual(scope.entities.map(e=>e.id),['finance']);
+  assert.deepEqual(scope.permissions['finance'],['read','upload','edit']);
+  const payload={unitId:'finance',title:'تقرير أكتوبر',period:'2026-10',summary:'أداء الإدارة والمخاطر واحتياجات القرار',author:'ceo@test.com',status:'reviewed',attachments:[{name:'report.docx',data:Buffer.from('sample word bytes').toString('base64')}]};
   assert.equal((await request('/api/performance-reports',payload)).status,401);
   assert.equal((await request('/api/performance-reports',{...payload,unitId:'digital'},manager)).status,403);
   assert.equal((await request('/api/performance-reports',{...payload,attachments:[{name:'unsafe.html',data:Buffer.from('<script>').toString('base64')}]},manager)).status,400);
@@ -59,7 +59,7 @@ test('manager approval, scoped reports, private attachments, review, suspension 
   await register('other@test.com');await request('/api/manager-accounts/other%40test.com/decision',{action:'approve',units:['digital']},ceo);
   const other=(await login('other@test.com')).cookie;
   assert.equal((await request('/api/performance-reports',undefined,other)).data.reports.length,0);assert.equal((await request(download,undefined,other)).status,404);
-  await request('/api/manager-accounts/other%40test.com/decision',{action:'approve',units:['national::finance']},ceo);
+  await request('/api/manager-accounts/other%40test.com/decision',{action:'approve',units:['finance']},ceo);
   assert.equal((await request('/api/performance-reports',undefined,other)).data.reports.length,0);
   assert.equal((await request(download,undefined,other)).status,404);
   // Duplicate registration cannot replace an approved manager's identity or password.

@@ -7,10 +7,8 @@ export const organization: OrgNode[] = [
       node('national-projects', 'اراك المشاريع', [
         node('technical-office', 'المكتب الفني'), node('sites', 'المواقع'),
         node('planning-quality', 'التخطيط والجودة'), node('operations-control', 'العمليات والرقابة'),
-        node('contracts-procurement', 'العقود والمشتريات'),
-        node('pricing-project-link', 'التنسيق مع قسم التسعير المركزي'),
       ]),
-      node('trading', 'اراك التجارية', [node('showroom', 'المعرض'), node('warehouse', 'المستودع'), node('wholesale', 'الجملة والصفقات'), node('branches', 'الفروع')]),
+      node('trading', 'اراك التجارية', [node('showroom', 'المعرض'), node('wholesale', 'الجملة والصفقات'), node('branches', 'الفروع')]),
     ]),
     node('logistics', 'اراك اللوجستية', undefined, 'logistic'),
     node('industrial', 'اراك الصناعية', [node('steel-factory', 'اراك الحديد'), node('food', 'اراك الغذائية')]),
@@ -20,8 +18,9 @@ export const organization: OrgNode[] = [
     node('secretariat', 'السكرتارية التنفيذية'), node('legal', 'الشؤون القانونية'),
     node('hr', 'الموارد البشرية'), node('archive-documents', 'الأرشفة والوثائق'),
     node('governance', 'الحوكمة والجودة'),
-    node('procurement', 'إدارة المشتريات والعقود', [node('pricing-procurement-link', 'التنسيق مع التسعير المركزي')]),
-    node('finance', 'الشؤون المالية', [node('pricing-finance-link', 'التنسيق مع التسعير المركزي')]),
+    node('procurement', 'إدارة المشتريات والعقود'),
+    node('warehouse', 'إدارة المستودعات'),
+    node('finance', 'الشؤون المالية'),
     node('pricing', 'قسم التسعير المركزي', [
       node('pricing-procurement', 'تكلفة المشتريات والمدخلات'),
       node('pricing-finance', 'التكلفة والربحية والهوامش'),
@@ -30,7 +29,7 @@ export const organization: OrgNode[] = [
       node('pricing-factory', 'منتجات المصنع'),
     ]),
     node('administration', 'الإدارية والخدمات'), node('maintenance', 'المتابعة والصيانة'),
-    node('it', 'تقنية المعلومات', [node('digital-transformation', 'التحول الرقمي'), node('marketing-media', 'تسويق وإعلام')]),
+    node('it', 'تقنية المعلومات', [node('digital-transformation', 'التحول الرقمي')]),
     node('resource-development', 'تنمية الموارد', [node('public-relations', 'العلاقات العامة')]),
     node('marketing', 'إدارة التسويق المركزي', [
       node('marketing-campaigns', 'الحملات التسويقية', [
