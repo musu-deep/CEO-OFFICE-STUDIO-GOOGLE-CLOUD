@@ -113,11 +113,13 @@ export default function LoginView({ onLoginSuccess, theme }: LoginViewProps) {
 
       if (!response.ok || !result.user) {
         if (response.status === 503 && result.error === 'AUTH_NOT_CONFIGURED') {
-          setError(`إعداد المصادقة غير مكتمل في الخادم (الجلسة: ${result.sessionConfigured ? 'مفعلة' : 'غير مفعلة'}، الحسابات: ${result.configuredUsers ?? 0}).`);
+          setError('خدمة الدخول تحتاج إكمال الإعداد لدى مشرف المنصة.');
+        } else if (response.status === 503 || response.status >= 500) {
+          setError('خدمة الدخول غير متاحة مؤقتًا. حاول بعد قليل أو تواصل مع المشرف.');
         } else if (response.status === 429) {
           setError('تم إيقاف المحاولات مؤقتاً. حاول لاحقاً.');
         } else {
-          setError('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+          setError('لم يُقبل تسجيل الدخول. تحقق من البريد وكلمة المرور، وتأكد من اعتماد الحسابات الجديدة لدى المكتب.');
         }
         return;
       }

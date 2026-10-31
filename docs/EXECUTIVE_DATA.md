@@ -88,3 +88,10 @@ Warehouses (`warehouse`) now belong to central support. The duplicated projects 
 A central department can optionally tag an operational record or a performance report with `companyId` to identify the company benefiting from its service. The tag is validated against actual company IDs and never grants access to the company's records. Central records can be filtered by beneficiary without creating duplicate departments. A missing tag means a group-level record.
 
 Legacy stored data is not deleted or automatically merged across departments. Obsolete per-company functional grants are not mapped to group-wide departments: doing so would widen access. If such grants exist, the office must replace them explicitly through **طلبات المستخدمين وصلاحيات الجهات**. Existing source records remain in the administrative backup for review.
+
+
+## Authentication availability and failures
+
+`GET /api/auth/status` and the registration-options response expose readiness booleans and a non-secret reason for unavailable registration. Registration requires a session secret, an office account that can approve requests, and an explicitly configured data directory in production. The form checks this state before collecting registration details and shows an unavailable-service notice rather than inviting submissions that must fail.
+
+`/ready` additionally exposes storage and registration readiness; its existing HTTP readiness status refers to the login bootstrap, not successful registration. `GET /api/auth/me` deliberately remains 401 for missing/expired/invalid sessions. A login 401 means credentials were not accepted or the account is not active; it is not proof of a disconnected server. Login request failures are caught so asynchronous password-verification errors return a structured 503 instead of becoming an unhandled process rejection. Malformed session-cookie encoding is treated as unauthenticated.

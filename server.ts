@@ -70,9 +70,9 @@ async function startServer() {
     if (!sessionSecret) return null;
     const raw = (req.headers.cookie || '').split(';').map(v => v.trim()).find(v => v.startsWith('araak_session='));
     if (!raw) return null;
-    const [payload, signature] = decodeURIComponent(raw.slice('araak_session='.length)).split('.');
-    if (!payload || !signature || !safeEqual(signSession(payload), signature)) return null;
     try {
+      const [payload, signature] = decodeURIComponent(raw.slice('araak_session='.length)).split('.');
+      if (!payload || !signature || !safeEqual(signSession(payload), signature)) return null;
       const session = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
       return session.exp > Date.now() ? session : null;
     } catch {
@@ -92,7 +92,13 @@ async function startServer() {
     return email && ['ceo','admin'].includes(accountOf(email)?.role||'') ? next() : res.status(403).json({ error: 'هذه الخدمة خارج نطاق صلاحيات حساب المدير.' });
   };
 
-  app.use('/api/auth', createRegistrationRouter(managers, authUsers));
+  const authAvailability = () => {
+    const hasOffice = Object.values(authUsers).some(a=>a && ['ceo','admin'].includes(a.role));
+    const storage = process.env.NODE_ENV !== 'production' || !!process.env.EXECUTIVE_DATA_DIR;
+    const reason = !sessionSecret ? 'authentication' as const : !hasOffice ? 'administration' as const : !storage ? 'storage' as const : null;
+    return {loginAvailable:!!sessionSecret && (Object.keys(authUsers).length>0 || managers.list().some(a=>a.status==='active')),registrationAvailable:reason===null,registrationUnavailableReason:reason};
+  };
+  app.use('/api/auth', createRegistrationRouter(managers, authUsers, authAvailability));
   app.use('/api/manager-accounts', requireAuth, createAccountAdministrationRouter(managers));
   app.use('/api/executive', requireAuth, createExecutiveRouter());
   app.use('/api/workspace', requireAuth, createScopedWorkspaceRouter(() => [...Object.keys(authUsers).map(email=>({email,name:String(profileOf(email)?.name||email)})), ...managers.list().filter(a=>a.status==='active').map(a=>({email:a.email,name:a.name}))]));
@@ -104,10 +110,13 @@ async function startServer() {
       status: ready ? 'ready' : 'configuration_required',
       sessionConfigured: Boolean(sessionSecret),
       configuredUsers: Object.keys(authUsers).length,
+      storageConfigured: !!process.env.EXECUTIVE_DATA_DIR,
+      ...authAvailability(),
     });
   });
 
   app.post('/api/auth/login', async (req, res) => {
+    try {
     const key = req.ip || 'unknown';
     const now = Date.now();
     const current = loginAttempts.get(key);
@@ -141,6 +150,10 @@ async function startServer() {
     const token = encodeURIComponent(`${payload}.${signSession(payload)}`);
     res.setHeader('Set-Cookie', `araak_session=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=28800`);
     return res.json({ ok: true, email, role: account.role, user: profileOf(email) });
+    } catch {
+      console.error('Authentication request failed; the service remains running.');
+      return res.status(503).json({error:'AUTH_TEMPORARILY_UNAVAILABLE'});
+    }
   });
 
   app.get('/api/auth/me', (req, res) => {

@@ -18,6 +18,8 @@ test('manager approval, scoped reports, private attachments, review, suspension 
  try{
   await start();
   assert.equal((await request('/api/auth/registration-options')).status,200);
+  assert.equal((await request('/api/auth/status')).data.registrationAvailable,true);
+  assert.equal((await request('/api/auth/me',undefined,'araak_session=%ZZ')).status,401);
   assert.equal((await request('/api/auth/register',{email:'bad',password:'short'})).status,400);
   assert.equal((await register('manager@test.com')).status,202);
   assert.equal((await login('manager@test.com')).status,401);
@@ -75,7 +77,17 @@ test('manager approval, scoped reports, private attachments, review, suspension 
   assert.equal((await request('/api/performance-reports',undefined,manager)).status,401);
   assert.equal((await login('manager@test.com')).status,401);
   assert.equal((await request('/api/performance-reports',undefined,ceo)).data.reports.length,1);
+  await stop();
+  const accountFile=path.join(dir,'manager-accounts.json'),accounts=JSON.parse(fs.readFileSync(accountFile,'utf8'));
+  accounts['manager@test.com'].status='active';accounts['manager@test.com'].hash='00';fs.writeFileSync(accountFile,JSON.stringify(accounts));
+  await start();
+  assert.equal((await login('manager@test.com')).status,503);
+  assert.equal((await request('/health')).status,200);
+  assert.equal((await login('ceo@test.com')).status,200);
   await stop();await start(false);
+  const availability=(await request('/api/auth/status')).data;
+  assert.equal(availability.loginAvailable,true);assert.equal(availability.registrationAvailable,false);assert.equal(availability.registrationUnavailableReason,'storage');
+  assert.equal((await request('/api/auth/registration-options')).data.registrationAvailable,false);
   assert.equal((await register('new@test.com')).status,503);
   assert.equal((await request('/api/performance-reports',payload,ceo)).status,503);
  }finally{if(p?.exitCode===null)await stop();fs.rmSync(dir,{recursive:true,force:true});}

@@ -8,6 +8,7 @@ import { executiveStore, actorOf } from './executiveRoutes';
 
 const scrypt = promisify(crypto.scrypt);
 type Account = { email: string; name: string; title: string; unitId: string; salt: string; hash: string; status: 'pending'|'active'|'rejected'|'suspended'; createdAt: string; decidedAt?: string; decidedBy?: string };
+export type AuthAvailability = { loginAvailable:boolean; registrationAvailable:boolean; registrationUnavailableReason:'storage'|'authentication'|'administration'|null };
 type BootstrapAccount = { password: string; role: string };
 const publicAccount = ({ salt, hash, ...account }: Account) => account;
 const fail = (message: string, status = 400) => Object.assign(Error(message), { status });
@@ -62,12 +63,15 @@ export class ManagerAccounts {
   }
 }
 
-export function createRegistrationRouter(accounts: ManagerAccounts, bootstrap: Record<string, BootstrapAccount>) {
+export function createRegistrationRouter(accounts: ManagerAccounts, bootstrap: Record<string, BootstrapAccount>, availability:()=>AuthAvailability) {
   const router = Router();
   const attempts = new Map<string, { count: number; until: number }>();
-  router.get('/registration-options', (_req, res) => res.json({ entities: registrationEntities() }));
+  router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next();});
+  router.get('/status',(_req,res)=>res.json(availability()));
+  router.get('/registration-options', (_req, res) => res.json({ entities: registrationEntities(), ...availability() }));
   router.post('/register', async (req, res) => {
-    if (process.env.NODE_ENV === 'production' && !process.env.EXECUTIVE_DATA_DIR) return res.status(503).json({ error: 'يجب تفعيل التخزين الدائم للحسابات لدى مشرف المنصة قبل استقبال طلبات التسجيل.' });
+    const status=availability();
+    if (!status.registrationAvailable) return res.status(503).json({ code:'REGISTRATION_UNAVAILABLE',reason:status.registrationUnavailableReason,error:status.registrationUnavailableReason==='storage'?'يجب تفعيل التخزين الدائم للحسابات لدى مشرف المنصة قبل استقبال طلبات التسجيل.':'إعداد خدمة التسجيل غير مكتمل لدى مشرف المنصة.' });
     const key = req.ip || 'unknown', now = Date.now();
     // Bound the rate-limit table without evicting live limits.
     for (const [ip, a] of attempts) if (a.until < now) attempts.delete(ip);
