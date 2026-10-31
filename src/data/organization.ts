@@ -62,7 +62,6 @@ export const organization: OrgNode[] = [
     { id: 'volunteering', name: 'منصة أراك للتطوع', status: 'مشروع تنموي', description: 'منصة للتطوع في مجالات التنمية' },
     { id: 'tanmyat', name: 'مجتمع تنميات', status: 'مجتمع متخصص', description: 'للمهتمين بقطاع التنمية من خبراء وعاملين ومؤسسات وشركات وكيانات' },
   ]),
-  { ...node('planned', 'قيد التنفيذ', []), planned: true },
 ];
 export function findOrgPath(id: string, nodes = organization, trail: OrgNode[] = []): OrgNode[] {
   for (const item of nodes) {

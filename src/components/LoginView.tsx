@@ -14,7 +14,6 @@ import {
 import { AppUser, PlatformTheme } from '../types';
 
 interface LoginViewProps {
-  users: AppUser[];
   onLoginSuccess: (user: AppUser) => void;
   theme: PlatformTheme;
 }
@@ -83,7 +82,7 @@ const themeTokens: Record<PlatformTheme, ThemeTokens> = {
   },
 };
 
-export default function LoginView({ users, onLoginSuccess, theme }: LoginViewProps) {
+export default function LoginView({ onLoginSuccess, theme }: LoginViewProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -123,8 +122,7 @@ export default function LoginView({ users, onLoginSuccess, theme }: LoginViewPro
         return;
       }
 
-      const known = !result.user.managerAccount && users.find(u => u.email.toLowerCase() === result.email && u.role === result.role);
-      onLoginSuccess({ ...(known || {}), ...result.user, name: known?.name || result.user.name, title: known?.title || result.user.title, avatar: known?.avatar || result.user.avatar, allowedViews: [...new Set<string>([...(known?.allowedViews || result.user.allowedViews), 'performance-reports'])], password: undefined });
+      onLoginSuccess({ ...result.user, password: undefined });
     } catch {
       setError('تعذر الاتصال بخدمة المصادقة. حاول مرة أخرى.');
     } finally { setBusy(false); }
@@ -292,7 +290,7 @@ after:pointer-events-none
           </div>
 
           <div className="relative space-y-2 pb-2 text-xs text-slate-300/85">
-            <p>الإصدار الحالي: 2.0 • عام 2025</p>
+            <p>بوابة الجهات والتقارير</p>
             <p>جميع الحقوق محفوظة © مجموعة أراك للتنمية</p>
           </div>
         </section>
@@ -387,7 +385,7 @@ after:pointer-events-none
             <div className="grid grid-cols-3 gap-2 border-t border-white/10 pt-4 text-center text-xs text-slate-300/80">
               <span className="flex items-center justify-center gap-1.5"><Lock className="h-4 w-4" /> شروط الاستخدام</span>
               <span className="flex items-center justify-center gap-1.5"><ShieldCheck className="h-4 w-4" /> سياسة الخصوصية</span>
-              <span className="flex items-center justify-center gap-1.5"><Users className="h-4 w-4" /> دعم على مدار الساعة</span>
+              <span className="flex items-center justify-center gap-1.5"><Users className="h-4 w-4" /> دعم المنصة</span>
             </div>
           </div>
         </section>

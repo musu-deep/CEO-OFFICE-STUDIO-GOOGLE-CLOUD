@@ -45,14 +45,14 @@ export class ManagerAccounts {
     this.save({ ...this.accounts, [email]: { email, name, title, unitId, salt, hash, status: 'pending', createdAt: new Date().toISOString() } });
   }
   list() { return Object.values(this.accounts).map(publicAccount); }
-  decide(email: string, action: string, unitIds: unknown, actor: string) {
+  decide(email: string, action: string, unitIds: unknown, actor: string, tasksOnly = false) {
     const a = this.accounts[email];
     if (!a) throw fail('الحساب غير موجود.', 404);
     if (!['approve','reject','suspend'].includes(action)) throw fail('إجراء غير صالح.');
     if (action === 'approve') {
-      if (!Array.isArray(unitIds) || !unitIds.length || unitIds.some(id => typeof id !== 'string' || !resolveEntity(id))) throw fail('اختر جهة واحدة على الأقل للصلاحيات.');
+      if (!Array.isArray(unitIds) || (!tasksOnly && !unitIds.length) || unitIds.some(id => typeof id !== 'string' || !resolveEntity(id))) throw fail('اختر جهة واحدة على الأقل للصلاحيات.');
       executiveStore.update(s => {
-        s.grants[email] = { units: [...new Set(unitIds)] as string[], actions: ['read','upload','edit'] };
+        s.grants[email] = { units: tasksOnly ? [] : [...new Set(unitIds)] as string[], actions: ['read','upload','edit'] };
         executiveStore.audit(s, actor, `اعتماد حساب مدير ${email}`);
       });
     } else {
@@ -88,7 +88,7 @@ export function createAccountAdministrationRouter(accounts: ManagerAccounts) {
   router.use((req, res, next) => ['ceo','admin'].includes(actorOf(req).role) ? next() : res.status(403).json({ error: 'إدارة التسجيل متاحة لمكتب الرئيس التنفيذي فقط.' }));
   router.get('/', (_req, res) => res.json({ accounts: accounts.list(), grants: executiveStore.read().grants }));
   router.post('/:email/decision', (req, res) => {
-    try { accounts.decide(req.params.email.toLowerCase(), req.body.action, req.body.units, actorOf(req).email); res.json({ ok: true }); }
+    try { accounts.decide(req.params.email.toLowerCase(), req.body.action, req.body.units, actorOf(req).email, req.body.tasksOnly === true); res.json({ ok: true }); }
     catch (e: any) { res.status(e.status || 400).json({ error: e.message }); }
   });
   return router;

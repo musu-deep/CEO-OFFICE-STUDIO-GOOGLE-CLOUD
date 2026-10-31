@@ -28,7 +28,7 @@ test('manager approval, scoped reports, private attachments, review, suspension 
   assert.equal((await request('/api/manager-accounts/manager%40test.com/decision',{action:'approve',units:['not-a-unit']},ceo)).status,400);
   assert.equal((await request('/api/manager-accounts/manager%40test.com/decision',{action:'approve',units:['national::finance']},ceo)).status,200);
   const authenticated=await login('manager@test.com'),manager=authenticated.cookie;
-  assert.equal(authenticated.status,200);assert.equal(authenticated.data.user.role,'head');assert.equal(authenticated.data.user.name,'مدير الاختبار');assert.deepEqual(authenticated.data.user.allowedViews,['performance-reports']);
+  assert.equal(authenticated.status,200);assert.equal(authenticated.data.user.role,'head');assert.equal(authenticated.data.user.name,'مدير الاختبار');assert.deepEqual(authenticated.data.user.allowedViews,['workspace','tasks','performance-reports']);
   assert.equal((await request('/api/manager-accounts',undefined,manager)).status,403);
   assert.equal((await request('/api/nama/dashboard',undefined,manager)).status,403);
   assert.equal((await request('/api/advisor',{message:'test'},manager)).status,403);

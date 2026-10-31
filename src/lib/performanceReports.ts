@@ -1,6 +1,6 @@
 export type ReportAttachment = { id: string; name: string; mimeType: string; size: number };
 export type PerformanceReport = {
-  id: string; unitId: string; title: string; period: string; summary: string;
+  id: string; unitId: string; taskId?:string; title: string; period: string; summary: string;
   author: string; createdAt: string; attachments: ReportAttachment[];
   status: 'submitted'|'reviewed'|'returned'; note?: string; reviewedBy?: string; reviewedAt?: string;
 };

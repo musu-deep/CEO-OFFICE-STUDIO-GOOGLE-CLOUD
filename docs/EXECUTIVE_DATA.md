@@ -40,3 +40,40 @@ Before enabling production registration and uploads, verify the service has a pe
 If the previous directory already contains real records/documents, copy and verify the entire old directory **before** any redeployment or path change; otherwise an ephemeral Render filesystem can lose it. Retain `SESSION_SECRET` and `ARAAK_AUTH_USERS` for existing CEO/admin access. Back up the whole data directory, including `manager-accounts.json` and `documents/`, to restore managers and attachments. Treat that backup as sensitive. The normal `/api/executive/backup` export does not include password hashes or attachment bytes.
 
 Validation: `npx tsc --noEmit`, `npm run build`, `node --import tsx --test tests/*.test.ts`, and `node --test tests/executiveApi.test.mjs tests/managerRegistrationApi.test.mjs`. The manager integration test covers pending approval, server-assigned roles, scope enforcement, private attachments (including two managers in the same entity), review notes, duplicate registration, persistence after restart and suspension of live sessions.
+
+## Scoped workspaces and retiring temporary data
+
+The application no longer loads `mockData`, the simulated executive feed, or the old local user list as an operational source. The mock exports are empty; the standalone simulated feed modules are removed. Legacy simulation endpoints return 410 to the office and are inaccessible to ordinary accounts. The generic AI and voice endpoints that manufactured fallback reports are retired. The entity agent is the supported AI path and uses approved records from that entity; an unavailable provider returns an error. Previously submitted real records and attachments are preserved. No untagged server record is guessed to be a demo and deleted.
+
+The server-backed session determines the role. The sidebar, home screen and entity chooser use only `/api/workspace` scopes returned for that account, including for existing bootstrap managers. CEO/admin accounts retain the group dashboard and five executive destinations. Manager interfaces contain their authorized entities, their own explicitly assigned tasks, and their own reports. Entity records and attachments are still authorized on every request; hiding a menu is not the access boundary. Ordinary accounts see only objectives linked to their readable entity revisions, and only directives explicitly assigned to their email.
+
+### Domain models
+
+`src/lib/workspaceProfiles.ts` maps organizational IDs and functional scopes to 18 domain profiles. Functional departments override the parent company's profile. Forms start blank and missing numbers remain missing. Entries are stored under `businessRecords[unitId]`, versioned to prevent stale updates, and validated against the server's domain schema. They are operational submissions; they do not become approved dashboard metrics automatically.
+
+| Domain | Fields and workflow | Layout |
+| --- | --- | --- |
+| Finance | Period, currency, budget, expenditure, receivables, payables, cash, source | Financial ledger and variance |
+| Procurement | Requisition/contract, supplier, value, delivery, stage | Request → offers → contract → receipt |
+| Human resources | Job group, planned/actual staffing, hires, exits, training | Staffing coverage table |
+| Legal | Matter, counterparty, next action date, priority, case status | Legal register |
+| Governance, quality and audit | Control, evidence, finding, corrective owner/due date | Control and corrective action register |
+| Logistics | Tracking, origin, destination, quantity, delivery | Shipment pipeline |
+| Industry | Line, target/actual output, rejections, downtime | Production panels |
+| Sales | Order, customer, currency, order value, collection | Order and collection ledger |
+| Projects | Project, milestone, due date, actual progress, cost, blocker | Milestone portfolio |
+| Marketing | Channel, spend, leads, conversions, source | Campaign portfolio |
+| Technology | Service, ticket, severity, availability, due date | Service/incident register |
+| Education | Program, date, participants, completion, satisfaction | Program portfolio |
+| Development | Initiative, partners, beneficiaries, resources, outcomes | Initiative portfolio |
+| Investment | Asset, capital, valuation/reference, stage, risk | Investment portfolio |
+| Pricing | Item, unit, total cost, proposed price, validity | Pricing ledger |
+| Documents and secretariat | Reference, document type, responsible party, dates | Correspondence register |
+| Corporate | Period, revenue, cost, cash, plan progress, headcount, decisions | Company portfolio |
+| Administrative services | Request, service, owner, due date, result | Service register |
+
+### Assignment-only accounts
+
+During manager approval the office can choose **حساب للمهام المسندة فقط**. This activates the account with no entity-wide grant. The office assigns tasks through **التكليفات والمتابعة**, selecting the actual active recipient account and entity. Existing free-text directive owners are not guessed to match an account. Only an exact `assigneeEmail` assignment gives task access. A task-only account sees its assigned tasks and can update their execution status and submit a report referencing that task. It cannot read entity metrics, operational records, documents, objectives or other users' tasks. The related report and attachments are private to their author and the CEO/admin inbox. Company scope still explicitly includes organizational descendants when granted.
+
+Additional validation: `node --test tests/scopedWorkspaceApi.test.mjs` after the build, and `tests/workspaceProfiles.test.ts` in the TypeScript test suite. These cover domain validation, cross-unit denial, task-only access, unrelated task/report denial, conflict checks, objective filtering, retired simulation APIs and persistence after restart.

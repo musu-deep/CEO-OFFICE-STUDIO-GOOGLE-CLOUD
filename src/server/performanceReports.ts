@@ -1,3 +1,4 @@
+import { assignedTask } from './scopedWorkspace';
 import express, { Router } from 'express';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -10,12 +11,13 @@ export function createPerformanceReportRouter() {
   router.use(express.json({ limit: '29mb' }));
   router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); });
   const isOffice = (req: any) => ['ceo','admin'].includes(actorOf(req).role);
-  const visible = (req: any, report: PerformanceReport) => isOffice(req) || (report.author === actorOf(req).email && executiveStore.can(actorOf(req), report.unitId, 'read'));
+  const visible = (req: any, report: PerformanceReport) => isOffice(req) || (report.author === actorOf(req).email && (executiveStore.can(actorOf(req), report.unitId, 'read') || (!!report.taskId && !!assignedTask(actorOf(req).email,report.taskId,report.unitId))));
   router.get('/', (req, res) => res.json({ reports: (executiveStore.read().reports || []).filter(r => visible(req, r)) }));
   router.post('/', (req, res) => {
     if (process.env.NODE_ENV === 'production' && !process.env.EXECUTIVE_DATA_DIR) return res.status(503).json({ error: 'يجب تفعيل التخزين الدائم لدى مشرف المنصة قبل استقبال التقارير والمرفقات.' });
     const actor = actorOf(req), body = req.body || {};
-    if (typeof body.unitId !== 'string' || !executiveStore.can(actor, body.unitId, 'upload')) return res.status(403).json({ error: 'لا تملك صلاحية إرسال تقرير لهذه الجهة.' });
+    if (typeof body.unitId !== 'string' || (!executiveStore.can(actor, body.unitId, 'upload') && !(typeof body.taskId==='string' && assignedTask(actor.email,body.taskId,body.unitId)))) return res.status(403).json({ error: 'لا تملك صلاحية إرسال تقرير لهذه الجهة.' });
+    if (body.taskId !== undefined && (typeof body.taskId !== 'string' || (!isOffice(req) && !assignedTask(actor.email,body.taskId,body.unitId)))) return res.status(403).json({error:'التكليف خارج نطاق حسابك.'});
     const text = (v: unknown, max: number) => typeof v === 'string' && !!v.trim() && v.length <= max;
     if (!text(body.title, 200) || !text(body.period, 100) || !text(body.summary, 10000) || !Array.isArray(body.attachments) || body.attachments.length > 5) return res.status(400).json({ error: 'أكمل عنوان التقرير وفترته وملخصه. الحد الأقصى خمسة مرفقات.' });
     const saved: string[] = [];
@@ -29,7 +31,7 @@ export function createPerformanceReportRouter() {
         return { name: a.name, mimeType, data: a.data, size: bytes.length };
       });
       const attachments = validated.map((a: any) => { const doc = executiveStore.document(a); saved.push(doc.id); return { ...doc, size: a.size }; });
-      const report: PerformanceReport = { id: crypto.randomUUID(), unitId: body.unitId, title: body.title.trim(), period: body.period.trim(), summary: body.summary.trim(), author: actor.email, createdAt: new Date().toISOString(), status: 'submitted', attachments };
+      const report: PerformanceReport = { id: crypto.randomUUID(), unitId: body.unitId, ...(body.taskId ? {taskId:body.taskId} : {}), title: body.title.trim(), period: body.period.trim(), summary: body.summary.trim(), author: actor.email, createdAt: new Date().toISOString(), status: 'submitted', attachments };
       executiveStore.update(s => { (s.reports ||= []).unshift(report); executiveStore.audit(s, actor.email, `إرسال تقرير أداء ${report.id}`, report.unitId); });
       res.status(201).json({ report });
     } catch (e: any) {

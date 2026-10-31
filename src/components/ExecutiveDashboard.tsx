@@ -3,10 +3,9 @@ import { useEffect,useState } from 'react';
 import { dimensions,functions,comparable,score,actions,type ExecutiveMetric,type Grant,type UnitRecord } from '../lib/executiveModel';
 import { executiveRequest,type ExecutiveResponse } from '../services/executiveClient';
 import UnitWorkspace from './UnitWorkspace';
-import ExecutiveLiveFeed from './ExecutiveLiveFeed';
 const field='rounded-xl border border-white/15 bg-black/10 p-3 text-sm';
 export default function ExecutiveDashboard({userKey,onOpen,onReports}:{userKey:string;onReports:()=>void;onOpen:(root:string,id:string)=>void}){
- const [data,setData]=useState<ExecutiveResponse|null>(null),[error,setError]=useState(''),[mode,setMode]=useState('group'),[selected,setSelected]=useState(''),[dimension,setDimension]=useState('plan'),[period,setPeriod]=useState(''),[chosen,setChosen]=useState<string[]>([]),[demo,setDemo]=useState(false);
+ const [data,setData]=useState<ExecutiveResponse|null>(null),[error,setError]=useState(''),[mode,setMode]=useState('group'),[selected,setSelected]=useState(''),[dimension,setDimension]=useState('plan'),[period,setPeriod]=useState(''),[chosen,setChosen]=useState<string[]>([]);
  const load=async()=>{try{setData(await executiveRequest('/state'));setError('');}catch(e:any){setError(e.message);}};
  useEffect(()=>{load();const t=setInterval(()=>{if(!document.hidden)load();},30000);return()=>clearInterval(t);},[]);
  if(!data)return <div role="status" className="p-6">{error||'جارٍ تحميل لوحة القيادة…'}{error&&<button onClick={load} className="mr-4 underline">إعادة المحاولة</button>}</div>;
@@ -33,7 +32,7 @@ export default function ExecutiveDashboard({userKey,onOpen,onReports}:{userKey:s
  <div className="overflow-x-auto"><table className="w-full text-right text-sm"><thead><tr className="text-slate-400">{['الجهة','المؤشر','القيمة','المستهدف','تحقيق المستهدف','الحالة'].map(t=><th key={t} className="p-3">{t}</th>)}</tr></thead><tbody>{rows.map(r=><tr key={r.entity.id} className="border-t border-white/10"><td className="p-3">{r.entity.name}</td><td className="p-3">{r.metric?.label||'غير متاح / متعدد'}</td><td className="p-3">{r.metric?`${r.metric.value.toLocaleString('ar-SA')} ${r.metric.unit}`:'—'}</td><td className="p-3">{r.metric?.target??'—'}</td><td className="p-3">{r.metric&&score(r.metric)!==undefined?`${Math.round(score(r.metric)!)}٪`:'—'}</td><td className="p-3">{comparableRows?'متوافق':'غير قابل للمقارنة'}</td></tr>)}</tbody></table></div>
  {comparableRows&&rows.every(r=>r.metric!.value>=0)&&<div className="space-y-4">{[...rows].sort((a,b)=>anchor!.direction==='up'?b.metric!.value-a.metric!.value:a.metric!.value-b.metric!.value).map(r=><div key={r.entity.id}><p className="mb-1 text-xs">{r.entity.name} · {r.metric!.value} {r.metric!.unit}</p><div className="h-3 rounded-full bg-white/10"><div style={{width:`${Math.max(1,Math.min(100,Math.abs(r.metric!.value)/Math.max(...rows.map(x=>Math.abs(x.metric!.value)),1)*100))}%`}} className="h-full rounded-full bg-[var(--theme-accent)]"/></div></div>)}</div>}</section>}
  {data.manage&&<><ManagerAccountAdministration entities={data.entities}/><Administration data={data} reload={load}/></>}
- <details className="rounded-xl border border-white/10 p-4"><summary className="cursor-pointer text-sm" onClick={()=>setDemo(true)}>المحاكاة</summary><p className="my-3 text-xs text-amber-400">أرقام وأحداث افتراضية منفصلة عن السجلات المعتمدة أعلاه.</p>{demo&&<ExecutiveLiveFeed onOpenOrganization={(root,id)=>{setSelected(id);setMode('entities');}}/>}</details>
+
  </div>;
 }
 export function FunctionalInfo({id}:{id:string}){const f=functions.find(f=>f.id===id);return f?<section className="grid gap-3 sm:grid-cols-3">{[['المدخلات',f.inputs],['العمليات',f.operations],['المخرجات',f.outputs]].map(([t,v])=><div key={t} className="rounded-xl border border-white/10 p-4"><h3 className="text-xs text-[var(--theme-accent)]">{t}</h3><p className="mt-2 text-sm leading-6">{v}</p></div>)}</section>:null;}
