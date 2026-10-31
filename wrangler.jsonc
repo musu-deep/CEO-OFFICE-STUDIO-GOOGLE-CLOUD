@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "araak-ceo-office",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2025-10-31",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "assets": {
+    "directory": "./build/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/health", "/ready"]
+  },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "araak-ceo-office",
+    "database_id": "00000000-0000-0000-0000-000000000000",
+    "migrations_dir": "migrations"
+  }],
+  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "araak-ceo-office-documents" }],
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 }
+}

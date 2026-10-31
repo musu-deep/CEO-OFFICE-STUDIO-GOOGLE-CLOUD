@@ -43,7 +43,7 @@ export function createScopedWorkspaceRouter(recipients:()=>{email:string;name:st
  router.post('/units/:id/records',handle((req:any,res:any)=>{
   const actor=actorOf(req),unitId=req.params.id;
   if(!executiveStore.can(actor,unitId,'edit'))return res.status(403).json({error:'لا تملك صلاحية تعديل سجلات هذه الجهة.'});
-  if(process.env.NODE_ENV==='production'&&!process.env.EXECUTIVE_DATA_DIR)return res.status(503).json({error:'يجب تفعيل التخزين الدائم قبل حفظ السجلات.'});
+  if(!executiveStore.persistent)return res.status(503).json({error:'يجب تفعيل التخزين الدائم قبل حفظ السجلات.'});
   const {title,values,id,version}=req.body||{};
   const companyId=validateServiceCompany(unitId,req.body?.companyId);
   if(typeof title!=='string'||!title.trim()||title.length>200)throw Error('أدخل عنوانًا للسجل بحد أقصى 200 حرف.');

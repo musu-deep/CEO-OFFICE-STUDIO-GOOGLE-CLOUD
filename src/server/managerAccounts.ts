@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import crypto from 'node:crypto';
 import { promisify } from 'node:util';
 import { Router } from 'express';
@@ -7,25 +5,17 @@ import { entities, resolveEntity, registrationEntities } from '../lib/executiveM
 import { executiveStore, actorOf } from './executiveRoutes';
 
 const scrypt = promisify(crypto.scrypt);
-type Account = { email: string; name: string; title: string; unitId: string; salt: string; hash: string; status: 'pending'|'active'|'rejected'|'suspended'; createdAt: string; decidedAt?: string; decidedBy?: string };
+export type Account = { email: string; name: string; title: string; unitId: string; salt: string; hash: string; status: 'pending'|'active'|'rejected'|'suspended'; createdAt: string; decidedAt?: string; decidedBy?: string };
 export type AuthAvailability = { loginAvailable:boolean; registrationAvailable:boolean; registrationUnavailableReason:'storage'|'authentication'|'administration'|null };
 type BootstrapAccount = { password: string; role: string };
 const publicAccount = ({ salt, hash, ...account }: Account) => account;
 const fail = (message: string, status = 400) => Object.assign(Error(message), { status });
 
+export interface AccountPersistence {read():Record<string,Account>;write(accounts:Record<string,Account>):void;}
 export class ManagerAccounts {
-  private accounts: Record<string, Account>;
-  private file: string;
-  constructor() {
-    this.file = path.join(executiveStore.dir, 'manager-accounts.json');
-    this.accounts = fs.existsSync(this.file) ? JSON.parse(fs.readFileSync(this.file, 'utf8')) : {};
-  }
-  private save(accounts: Record<string, Account>) {
-    const temp = `${this.file}.${crypto.randomUUID()}.tmp`;
-    fs.writeFileSync(temp, JSON.stringify(accounts), { mode: 0o600 });
-    fs.renameSync(temp, this.file);
-    this.accounts = accounts;
-  }
+  constructor(private persistence:AccountPersistence) {}
+  private get accounts(){return this.persistence.read();}
+  private save(accounts:Record<string,Account>){this.persistence.write(accounts);}
   active(email: string) { const a = this.accounts[email]; return a?.status === 'active' ? publicAccount(a) : undefined; }
   async verify(email: string, password: string) {
     const a = this.accounts[email];
