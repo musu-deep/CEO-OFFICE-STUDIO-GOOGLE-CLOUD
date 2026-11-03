@@ -10,9 +10,22 @@ import { CloudflareStore } from './storage';
 type Bindings={DB:D1Database;BUCKET:R2Bucket;ASSETS:{fetch(request:Request):Promise<Response>};SESSION_SECRET?:string;ARAAK_AUTH_USERS?:string;GEMINI_API_KEY?:string;GEMINI_MODEL?:string};
 const bindings=env as unknown as Bindings;
 let authUsers:Record<string,any>={};
+// Aggregate diagnostics only: never return account identities or secret values.
+const authConfiguration={version:1,sourceEntries:0,acceptedEntries:0,invalidPasswordType:0,invalidRole:0,duplicateNormalizedEmails:0,parseError:false};
 try{
- authUsers=Object.fromEntries(Object.entries(JSON.parse(bindings.ARAAK_AUTH_USERS||'{}')).filter(([,a]:any)=>a&&typeof a.password==='string'&&['ceo','admin','head'].includes(a.role)).map(([email,a])=>[email.trim().toLowerCase(),a]));
-}catch{console.error('Invalid bootstrap account configuration');}
+ const entries=Object.entries(JSON.parse(bindings.ARAAK_AUTH_USERS||'{}'));
+ authConfiguration.sourceEntries=entries.length;
+ const accepted=entries.filter(([,a]:any)=>{
+  const passwordValid=!!a&&typeof a.password==='string';
+  const roleValid=!!a&&['ceo','admin','head'].includes(a.role);
+  if(!passwordValid)authConfiguration.invalidPasswordType++;
+  if(!roleValid)authConfiguration.invalidRole++;
+  return passwordValid&&roleValid;
+ }).map(([email,a])=>[email.trim().toLowerCase(),a] as const);
+ authUsers=Object.fromEntries(accepted);
+ authConfiguration.acceptedEntries=accepted.length;
+ authConfiguration.duplicateNormalizedEmails=accepted.length-Object.keys(authUsers).length;
+}catch{authConfiguration.parseError=true;console.error('Invalid bootstrap account configuration');}
 const currentStore=()=>storageContext.getStore() as CloudflareStore;
 const managers=new ManagerAccounts({read:()=>structuredClone(currentStore().accounts),write:accounts=>{currentStore().accounts=structuredClone(accounts);}});
 const app=createApplication({sessionSecret:bindings.SESSION_SECRET||'',authUsers,managers,clientIp:req=>String(req.headers['cf-connecting-ip']||'unknown')});
@@ -55,9 +68,14 @@ export default {
    return await storageContext.run(store,async()=>{
     const result=await server.fetch(request,_env,ctx);
     // Finish the route and make durable writes BEFORE returning a success response.
-    const body=await result.arrayBuffer();
+    let body=await result.arrayBuffer();
+    if(path==='/ready'&&request.method==='GET'){
+     const readiness=JSON.parse(new TextDecoder().decode(body));
+     body=new TextEncoder().encode(JSON.stringify({...readiness,authConfiguration})).buffer;
+    }
     if(result.status<400)await store.commit();
     const headers=new Headers(result.headers);headers.set('Cache-Control','no-store');
+    if(path==='/ready'&&request.method==='GET'){headers.delete('Content-Length');headers.delete('ETag');}
     return new Response(result.status===204?null:body,{status:result.status,statusText:result.statusText,headers});
    });
   }catch(error:any){
