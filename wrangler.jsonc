@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "araak-ceo-office",
+  "name": "ceo-office-studio-google-cloud",
   "main": "src/worker/index.ts",
   "compatibility_date": "2025-10-31",
   "compatibility_flags": ["nodejs_compat"],
