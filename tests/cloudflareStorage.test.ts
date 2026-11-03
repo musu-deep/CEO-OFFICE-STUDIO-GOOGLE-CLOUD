@@ -73,3 +73,23 @@ test('Workers registration, approval, private reports, persistent restart, suspe
   assert.equal((await request('/api/auth/login',{email:'bad@test.com',password:'wrong'},undefined,{'CF-Connecting-IP':'192.0.2.99'})).status,429);
  }finally{await mf.dispose();fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+test('administration settings persist in D1 and R2 deletion waits for successful metadata commit',async()=>{
+ const mf=instance();
+ try{
+  await migrate(mf);const db=await mf.getD1Database('DB') as unknown as D1Database,bucket=await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
+  const initial=await CloudflareStore.open(db,bucket);
+  const doc=initial.document({name:'admin-delete.pdf',mimeType:'application/pdf',data:Buffer.from('keep until commit').toString('base64')});
+  initial.update(s=>{
+   s.platformSettings={registration:'closed',closedUnits:['finance'],disabledAgents:['finance'],pendingRecords:[]};
+   s.units.finance={version:1,history:[],directives:[],documents:[{...doc,author:'ceo@test.com',at:new Date().toISOString()}]};
+  });await initial.commit();
+  const fresh=await CloudflareStore.open(db,bucket),stale=await CloudflareStore.open(db,bucket);
+  assert.equal(fresh.read().platformSettings?.registration,'closed');assert.deepEqual(fresh.read().platformSettings?.disabledAgents,['finance']);
+  fresh.update(s=>{s.platformSettings!.registration='approval';});await fresh.commit();
+  stale.update(s=>{s.units.finance.documents=[];});stale.removeDocument(doc.id);
+  await assert.rejects(()=>stale.commit(),{status:409});assert.ok(await bucket.get(`documents/${doc.id}`));
+  const final=await CloudflareStore.open(db,bucket);final.update(s=>{s.units.finance.documents=[];});final.removeDocument(doc.id);await final.commit();
+  assert.equal(await bucket.get(`documents/${doc.id}`),null);
+ }finally{await mf.dispose();}
+});

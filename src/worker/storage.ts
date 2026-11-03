@@ -5,7 +5,7 @@ import type { Account } from '../server/managerAccounts';
 import type { D1Database, D1PreparedStatement, R2Bucket } from '@cloudflare/workers-types';
 
 type Row = {kind:string;id:string;value:string};
-type Collection = 'unit'|'history'|'directive'|'document'|'objective'|'grant'|'audit'|'report'|'business'|'account';
+type Collection = 'unit'|'history'|'directive'|'document'|'objective'|'grant'|'audit'|'report'|'business'|'account'|'settings';
 const recordKey=(kind:string,id:string)=>JSON.stringify([kind,id]);
 const fail=(message:string,status:number)=>Object.assign(Error(message),{status});
 
@@ -28,14 +28,15 @@ export function encodeState(state:ExecutiveState,accounts:Record<string,Account>
  for(const [position,value] of state.audit.entries())put('audit',value.id,{position:0,value});
  for(const [position,value] of (state.reports||[]).entries())put('report',value.id,{position:0,value});
  for(const [unitId,records] of Object.entries(state.businessRecords||{}))for(const [position,value] of records.entries())put('business',`${unitId}/${value.id}`,{unitId,position:0,value});
+ if(state.platformSettings)put('settings','platform',state.platformSettings);
  for(const [id,value] of Object.entries(accounts))put('account',id,value);
  return rows;
 }
 export function decodeState(rows:Row[]){
  const state:ExecutiveState={units:{},objectives:[],grants:{},audit:[],reports:[],businessRecords:{}};
  const accounts:Record<string,Account>={};
- for(const row of rows){const value=JSON.parse(row.value);if(row.kind==='unit')state.units[row.id]=value;else if(row.kind==='grant')state.grants[row.id]=value;else if(row.kind==='account')accounts[row.id]=value;}
- const ordered=rows.filter(r=>!['unit','grant','account'].includes(r.kind)).map(r=>({...r,parsed:JSON.parse(r.value)})).sort((a,b)=>a.parsed.position-b.parsed.position||String(b.parsed.value.at||b.parsed.value.createdAt||'').localeCompare(String(a.parsed.value.at||a.parsed.value.createdAt||'')));
+ for(const row of rows){const value=JSON.parse(row.value);if(row.kind==='unit')state.units[row.id]=value;else if(row.kind==='grant')state.grants[row.id]=value;else if(row.kind==='account')accounts[row.id]=value;else if(row.kind==='settings')state.platformSettings=value;}
+ const ordered=rows.filter(r=>!['unit','grant','account','settings'].includes(r.kind)).map(r=>({...r,parsed:JSON.parse(r.value)})).sort((a,b)=>a.parsed.position-b.parsed.position||String(b.parsed.value.at||b.parsed.value.createdAt||'').localeCompare(String(a.parsed.value.at||a.parsed.value.createdAt||'')));
  for(const {kind,parsed:{unitId,value}} of ordered){
   if(kind==='history'||kind==='directive'||kind==='document'){
    const unit=state.units[unitId];if(!unit)throw Error('Inconsistent unit record');
@@ -49,6 +50,7 @@ export function decodeState(rows:Row[]){
 }
 export class CloudflareStore extends MemoryExecutiveStore {
  accounts:Record<string,Account>;
+ private removed=new Set<string>();
  private staged=new Map<string,{name:string;mimeType:string;bytes:Buffer}>();
  private constructor(private db:D1Database,private bucket:R2Bucket,private revision:number,private original:Map<string,Row>,state:ExecutiveState,accounts:Record<string,Account>){super(state);this.accounts=accounts;}
  static async open(db:D1Database,bucket:R2Bucket){
@@ -64,6 +66,7 @@ export class CloudflareStore extends MemoryExecutiveStore {
   const id=crypto.randomUUID();this.staged.set(id,{name:data.name,mimeType:data.mimeType,bytes:Buffer.from(data.data,'base64')});
   return {id,name:data.name,mimeType:data.mimeType};
  }
+ removeDocument(id:string){this.removed.add(id);}
  discardDocument(id:string){this.staged.delete(id);}
  async bytes(id:string){
   if(!/^[a-f0-9-]{36}$/.test(id))throw fail('المستند غير موجود.',404);
@@ -84,6 +87,8 @@ export class CloudflareStore extends MemoryExecutiveStore {
    // Account approval + permissions + audit always commit together, never partially.
    const guard=this.db.prepare('UPDATE app_revision SET version=CASE WHEN version=? THEN version+1 ELSE NULL END WHERE id=1').bind(this.revision);
    await this.db.batch([guard,...changes]);
+   // Delete bytes only after metadata removal commits; failed cleanup leaves an inaccessible orphan.
+   await Promise.all([...this.removed].map(async id=>{try{await this.bucket.delete(`documents/${id}`);}catch{console.warn('Deferred document cleanup failed');}}));
   }catch(error){
    await Promise.allSettled(uploaded.map(id=>this.bucket.delete(`documents/${id}`)));
    if(String(error).includes('NOT NULL constraint failed: app_revision.version'))throw fail('تغيرت البيانات أثناء الحفظ. حدّث الصفحة وأعد المحاولة.',409);

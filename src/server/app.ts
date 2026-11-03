@@ -7,6 +7,7 @@ import { createScopedWorkspaceRouter } from './scopedWorkspace';
 import { createPerformanceReportRouter } from './performanceReports';
 
 
+import { createPlatformAdministrationRouter } from './platformAdministration';
 import { executiveStore } from './storeContext';
 export function createApplication(options:{sessionSecret:string;authUsers:Record<string,any>;managers:ManagerAccounts;clientIp?:(req:Request)=>string}) {
   const app = express();
@@ -65,7 +66,8 @@ export function createApplication(options:{sessionSecret:string;authUsers:Record
   const requireAuth = (req: Request, res: Response, next: () => void) => {
     const session = readSession(req);
     if (!session || !accountOf(session.email)) return res.status(401).json({ error: 'Authentication required' });
-    (req as Request & { auth?: unknown }).auth = { ...session, role: accountOf(session.email)!.role };
+    (req as Request & { auth?: unknown }).auth = { ...session, role: accountOf(session.email)!.role, participation:managers.participation(session.email) };
+    if(!['ceo','admin'].includes(accountOf(session.email)!.role)&&!['GET','HEAD','OPTIONS'].includes(req.method)&&managers.participation(session.email)==='blocked')return res.status(403).json({error:'مشاركة هذا الحساب معلّقة لدى إدارة المنصة.'});
     next();
   };
 
@@ -78,11 +80,13 @@ export function createApplication(options:{sessionSecret:string;authUsers:Record
   const authAvailability = () => {
     const hasOffice = Object.values(authUsers).some(a=>a && ['ceo','admin'].includes(a.role));
     const storage = executiveStore.persistent;
-    const reason = !sessionSecret ? 'authentication' as const : !hasOffice ? 'administration' as const : !storage ? 'storage' as const : null;
+    const closed=executiveStore.read().platformSettings?.registration==='closed';
+    const reason = closed ? 'administration' as const : !sessionSecret ? 'authentication' as const : !hasOffice ? 'administration' as const : !storage ? 'storage' as const : null;
     return {loginAvailable:!!sessionSecret && (Object.keys(authUsers).length>0 || managers.list().some(a=>a.status==='active')),registrationAvailable:reason===null,registrationUnavailableReason:reason};
   };
   app.use('/api/auth', createRegistrationRouter(managers, authUsers, authAvailability));
-  app.use('/api/manager-accounts', requireAuth, createAccountAdministrationRouter(managers));
+  app.use('/api/manager-accounts', requireAuth, createAccountAdministrationRouter(managers,authUsers));
+  app.use('/api/platform-administration',requireAuth,createPlatformAdministrationRouter());
   app.use('/api/executive', requireAuth, createExecutiveRouter());
   app.use('/api/workspace', requireAuth, createScopedWorkspaceRouter(() => [...Object.keys(authUsers).map(email=>({email,name:String(profileOf(email)?.name||email)})), ...managers.list().filter(a=>a.status==='active').map(a=>({email:a.email,name:a.name}))]));
 

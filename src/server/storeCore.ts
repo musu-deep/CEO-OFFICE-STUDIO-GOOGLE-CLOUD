@@ -7,7 +7,7 @@ export class MemoryExecutiveStore {
  constructor(state:ExecutiveState={units:{},objectives:[],grants:{},audit:[]}) { this.state=structuredClone(state); }
  read(){return structuredClone(this.state);}
  update(fn:(state:ExecutiveState)=>void){const next=this.read();fn(next);this.state=next;return this.read();}
- can(actor:{email:string;role:string},unitId:string,action:Action){return !!resolveEntity(unitId)&&hasPermission(actor.email,actor.role,this.state.grants,unitId,action);}
+ can(actor:{email:string;role:string},unitId:string,action:Action){return !(!['ceo','admin'].includes(actor.role)&&action!=='read'&&this.state.platformSettings?.closedUnits?.includes(unitId))&&!!resolveEntity(unitId)&&hasPermission(actor.email,actor.role,this.state.grants,unitId,action);}
  audit(s:ExecutiveState,actor:string,action:string,unitId?:string){s.audit.unshift({id:crypto.randomUUID(),at:new Date().toISOString(),actor,action,unitId});s.audit=s.audit.slice(0,5000);}
  saveDraft(actor:{email:string;role:string},unitId:string,input:any,expected:number,source:string){
   if(!this.can(actor,unitId,'edit')&&!this.can(actor,unitId,'upload'))throw Object.assign(new Error('لا تملك صلاحية رفع بيانات لهذه الجهة.'),{status:403});
@@ -18,6 +18,7 @@ export class MemoryExecutiveStore {
  }
  document(data:{name:string;mimeType:string;data:string}):{id:string;name:string;mimeType:string}{throw Error('Document storage is not configured');}
  bytes(id:string):Buffer|Promise<Buffer>{throw Error('Document storage is not configured');}
+ removeDocument(id:string):void {}
  discardDocument(id:string):void {}
 }
 export function validateGrant(input:any):Grant {const allowed=['read','upload','edit','review','approve','direct'];if(!input||!Array.isArray(input.units)||!Array.isArray(input.actions)||input.units.some((v:any)=>typeof v!=='string'||!resolveEntity(v))||input.actions.some((v:any)=>!allowed.includes(v)))throw Object.assign(new Error('صلاحيات غير صالحة.'),{status:400});return {units:[...new Set(input.units)] as string[],actions:[...new Set(input.actions)] as Action[]};}

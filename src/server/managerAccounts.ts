@@ -5,7 +5,7 @@ import { entities, resolveEntity, registrationEntities } from '../lib/executiveM
 import { executiveStore, actorOf } from './executiveRoutes';
 
 const scrypt = promisify(crypto.scrypt);
-export type Account = { email: string; name: string; title: string; unitId: string; salt: string; hash: string; status: 'pending'|'active'|'rejected'|'suspended'; createdAt: string; decidedAt?: string; decidedBy?: string };
+export type Account = { email: string; name: string; title: string; unitId: string; salt: string; hash: string; participation?:'direct'|'review'|'blocked'; status: 'pending'|'active'|'rejected'|'suspended'; createdAt: string; decidedAt?: string; decidedBy?: string };
 export type AuthAvailability = { loginAvailable:boolean; registrationAvailable:boolean; registrationUnavailableReason:'storage'|'authentication'|'administration'|null };
 type BootstrapAccount = { password: string; role: string };
 const publicAccount = ({ salt, hash, ...account }: Account) => account;
@@ -34,6 +34,18 @@ export class ManagerAccounts {
     // Do not overwrite a pending or approved account, including concurrent submissions.
     if (bootstrap[email] || this.accounts[email]) return;
     this.save({ ...this.accounts, [email]: { email, name, title, unitId, salt, hash, status: 'pending', createdAt: new Date().toISOString() } });
+    if(executiveStore.read().platformSettings?.registration==='automatic')this.decide(email,'approve',[unitId],'سياسة التسجيل التلقائي');
+  }
+  participation(email:string){return this.accounts[email]?.participation||'direct';}
+  setParticipation(email:string,value:string,actor:string){
+    if(!['direct','review','blocked'].includes(value)||!this.accounts[email])throw fail('إعداد مشاركة غير صالح.');
+    this.save({...this.accounts,[email]:{...this.accounts[email],participation:value as Account['participation']}});
+    executiveStore.update(s=>executiveStore.audit(s,actor,`تعديل سياسة مشاركة ${email}: ${value}`));
+  }
+  remove(email:string,actor:string){
+    if(!this.accounts[email])throw fail('الحساب غير موجود.',404);
+    const next={...this.accounts};delete next[email];this.save(next);
+    executiveStore.update(s=>{delete s.grants[email];executiveStore.audit(s,actor,`حذف حساب ${email}`);});
   }
   list() { return Object.values(this.accounts).map(publicAccount); }
   decide(email: string, action: string, unitIds: unknown, actor: string, tasksOnly = false) {
@@ -71,16 +83,27 @@ export function createRegistrationRouter(accounts: ManagerAccounts, bootstrap: R
     attempts.set(key, attempt);
     try {
       await accounts.register(req.body || {}, bootstrap);
-      res.status(202).json({ message: 'تم استلام الطلب. بعد اعتماد مكتب الرئيس التنفيذي يمكنك الدخول بالبريد وكلمة المرور المسجلين. إذا كان البريد مسجلًا مسبقًا فراجع المكتب.' });
+      res.status(202).json({ message: 'تم استلام بيانات التسجيل. يخضع تفعيل الحساب لسياسة إدارة المنصة. إذا كان البريد مسجلًا مسبقًا فراجع المشرف.' });
     } catch (e: any) { res.status(e.status || 500).json({ error: e.status ? e.message : 'تعذر حفظ الطلب.' }); }
   });
   return router;
 }
 
-export function createAccountAdministrationRouter(accounts: ManagerAccounts) {
+export function createAccountAdministrationRouter(accounts: ManagerAccounts,bootstrap:Record<string,BootstrapAccount>={}) {
   const router = Router();
   router.use((req, res, next) => ['ceo','admin'].includes(actorOf(req).role) ? next() : res.status(403).json({ error: 'إدارة التسجيل متاحة لمكتب الرئيس التنفيذي فقط.' }));
-  router.get('/', (_req, res) => res.json({ accounts: accounts.list(), grants: executiveStore.read().grants }));
+  router.get('/', (_req, res) => res.json({ accounts: accounts.list(), grants: executiveStore.read().grants,protectedAccounts:Object.entries(bootstrap).map(([email,a])=>({email,role:a.role})) }));
+  router.post('/',async(req,res)=>{try{
+    const email=String(req.body.email||'').trim().toLowerCase();
+    if(bootstrap[email]||accounts.list().some(a=>a.email===email))throw fail('البريد مسجل بالفعل.');
+    if(!['direct','review','blocked'].includes(req.body.participation))throw fail('اختر سياسة المشاركة.');
+    if(!Array.isArray(req.body.units)||(!req.body.tasksOnly&&!req.body.units.length)||req.body.units.some((id:any)=>typeof id!=='string'||!resolveEntity(id)))throw fail('اختر جهات صحيحة.');
+    await accounts.register(req.body,bootstrap);
+    accounts.decide(email,'approve',req.body.units,actorOf(req).email,req.body.tasksOnly===true);
+    accounts.setParticipation(email,req.body.participation,actorOf(req).email);res.status(201).json({ok:true});
+  }catch(e:any){res.status(e.status||400).json({error:e.message});}});
+  router.post('/:email/participation',(req,res)=>{try{accounts.setParticipation(req.params.email.toLowerCase(),req.body.participation,actorOf(req).email);res.json({ok:true});}catch(e:any){res.status(e.status||400).json({error:e.message});}});
+  router.delete('/:email',(req,res)=>{try{accounts.remove(req.params.email.toLowerCase(),actorOf(req).email);res.json({ok:true});}catch(e:any){res.status(e.status||400).json({error:e.message});}});
   router.post('/:email/decision', (req, res) => {
     try { accounts.decide(req.params.email.toLowerCase(), req.body.action, req.body.units, actorOf(req).email, req.body.tasksOnly === true); res.json({ ok: true }); }
     catch (e: any) { res.status(e.status || 400).json({ error: e.message }); }
