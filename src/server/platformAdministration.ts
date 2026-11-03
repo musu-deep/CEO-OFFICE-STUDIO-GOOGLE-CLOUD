@@ -1,11 +1,17 @@
 import { Router } from 'express';
 import { executiveStore } from './storeContext';
 import { actorOf } from './executiveRoutes';
-import { resolveEntity } from '../lib/executiveModel';
-export const participationOf=(req:any)=>req.auth?.participation||'direct';
+import type { ManagerAccounts } from './managerAccounts';
+import { resolveEntity, actions, hasPermission, type EntityAdministrationPolicy } from '../lib/executiveModel';
+export const participationOf=(req:any,unitId?:string)=>{const mode=unitId?executiveStore.read().platformSettings?.entityPolicies?.[unitId]?.review:undefined;return mode&&mode!=='inherit'?mode:req.auth?.participation||'direct';};
 export const officeActor=(req:any)=>['ceo','admin'].includes(actorOf(req).role);
-export function unitClosed(req:any,id:string){return !officeActor(req)&&!!executiveStore.read().platformSettings?.closedUnits?.includes(id);}
-export function createPlatformAdministrationRouter(){
+export function entityPolicy(id:string):EntityAdministrationPolicy{
+ const settings=executiveStore.read().platformSettings;
+ return settings?.entityPolicies?.[id]||{version:0,mode:settings?.closedUnits?.includes(id)?'readonly':'active',review:'inherit',records:true,uploads:true,reports:true,tasks:true,agent:{enabled:!settings?.disabledAgents?.includes(id),name:`وكيل ${resolveEntity(id)?.name||id}`,instructions:'',allowDocuments:true,maxQuestionLength:6000}};
+}
+export function unitClosed(req:any,id:string){return !officeActor(req)&&entityPolicy(id).mode==='readonly';}
+export function unitOperationAllowed(req:any,id:string,operation:'records'|'uploads'|'reports'|'tasks'){return officeActor(req)||(entityPolicy(id).mode!=='readonly'&&entityPolicy(id)[operation]);}
+export function createPlatformAdministrationRouter(managers?:ManagerAccounts){
  const router=Router();
  router.use((req,res,next)=>officeActor(req)?next():res.status(403).json({error:'إدارة المنصة متاحة للآدمن فقط.'}));
  const handle=(fn:any)=>(req:any,res:any)=>{try{return fn(req,res);}catch(e:any){return res.status(e.status||400).json({error:e.message||'تعذر تنفيذ الإجراء.'});}};
@@ -25,6 +31,33 @@ export function createPlatformAdministrationRouter(){
   const {registration,closedUnits,disabledAgents}=req.body||{};
   if(!['approval','automatic','closed'].includes(registration)||![closedUnits,disabledAgents].every(a=>Array.isArray(a)&&a.every(id=>typeof id==='string'&&!!resolveEntity(id))))throw Error('إعدادات غير صالحة.');
   executiveStore.update(s=>{s.platformSettings={...s.platformSettings,registration,closedUnits:[...new Set(closedUnits)] as string[],disabledAgents:[...new Set(disabledAgents)] as string[]};executiveStore.audit(s,actorOf(req).email,'تعديل سياسة التسجيل وإغلاق الجهات والوكلاء');});res.json({ok:true});
+ }));
+ router.get('/entities/:id',handle((req:any,res:any)=>{
+  const id=req.params.id;if(!resolveEntity(id))return res.status(404).json({error:'الجهة غير موجودة.'});
+  const grants=executiveStore.read().grants;
+  res.json({policy:entityPolicy(id),audit:executiveStore.read().audit.filter(a=>a.unitId===id).slice(0,200),users:(managers?.list()||[]).map(a=>({...a,accessSource:grants[a.email]?.unitActions?.[id]!==undefined?'local':grants[a.email]?.units.includes(id)?'account':'inherited',actions:actions.filter(action=>hasPermission(a.email,'head',grants,id,action)),grant:grants[a.email]||null}))});
+ }));
+ router.post('/entities/:id/policy',handle((req:any,res:any)=>{
+  const id=req.params.id,p=req.body.policy;if(!resolveEntity(id)||!p||!['active','readonly'].includes(p.mode)||!['inherit','review','direct'].includes(p.review)||!['records','uploads','reports','tasks'].every(k=>typeof p[k]==='boolean')||!p.agent||typeof p.agent.enabled!=='boolean'||typeof p.agent.allowDocuments!=='boolean'||typeof p.agent.name!=='string'||!p.agent.name.trim()||p.agent.name.length>120||typeof p.agent.instructions!=='string'||p.agent.instructions.length>4000||!Number.isInteger(p.agent.maxQuestionLength)||p.agent.maxQuestionLength<500||p.agent.maxQuestionLength>6000)throw Error('أكمل إعدادات الجهة والوكيل بصورة صحيحة.');
+  if(req.body.version!==entityPolicy(id).version)throw Object.assign(Error('تغيرت إعدادات الجهة. أعد فتحها قبل الحفظ.'),{status:409});
+  executiveStore.update(s=>{
+   const settings=s.platformSettings||={};(settings.entityPolicies||={})[id]={version:entityPolicy(id).version+1,mode:p.mode,review:p.review,records:p.records,uploads:p.uploads,reports:p.reports,tasks:p.tasks,agent:{enabled:p.agent.enabled,name:p.agent.name.trim(),instructions:p.agent.instructions.trim(),allowDocuments:p.agent.allowDocuments,maxQuestionLength:p.agent.maxQuestionLength}};
+   settings.closedUnits=settings.closedUnits?.filter(v=>v!==id);settings.disabledAgents=settings.disabledAgents?.filter(v=>v!==id);
+   executiveStore.audit(s,actorOf(req).email,'تحديث ملف إدارة الجهة وسياسة المراجعة وإعداد الوكيل',id);
+  });res.json({ok:true});
+ }));
+ router.post('/entities/:id/access',handle((req:any,res:any)=>{
+  const id=req.params.id,email=String(req.body.email||'').trim().toLowerCase(),requested=req.body.actions,inherit=req.body.inherit===true;
+  if(!resolveEntity(id)||!managers?.list().some(a=>a.email===email)||!Array.isArray(requested)||requested.some(a=>!actions.includes(a)))throw Error('مستخدم أو صلاحيات غير صالحة.');
+  if(requested.some(a=>['review','approve','direct'].includes(a))&&!requested.includes('read'))throw Error('صلاحية الاطلاع مطلوبة للمراجعة والاعتماد والتوجيه.');
+  executiveStore.update(s=>{
+   const previous=s.grants[email]||null;
+   if(JSON.stringify(previous)!==JSON.stringify(req.body.expectedGrant))throw Object.assign(Error('تغير نطاق المستخدم. حدّث بيانات الجهة.'),{status:409});
+   const grant=previous||{units:[],actions:[]};
+   // Empty local rights are an explicit denial, including inherited access.
+   if(inherit){const unitActions={...grant.unitActions};delete unitActions[id];s.grants[email]={...grant,unitActions};}else s.grants[email]={...grant,units:[...new Set([...grant.units,...(requested.length?[id]:[])])],unitActions:{...grant.unitActions,[id]:[...new Set(requested)]}};
+   executiveStore.audit(s,actorOf(req).email,`تحديث صلاحيات المستخدم ${email} لهذه الجهة`,id);
+  });res.json({ok:true});
  }));
  router.post('/content/action',handle((req:any,res:any)=>{
   const {kind,id,unitId,action,version}=req.body||{};

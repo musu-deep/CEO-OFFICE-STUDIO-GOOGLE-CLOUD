@@ -55,7 +55,7 @@ export class ManagerAccounts {
     if (action === 'approve') {
       if (!Array.isArray(unitIds) || (!tasksOnly && !unitIds.length) || unitIds.some(id => typeof id !== 'string' || !resolveEntity(id))) throw fail('اختر جهة واحدة على الأقل للصلاحيات.');
       executiveStore.update(s => {
-        s.grants[email] = { units: tasksOnly ? [] : [...new Set(unitIds)] as string[], actions: ['read','upload','edit'] };
+        s.grants[email] = { units: tasksOnly ? [] : [...new Set(unitIds)] as string[], actions: ['read','upload','edit'],...(s.grants[email]?.unitActions?{unitActions:s.grants[email].unitActions}:{}) };
         executiveStore.audit(s, actor, `اعتماد حساب مدير ${email}`);
       });
     } else {

@@ -1,4 +1,4 @@
-import { participationOf, unitClosed } from './platformAdministration';
+import { participationOf, unitClosed, unitOperationAllowed } from './platformAdministration';
 import { Router } from 'express';
 import crypto from 'node:crypto';
 import { executiveStore, actorOf } from './executiveRoutes';
@@ -33,7 +33,7 @@ export function createScopedWorkspaceRouter(recipients:()=>{email:string;name:st
   if(!['open','working','closed'].includes(status))throw Error('حالة غير صالحة.');
   const found=Object.entries(executiveStore.read().units).flatMap(([unitId,r])=>r.directives.map(task=>({unitId,task}))).find(x=>x.task.id===req.params.id);
   if(!found||(!office(req)&&found.task.assigneeEmail!==actor.email))return res.status(404).json({error:'التكليف غير متاح.'});
-  if(unitClosed(req,found.unitId))return res.status(403).json({error:'مساحة الجهة مغلقة للمشاركة.'});
+  if(!unitOperationAllowed(req,found.unitId,'tasks'))return res.status(403).json({error:'مساحة الجهة مغلقة للمشاركة.'});
   if(expectedStatus!==found.task.status)return res.status(409).json({error:'تغيرت حالة التكليف. حدّث الصفحة.'});
   executiveStore.update(s=>{const r=s.units[found.unitId],d=r.directives.find(d=>d.id===req.params.id)!;d.status=status;d.updatedAt=new Date().toISOString();r.version++;executiveStore.audit(s,actor.email,`تحديث تكليف ${d.id}`,found.unitId);});res.json({ok:true});
  }));
@@ -46,7 +46,7 @@ export function createScopedWorkspaceRouter(recipients:()=>{email:string;name:st
  }));
  router.post('/units/:id/records',handle((req:any,res:any)=>{
   const actor=actorOf(req),unitId=req.params.id;
-  if(unitClosed(req,unitId)||!executiveStore.can(actor,unitId,'edit'))return res.status(403).json({error:'لا تملك صلاحية تعديل سجلات هذه الجهة.'});
+  if(!unitOperationAllowed(req,unitId,'records')||!executiveStore.can(actor,unitId,'edit'))return res.status(403).json({error:'لا تملك صلاحية تعديل سجلات هذه الجهة.'});
   if(!executiveStore.persistent)return res.status(503).json({error:'يجب تفعيل التخزين الدائم قبل حفظ السجلات.'});
   const {title,values,id,version}=req.body||{};
   const companyId=validateServiceCompany(unitId,req.body?.companyId);
@@ -60,7 +60,7 @@ export function createScopedWorkspaceRouter(recipients:()=>{email:string;name:st
    if(id&&!existing&&!queued)throw Object.assign(Error('السجل غير موجود.'),{status:404});
    if(id&&version!==(queued?.record.version??existing?.version))throw Object.assign(Error('تغير السجل. حدّث الصفحة قبل الحفظ.'),{status:409});
    record={id:existing?.id||queued?.record.id||crypto.randomUUID(),unitId,...(companyId?{companyId}:{}),profileId:profileFor(unitId).id,title:title.trim(),values:normalized,version:(queued?.record.version??existing?.version??0)+1,author:actor.email,createdAt:existing?.createdAt||queued?.record.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
-   if(!office(req)&&participationOf(req)==='review'){
+   if(!office(req)&&participationOf(req,unitId)==='review'){
     const settings=s.platformSettings||={},queue=settings.pendingRecords||=[];
     if(queue.length>=200&&!queued)throw Error('قائمة المراجعة ممتلئة. راجع إدارة المنصة.');
     const i=queue.findIndex(p=>p.record.id===record.id&&p.record.unitId===unitId);
@@ -68,7 +68,7 @@ export function createScopedWorkspaceRouter(recipients:()=>{email:string;name:st
     if(i>=0){if(queue[i].record.author!==actor.email)throw Error('يوجد تعديل آخر بانتظار الموافقة.');queue[i]=entry;}else queue.push(entry);
    }else{if(existing)list[list.indexOf(existing)]=record;else list.unshift(record);if(queued)s.platformSettings!.pendingRecords=s.platformSettings!.pendingRecords!.filter(p=>p!==queued);}
    executiveStore.audit(s,actor.email,`${existing?'تحديث':'إضافة'} ${profileFor(unitId).recordLabel}`,unitId);
-  });res.status(id?200:201).json({record:record!,pendingApproval:!office(req)&&participationOf(req)==='review'});
+  });res.status(id?200:201).json({record:record!,pendingApproval:!office(req)&&participationOf(req,unitId)==='review'});
  }));
  return router;
 }

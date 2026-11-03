@@ -1,4 +1,4 @@
-import { unitClosed } from './platformAdministration';
+import { unitOperationAllowed } from './platformAdministration';
 import { validateServiceCompany } from '../lib/executiveModel';
 import { assignedTask } from './scopedWorkspace';
 import express, { Router } from 'express';
@@ -22,10 +22,11 @@ export function createPerformanceReportRouter() {
   router.post('/', (req, res) => {
     if (!executiveStore.persistent) return res.status(503).json({ error: 'يجب تفعيل التخزين الدائم لدى مشرف المنصة قبل استقبال التقارير والمرفقات.' });
     const actor = actorOf(req), body = req.body || {};
-    if (typeof body.unitId !== 'string' || unitClosed(req,body.unitId) || (!executiveStore.can(actor, body.unitId, 'upload') && !(typeof body.taskId==='string' && assignedTask(actor.email,body.taskId,body.unitId)))) return res.status(403).json({ error: 'لا تملك صلاحية إرسال تقرير لهذه الجهة.' });
+    if (typeof body.unitId !== 'string' || !unitOperationAllowed(req,body.unitId,'reports') || (!executiveStore.can(actor, body.unitId, 'upload') && !(typeof body.taskId==='string' && assignedTask(actor.email,body.taskId,body.unitId)))) return res.status(403).json({ error: 'لا تملك صلاحية إرسال تقرير لهذه الجهة.' });
     if (body.taskId !== undefined && (typeof body.taskId !== 'string' || (!isOffice(req) && !assignedTask(actor.email,body.taskId,body.unitId)))) return res.status(403).json({error:'التكليف خارج نطاق حسابك.'});
     const text = (v: unknown, max: number) => typeof v === 'string' && !!v.trim() && v.length <= max;
     if (!text(body.title, 200) || !text(body.period, 100) || !text(body.summary, 10000) || !Array.isArray(body.attachments) || body.attachments.length > 5) return res.status(400).json({ error: 'أكمل عنوان التقرير وفترته وملخصه. الحد الأقصى خمسة مرفقات.' });
+    if(body.attachments.length&&!unitOperationAllowed(req,body.unitId,'uploads'))return res.status(403).json({error:'رفع المرفقات غير متاح لهذه الجهة.'});
     const saved: string[] = [];
     try {
       const companyId=validateServiceCompany(body.unitId,body.companyId);

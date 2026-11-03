@@ -86,7 +86,7 @@ export function createApplication(options:{sessionSecret:string;authUsers:Record
   };
   app.use('/api/auth', createRegistrationRouter(managers, authUsers, authAvailability));
   app.use('/api/manager-accounts', requireAuth, createAccountAdministrationRouter(managers,authUsers));
-  app.use('/api/platform-administration',requireAuth,createPlatformAdministrationRouter());
+  app.use('/api/platform-administration',requireAuth,createPlatformAdministrationRouter(managers));
   app.use('/api/executive', requireAuth, createExecutiveRouter());
   app.use('/api/workspace', requireAuth, createScopedWorkspaceRouter(() => [...Object.keys(authUsers).map(email=>({email,name:String(profileOf(email)?.name||email)})), ...managers.list().filter(a=>a.status==='active').map(a=>({email:a.email,name:a.name}))]));
 

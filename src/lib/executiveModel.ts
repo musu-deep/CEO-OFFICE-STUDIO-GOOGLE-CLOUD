@@ -35,21 +35,24 @@ export function validateServiceCompany(unitId:string,companyId:unknown):string|u
 }
 export const actions = ['read','upload','edit','review','approve','direct'] as const;
 export type Action = typeof actions[number];
-export type Grant = {units:string[];actions:Action[]};
+export type Grant = {units:string[];actions:Action[];unitActions?:Record<string,Action[]>};
 export type ExecutiveMetric = Metric & {dimension?: string; definition?: string; objectiveId?: string};
 export type ExecutiveSnapshot = Omit<UnitSnapshot,'metrics'> & {metrics:ExecutiveMetric[]};
 export type Revision = {id:string; snapshot:ExecutiveSnapshot; state:'draft'|'reviewed'|'approved'|'returned'; createdAt:string; author:string; reviewer?:string; reviewedAt?:string; note?:string};
 export type Directive = {id:string;title:string;owner:string;due:string;status:'open'|'working'|'closed';assigneeEmail?:string;updatedAt?:string;createdAt:string;author:string};
 export type UnitRecord = {version:number; approved?:Revision; pending?:Revision; history:Revision[]; documents:{id:string;name:string;mimeType:string;at:string;author:string;moderation?:'pending'|'published'|'returned';moderationNote?:string}[];directives:Directive[]};
 export type Objective = {id:string;title:string;target:string;owner:string};
-export type PlatformSettings = {registration?:'approval'|'automatic'|'closed';closedUnits?:string[];disabledAgents?:string[];pendingRecords?:{record:DomainRecord;baseVersion:number;status?:'pending'|'returned';note?:string}[]};
+export type EntityAdministrationPolicy = {version:number;mode:'active'|'readonly';review:'inherit'|'review'|'direct';records:boolean;uploads:boolean;reports:boolean;tasks:boolean;agent:{enabled:boolean;name:string;instructions:string;allowDocuments:boolean;maxQuestionLength:number}};
+export type PlatformSettings = {entityPolicies?:Record<string,EntityAdministrationPolicy>;registration?:'approval'|'automatic'|'closed';closedUnits?:string[];disabledAgents?:string[];pendingRecords?:{record:DomainRecord;baseVersion:number;status?:'pending'|'returned';note?:string}[]};
 export type ExecutiveState = {platformSettings?:PlatformSettings;businessRecords?:Record<string,DomainRecord[]>;reports?:PerformanceReport[];units:Record<string,UnitRecord>;objectives:Objective[];grants:Record<string,Grant>;audit:{id:string;at:string;actor:string;unitId?:string;action:string}[]};
 export const emptyRecord=():UnitRecord=>({version:0,history:[],documents:[],directives:[]});
 export function hasPermission(email:string,role:string,grants:Record<string,Grant>,unitId:string,action:Action){
  if(!resolveEntity(unitId))return false;
  if(role==='ceo'||role==='admin')return true;
- const grant=grants[email];if(!grant?.actions.includes(action))return false;
- return grant.units.some(scope=>scope===unitId || findOrgPath(unitId).some(n=>n.id===scope));
+ const grant=grants[email];if(!grant)return false;
+ if(!grant.units.some(scope=>scope===unitId||findOrgPath(unitId).some(n=>n.id===scope)))return false;
+ const override=[...findOrgPath(unitId)].reverse().map(n=>grant.unitActions?.[n.id]).find(a=>a!==undefined);
+ return (override||grant.actions).includes(action);
 }
 export function comparable(a:ExecutiveMetric,b:ExecutiveMetric){return !!a.definition?.trim() && !!a.period?.trim() && !!a.unit?.trim() && a.dimension===b.dimension && a.definition.trim()===b.definition?.trim() && a.period.trim()===b.period?.trim() && a.unit.trim()===b.unit?.trim() && a.direction===b.direction;}
 export function score(m:ExecutiveMetric){return achievement(m);}

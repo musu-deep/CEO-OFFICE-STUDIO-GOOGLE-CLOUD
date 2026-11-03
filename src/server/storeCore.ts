@@ -7,7 +7,7 @@ export class MemoryExecutiveStore {
  constructor(state:ExecutiveState={units:{},objectives:[],grants:{},audit:[]}) { this.state=structuredClone(state); }
  read(){return structuredClone(this.state);}
  update(fn:(state:ExecutiveState)=>void){const next=this.read();fn(next);this.state=next;return this.read();}
- can(actor:{email:string;role:string},unitId:string,action:Action){return !(!['ceo','admin'].includes(actor.role)&&action!=='read'&&this.state.platformSettings?.closedUnits?.includes(unitId))&&!!resolveEntity(unitId)&&hasPermission(actor.email,actor.role,this.state.grants,unitId,action);}
+ can(actor:{email:string;role:string},unitId:string,action:Action){return !(!['ceo','admin'].includes(actor.role)&&action!=='read'&&(this.state.platformSettings?.closedUnits?.includes(unitId)||this.state.platformSettings?.entityPolicies?.[unitId]?.mode==='readonly'))&&!!resolveEntity(unitId)&&hasPermission(actor.email,actor.role,this.state.grants,unitId,action);}
  audit(s:ExecutiveState,actor:string,action:string,unitId?:string){s.audit.unshift({id:crypto.randomUUID(),at:new Date().toISOString(),actor,action,unitId});s.audit=s.audit.slice(0,5000);}
  saveDraft(actor:{email:string;role:string},unitId:string,input:any,expected:number,source:string){
   if(!this.can(actor,unitId,'edit')&&!this.can(actor,unitId,'upload'))throw Object.assign(new Error('لا تملك صلاحية رفع بيانات لهذه الجهة.'),{status:403});
@@ -21,4 +21,4 @@ export class MemoryExecutiveStore {
  removeDocument(id:string):void {}
  discardDocument(id:string):void {}
 }
-export function validateGrant(input:any):Grant {const allowed=['read','upload','edit','review','approve','direct'];if(!input||!Array.isArray(input.units)||!Array.isArray(input.actions)||input.units.some((v:any)=>typeof v!=='string'||!resolveEntity(v))||input.actions.some((v:any)=>!allowed.includes(v)))throw Object.assign(new Error('صلاحيات غير صالحة.'),{status:400});return {units:[...new Set(input.units)] as string[],actions:[...new Set(input.actions)] as Action[]};}
+export function validateGrant(input:any):Grant {const allowed=['read','upload','edit','review','approve','direct'];if(!input||!Array.isArray(input.units)||!Array.isArray(input.actions)||input.units.some((v:any)=>typeof v!=='string'||!resolveEntity(v))||input.actions.some((v:any)=>!allowed.includes(v)))throw Object.assign(new Error('صلاحيات غير صالحة.'),{status:400});const unitActions:Record<string,Action[]>={};if(input.unitActions!==undefined){if(!input.unitActions||typeof input.unitActions!=='object'||Array.isArray(input.unitActions))throw Error('صلاحيات الجهة غير صالحة.');for(const [id,list] of Object.entries(input.unitActions)){if(!resolveEntity(id)||!Array.isArray(list)||list.some(a=>!allowed.includes(a)))throw Error('صلاحيات الجهة غير صالحة.');unitActions[id]=[...new Set(list)] as Action[];}}return {units:[...new Set(input.units)] as string[],actions:[...new Set(input.actions)] as Action[],...(input.unitActions?{unitActions}:{})};}
