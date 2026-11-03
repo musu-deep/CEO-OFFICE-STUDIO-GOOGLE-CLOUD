@@ -31,11 +31,21 @@ test('office receives live dashboard activity while scoped users cannot obtain t
  const request=async(path:string,body?:unknown,cookie?:string)=>{const r=await fetch(base+path,{headers:{'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},...(body===undefined?{}:{method:'POST',body:JSON.stringify(body)})});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]};};
  try{
   assert.equal((await request('/api/executive/state')).status,401);
+  assert.equal((await request('/api/executive/dashboard-source?source=reports')).status,401);
   const ceo=(await request('/api/auth/login',{email:'ceo@test.example',password:'test'})).cookie;
   const head=(await request('/api/auth/login',{email:'head@test.example',password:'test'})).cookie;
   const office=(await request('/api/executive/state',undefined,ceo)).data;
   assert.equal(office.dashboardActivity.records[0].id,'opportunity');assert.equal(office.dashboardActivity.reports[0].id,'report');
   assert.equal(office.units.investment.approved,undefined);
+  const source=await request('/api/executive/dashboard-source?source=reports-submitted',undefined,ceo);
+  assert.equal(source.status,200);assert.equal(source.data.total,1);assert.equal(source.data.items[0].id,'report');assert.equal(source.data.counter.value,office.dashboardActivity.counters.find((c:any)=>c.id==='reports-submitted').value);
+  assert.equal((await request('/api/executive/dashboard-source?source=reports',undefined,head)).status,403);
+  assert.equal((await request('/api/executive/dashboard-source?source=invalid',undefined,ceo)).status,400);
+  assert.equal((await request('/api/executive/dashboard-source?source=reports&offset=-1',undefined,ceo)).status,400);
+  const empty=await request('/api/executive/dashboard-source?source=approved-units',undefined,ceo);assert.equal(empty.data.total,0);assert.ok(empty.data.counter.emptyMessage);
+  store.update(s=>{s.reports!.push(...Array.from({length:23},(_,i)=>({...s.reports![0],id:`paged-${i}`,status:'reviewed' as const})));});
+  const page=await request('/api/executive/dashboard-source?source=reports&offset=20',undefined,ceo);assert.equal(page.data.total,24);assert.equal(page.data.items.length,4);assert.equal(page.data.counter.value,24);
+
   const scoped=(await request('/api/executive/state',undefined,head)).data;
   assert.equal(scoped.dashboardActivity,undefined);assert.equal(JSON.stringify(scoped).includes('تقرير أراك ستورز'),false);
   store.update(s=>{s.reports![0].status='reviewed';});

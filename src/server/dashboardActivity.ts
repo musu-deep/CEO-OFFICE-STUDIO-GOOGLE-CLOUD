@@ -1,3 +1,4 @@
+import {dashboardCounters} from './dashboardCounters';
 import type {ExecutiveState} from '../lib/executiveModel';
 import type {DashboardActivity,DashboardRecord} from '../lib/dashboardActivity';
 import {profileFor,type DomainRecord} from '../lib/workspaceProfiles';
@@ -10,7 +11,7 @@ export function dashboardActivity(state:ExecutiveState):DashboardActivity{
  // Show a pending revision once, retaining the recorded copy in storage until approval.
  const records=new Map(saved.map(r=>[JSON.stringify([r.unitId,r.id]),project(r,'recorded')]));
  for(const p of pending)records.set(JSON.stringify([p.record.unitId,p.record.id]),project(p.record,p.status==='returned'?'returned':'pending'));
- return {recordCount:saved.length,pendingRecordCount:pending.filter(p=>p.status!=='returned').length,reportCount:reports.length,reportsAwaitingReview:reports.filter(r=>r.status==='submitted').length,
+ return {counters:dashboardCounters(state),recordCount:saved.length,pendingRecordCount:pending.filter(p=>p.status!=='returned').length,reportCount:reports.length,reportsAwaitingReview:reports.filter(r=>r.status==='submitted').length,
   records:[...records.values()].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)||a.id.localeCompare(b.id)).slice(0,10),
   reports:[...reports].sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||a.id.localeCompare(b.id)).slice(0,10).map(r=>({id:r.id,unitId:r.unitId,title:r.title,period:r.period,createdAt:r.createdAt,status:r.status,attachmentCount:r.attachments.length,summary:r.summary.slice(0,240)}))};
 }

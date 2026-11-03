@@ -1,3 +1,5 @@
+import {dashboardCounters,dashboardCounterItems} from './dashboardCounters';
+import {dashboardCounterIds,type DashboardCounterId} from '../lib/dashboardCounters';
 import { dashboardActivity } from './dashboardActivity';
 import { entityPolicy } from './platformAdministration';
 import { Router } from 'express';
@@ -17,6 +19,13 @@ export function createExecutiveRouter(){
   const visible=Object.fromEntries(list.filter(e=>executiveStore.can(actor,e.id,'read')).map(e=>{const r=s.units[e.id]||emptyRecord();return [e.id,{...r,documents:r.documents.filter(d=>isOffice||!d.moderation||d.moderation==='published'||d.author===actor.email),directives:r.directives.filter(d=>isOffice||d.assigneeEmail===actor.email)}];}));
   const objectiveIds=new Set(Object.values(visible).flatMap((r:any)=>[r.approved,r.pending].filter(Boolean).flatMap(x=>x.snapshot.metrics.map(m=>m.objectiveId))));
   res.json({...(isOffice?{dashboardActivity:dashboardActivity(s)}:{}),entities:list.map(e=>({...e,children:undefined})),units:visible,objectives:isOffice?s.objectives:s.objectives.filter(o=>objectiveIds.has(o.id)),permissions:Object.fromEntries(list.map(e=>[e.id,actions.filter(a=>executiveStore.can(actor,e.id,a))])),manage:actor.role==='admin'||actor.role==='ceo',storage:{shared:true,persistentConfigured:executiveStore.persistent},providerConfigured:!!process.env.GEMINI_API_KEY&&process.env.GEMINI_API_KEY!=='MY_GEMINI_API_KEY'});
+ }));
+ router.get('/dashboard-source',handler((req:any,res:any)=>{
+  if(!['ceo','admin'].includes(actorOf(req).role))return res.status(403).json({error:'تفاصيل موجز المجموعة متاحة لمكتب الرئيس التنفيذي فقط.'});
+  const source=req.query.source,offset=Number(req.query.offset||0);
+  if(typeof source!=='string'||!dashboardCounterIds.includes(source as DashboardCounterId)||!Number.isInteger(offset)||offset<0||offset>1000000)return res.status(400).json({error:'مصدر أو صفحة غير صالحة.'});
+  const state=executiveStore.read(),now=new Date(),id=source as DashboardCounterId,items=dashboardCounterItems(state,id,now);
+  res.json({counter:dashboardCounters(state,now).find(c=>c.id===id),total:items.length,items:items.slice(offset,offset+20),offset,limit:20});
  }));
  router.get('/units/:id',handler((req:any,res:any)=>{const actor=actorOf(req),id=req.params.id;if(!executiveStore.can(actor,id,'read')&&!executiveStore.can(actor,id,'upload')&&!executiveStore.can(actor,id,'edit'))return res.status(403).json({error:'هذه الجهة خارج نطاق صلاحياتك.'});const agent=entityPolicy(id).agent;res.json({agent:{name:agent.name,enabled:agent.enabled,allowDocuments:agent.allowDocuments,maxQuestionLength:agent.maxQuestionLength},record:executiveStore.can(actor,id,'read')?(()=>{const r=executiveStore.read().units[id]||emptyRecord();return {...r,documents:r.documents.filter(d=>['ceo','admin'].includes(actor.role)||!d.moderation||d.moderation==='published'||d.author===actor.email),directives:r.directives.filter(d=>['ceo','admin'].includes(actor.role)||d.assigneeEmail===actor.email)};})():emptyRecord(),permissions:actions.filter(a=>executiveStore.can(actor,id,a))});}));
  router.post('/units/:id/draft',handler((req:any,res:any)=>{const actor=actorOf(req),id=req.params.id;executiveStore.saveDraft(actor,id,req.body.snapshot,req.body.version,typeof req.body.source==='string'?req.body.source.slice(0,200):'إدخال مسؤول الجهة');res.json({ok:true});}));
