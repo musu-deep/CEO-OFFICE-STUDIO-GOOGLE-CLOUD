@@ -104,3 +104,14 @@ test('project reference migration preserves private source data, survives D1 com
   const reopened=await CloudflareStore.open(db,bucket);assert.equal(reopened.read().projectReports![0].version,1);assert.equal(reopened.read().projectReports![0].state,'draft');
  }finally{await mf.dispose();}
 });
+
+test('published project payload remains independent of its draft after D1 and R2 reload',async()=>{
+ const mf=instance();try{
+  await migrate(mf);const db=await mf.getD1Database('DB') as unknown as D1Database,bucket=await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
+  const store=await CloudflareStore.open(db,bucket);const payload={data:{project:{title:'نسخة معتمدة'},boq:[{code:'A',contractValue:1000}]},snapshot:{at:'2026-11-04',by:'engineer',s:{}},source:{name:'نموذج إدخال',at:'2026-11-04',by:'engineer'}};
+  const file=store.document({name:'test.pdf',mimeType:'application/pdf',data:Buffer.from('%PDF-project-test').toString('base64')});const attachment={...file,size:17,at:'2026-11-04',author:'engineer'};
+  store.update(s=>{s.projectReports=[{...structuredClone(payload),id:'project-test',unitId:'national-projects',name:'مسودة جديدة',version:5,state:'draft',contentHash:'draft-hash',events:[],attachments:[attachment],published:{payload:structuredClone(payload),version:4,at:'2026-11-04',by:'ceo',hash:'approved-hash',attachments:[attachment]}}];s.projectReports[0].data.project.title='مسودة جديدة';});await store.commit();
+  const reloaded=await CloudflareStore.open(db,bucket);const p=reloaded.read().projectReports![0];assert.equal(p.data.project.title,'مسودة جديدة');assert.equal(p.published!.payload.data.project.title,'نسخة معتمدة');assert.equal(p.published!.version,4);assert.equal(Buffer.from(await reloaded.bytes(file.id)).toString(),'%PDF-project-test');
+  const rows=await db.prepare("SELECT kind FROM app_records WHERE kind IN ('project-report','project-published')").all();assert.equal(rows.results.length,2);
+ }finally{await mf.dispose();}
+});

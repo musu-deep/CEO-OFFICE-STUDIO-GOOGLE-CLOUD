@@ -5,7 +5,7 @@ import type { Account } from '../server/managerAccounts';
 import type { D1Database, D1PreparedStatement, R2Bucket } from '@cloudflare/workers-types';
 
 type Row = {kind:string;id:string;value:string};
-type Collection = 'unit'|'history'|'directive'|'document'|'objective'|'grant'|'audit'|'report'|'business'|'account'|'settings'|'project-report';
+type Collection = 'unit'|'history'|'directive'|'document'|'objective'|'grant'|'audit'|'report'|'business'|'account'|'settings'|'project-report'|'project-published';
 const recordKey=(kind:string,id:string)=>JSON.stringify([kind,id]);
 const fail=(message:string,status:number)=>Object.assign(Error(message),{status});
 
@@ -28,7 +28,7 @@ export function encodeState(state:ExecutiveState,accounts:Record<string,Account>
  for(const [position,value] of state.audit.entries())put('audit',value.id,{position:0,value});
  for(const [position,value] of (state.reports||[]).entries())put('report',value.id,{position:0,value});
  for(const [unitId,records] of Object.entries(state.businessRecords||{}))for(const [position,value] of records.entries())put('business',`${unitId}/${value.id}`,{unitId,position:0,value});
- for(const value of state.projectReports||[])put('project-report',value.id,{position:0,value});
+ for(const value of state.projectReports||[]){const {published,...draft}=value;put('project-report',value.id,{position:0,value:draft});if(published)put('project-published',value.id,{position:0,value:{id:value.id,published}});}
  if(state.platformSettings)put('settings','platform',state.platformSettings);
  for(const [id,value] of Object.entries(accounts))put('account',id,value);
  return rows;
@@ -48,6 +48,7 @@ export function decodeState(rows:Row[]){
   else if(kind==='report')state.reports!.push(value);
   else if(kind==='business')(state.businessRecords![unitId]||=[]).push(value);
  }
+ for(const r of rows.filter(r=>r.kind==='project-published')){const v=JSON.parse(r.value).value,p=state.projectReports?.find(p=>p.id===v.id);if(p)p.published=v.published;}
  return {state,accounts};
 }
 export class CloudflareStore extends MemoryExecutiveStore {

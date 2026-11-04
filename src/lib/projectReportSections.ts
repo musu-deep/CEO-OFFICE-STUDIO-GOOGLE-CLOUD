@@ -1,6 +1,6 @@
 import type {ProjectPayload} from './projectReports';
 import {projectOperations,type SitePresentation} from './projectOperations';
-export const projectReportTabs=[['operations','لوحة المشروع والمخطط'],['overview','ملخص العقد'],['progress','الإنجاز والوحدات'],['tasks','إدارة المهام'],['boq','المقايسة'],['quantities','جداول الكميات'],['finance','مستخلصات المشروع'],['schedule','الجدول الزمني'],['supply','جدول التوريدات'],['procurement','المشتريات'],['inventory','المستودعات'],['labor','العمالة ومقاولو الباطن'],['work','الموقع وأوامر العمل'],['audit','سجل التدقيق'],['governance','الحوكمة والاعتماد'],['source','كامل بيانات المصدر']] as const;
+export const projectReportTabs=[['operations','لوحة المشروع والمخطط'],['overview','ملخص العقد'],['progress','الإنجاز والوحدات'],['tasks','إدارة المهام'],['boq','المقايسة'],['quantities','جداول الكميات'],['finance','مستخلصات المشروع'],['schedule','الجدول الزمني'],['supply','جدول التوريدات'],['procurement','المشتريات'],['inventory','المستودعات'],['labor','العمالة ومقاولو الباطن'],['work','الموقع وأوامر العمل'],['audit','سجل التدقيق'],['governance','الحوكمة والاعتماد']] as const;
 export const additionalProjectSections=['tasks','supply','inventory','labor','work','audit'];
 export const recordedNumber=(v:any):number|null=>(typeof v==='number'||typeof v==='string'&&v.trim()!=='')&&Number.isFinite(Number(v))?Number(v):null;
 const total=(a:(number|null)[])=>a.every(v=>v!==null)?a.reduce<number>((s,v)=>s+v,0):null;

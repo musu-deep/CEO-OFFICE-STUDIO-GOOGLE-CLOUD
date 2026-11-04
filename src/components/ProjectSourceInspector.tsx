@@ -1,0 +1,7 @@
+import {useEffect,useState} from 'react';
+export default function ProjectSourceInspector(){
+ const [list,setList]=useState<any[]>([]),[id,setId]=useState(''),[data,setData]=useState<any>(null),[error,setError]=useState('');
+ useEffect(()=>{fetch('/api/project-reports?mode=edit').then(r=>r.json()).then(d=>setList(d.projects||[])).catch(e=>setError(e.message));},[]);
+ useEffect(()=>{let active=true;setData(null);setError('');if(id)fetch(`/api/project-reports/${id}?mode=edit`).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error);if(active)setData(d.report);}).catch(e=>{if(active)setError(e.message);});return()=>{active=false;};},[id]);
+ return <section className="space-y-5"><h2 className="text-xl font-bold">فحص بيانات المصدر</h2><p>أداة مراجعة إدارية لعرض حقول التقرير وبصمته وسجل نسخته. تعرض المسودة الحالية، وقد تختلف عن النسخة المعتمدة في الداشبورد.</p><label>المشروع<select value={id} onChange={e=>setId(e.target.value)} className="m-3 rounded-xl border border-slate-500/30 bg-transparent p-3"><option value="">اختر المشروع</option>{list.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>{error&&<p role="alert">{error}</p>}{data&&<><p className="break-all">بصمة البيانات: {data.contentHash}</p><details className="rounded-xl border border-slate-500/30 p-4"><summary>عرض جميع حقول المصدر</summary><pre dir="ltr" className="mt-4 max-h-[70vh] overflow-auto whitespace-pre-wrap break-words text-xs">{JSON.stringify({data:data.data,snapshot:data.snapshot,source:data.source},null,2)}</pre></details></>}</section>;
+}
