@@ -1,3 +1,4 @@
+import {originalReportHTML,originalReportCSP} from './originalProjectReport';
 import {projectPresentation} from './projectPresentation';
 import {Router} from 'express';
 import crypto from 'node:crypto';
@@ -50,6 +51,7 @@ export function createProjectReportsRouter(){
   const stored=executiveStore.read().projectReports||[],all=[...stored,...(stored.some(r=>r.id==='farasan-reference')?[]:[reference()])].filter(r=>executiveStore.can(actorOf(req),r.unitId,'read'));
   res.json({projects:all.map(({id,unitId,name,version,state,source})=>({id,unitId,name,version,state,source})),canCreate:['ceo','admin'].includes(actorOf(req).role)});
  }));
+ router.get('/:id/original',handle((req:any,res:any)=>{const p=find(req.params.id);if(!p)throw fail('المشروع غير موجود.',404);allowed(req,p.unitId,'read');const section=String(req.query.section||''),theme=req.query.theme==='light'?'light':'dark';const html=originalReportHTML(p,section,theme);res.removeHeader('X-Frame-Options');res.setHeader('Content-Security-Policy',originalReportCSP);res.type('html').send(html);}));
  router.get('/:id',handle((req:any,res:any)=>{const p=find(req.params.id);if(!p)throw fail('المشروع غير موجود.',404);allowed(req,p.unitId,'read');res.json({report:p,presentation:projectPresentation(p),permissions:['edit','upload','review','approve'].filter(a=>executiveStore.can(actorOf(req),p.unitId,a as any))});}));
  router.post('/',handle((req:any,res:any)=>{
   if(!['ceo','admin'].includes(actorOf(req).role))throw fail('إنشاء مشاريع متاح لإدارة المكتب فقط.',403);

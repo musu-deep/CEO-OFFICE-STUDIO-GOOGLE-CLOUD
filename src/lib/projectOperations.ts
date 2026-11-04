@@ -1,5 +1,5 @@
 import type {ProjectPayload} from './projectReports';
-export type SitePresentation={sitePlan?:any;targetGroups?:any[];origin?:string};
+export type SitePresentation={originalReportAvailable?:boolean;sitePlan?:any;targetGroups?:any[];origin?:string};
 const finite=(v:any):number|null=>(typeof v==='number'||typeof v==='string'&&v.trim()!=='')&&Number.isFinite(Number(v))?Number(v):null;
 const sum=(a:number[])=>a.reduce((s,x)=>s+x,0);
 export function workOrderCost(w:any){
