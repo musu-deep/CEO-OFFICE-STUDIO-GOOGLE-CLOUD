@@ -93,3 +93,14 @@ test('administration settings persist in D1 and R2 deletion waits for successful
   assert.equal(await bucket.get(`documents/${doc.id}`),null);
  }finally{await mf.dispose();}
 });
+
+test('project reference migration preserves private source data, survives D1 commit and never overwrites an existing report',async()=>{
+ const mf=instance();
+ try{
+  await migrate(mf);const db=await mf.getD1Database('DB') as unknown as D1Database,bucket=await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
+  const sql=fs.readFileSync('migrations/0002_project_reference.sql','utf8');const seed=async()=>{for(const line of sql.split('\n').filter(s=>s.trim()&&!s.startsWith('--')))await db.prepare(line).run();};await seed();
+  const store=await CloudflareStore.open(db,bucket),p=store.read().projectReports![0];assert.equal(p.id,'farasan-reference');assert.equal(p.data.unitProgress.length,92);assert.equal(p.snapshot.s.users,undefined);
+  store.update(s=>{s.projectReports![0].version=1;s.projectReports![0].state='draft';});await store.commit();await seed();
+  const reopened=await CloudflareStore.open(db,bucket);assert.equal(reopened.read().projectReports![0].version,1);assert.equal(reopened.read().projectReports![0].state,'draft');
+ }finally{await mf.dispose();}
+});

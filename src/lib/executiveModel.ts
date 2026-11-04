@@ -1,3 +1,4 @@
+import type {ProjectReport} from './projectReports';
 import type { DomainRecord } from './workspaceProfiles';
 import type { PerformanceReport } from './performanceReports';
 import { organization, findOrgPath, type OrgNode } from '../data/organization';
@@ -44,7 +45,7 @@ export type UnitRecord = {version:number; approved?:Revision; pending?:Revision;
 export type Objective = {id:string;title:string;target:string;owner:string};
 export type EntityAdministrationPolicy = {version:number;mode:'active'|'readonly';review:'inherit'|'review'|'direct';records:boolean;uploads:boolean;reports:boolean;tasks:boolean;agent:{enabled:boolean;name:string;instructions:string;allowDocuments:boolean;maxQuestionLength:number}};
 export type PlatformSettings = {entityPolicies?:Record<string,EntityAdministrationPolicy>;registration?:'approval'|'automatic'|'closed';closedUnits?:string[];disabledAgents?:string[];pendingRecords?:{record:DomainRecord;baseVersion:number;status?:'pending'|'returned';note?:string}[]};
-export type ExecutiveState = {platformSettings?:PlatformSettings;businessRecords?:Record<string,DomainRecord[]>;reports?:PerformanceReport[];units:Record<string,UnitRecord>;objectives:Objective[];grants:Record<string,Grant>;audit:{id:string;at:string;actor:string;unitId?:string;action:string}[]};
+export type ExecutiveState = {projectReports?:ProjectReport[];platformSettings?:PlatformSettings;businessRecords?:Record<string,DomainRecord[]>;reports?:PerformanceReport[];units:Record<string,UnitRecord>;objectives:Objective[];grants:Record<string,Grant>;audit:{id:string;at:string;actor:string;unitId?:string;action:string}[]};
 export const emptyRecord=():UnitRecord=>({version:0,history:[],documents:[],directives:[]});
 export function hasPermission(email:string,role:string,grants:Record<string,Grant>,unitId:string,action:Action){
  if(!resolveEntity(unitId))return false;

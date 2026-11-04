@@ -1,3 +1,4 @@
+import {createProjectReportsRouter} from './projectReports';
 import express, { Request, Response } from 'express';
 import crypto from 'crypto';
 import { createUnitWorkspaceRouter } from './unitWorkspaceRoutes';
@@ -25,6 +26,7 @@ export function createApplication(options:{sessionSecret:string;authUsers:Record
   app.use('/api/unit-workspace', (req, res, next) => { requireAuth(req, res, next); }, createUnitWorkspaceRouter());
   // Report uploads use a larger, authenticated parser before the general API parser.
   app.use('/api/performance-reports', (req, res, next) => requireAuth(req, res, next), createPerformanceReportRouter());
+  app.use('/api/project-reports', (req,res,next)=>requireAuth(req,res,next),express.json({limit:'700kb'}),createProjectReportsRouter());
   app.use(express.json({ limit: '512kb' }));
 
   const {sessionSecret,authUsers,managers}=options;

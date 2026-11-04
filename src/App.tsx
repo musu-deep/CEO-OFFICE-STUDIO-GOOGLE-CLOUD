@@ -1,3 +1,4 @@
+import ProjectReportsWorkspace from './components/ProjectReportsWorkspace';
 import { useEffect, useState, useRef, type CSSProperties } from 'react';
 import { Building2, CheckSquare, FileText, Bot, Layers, Menu, X, LogOut, Sun, Moon, ArrowLeft, RefreshCw, ShieldCheck } from 'lucide-react';
 import type { AppUser, PlatformTheme } from './types';
@@ -122,6 +123,8 @@ const themeTokens: Record<PlatformTheme, ThemeDesignTokens> = {
     activeMenu: 'bg-gradient-to-l from-emerald-600 to-teal-500 text-white border border-emerald-700/10 shadow-lg shadow-emerald-600/15',
     selectRing: 'focus-within:border-emerald-600/35 focus-within:ring-2 focus-within:ring-emerald-600/10',
     cssVars: {
+      '--theme-panel-bg': '#ffffff',
+      '--theme-main-bg': '#f3f7f5',
       '--theme-accent': '#047857',
       '--theme-accent-soft': 'rgba(5,150,105,.10)',
       '--theme-card': 'rgba(255,255,255,.92)',
@@ -143,7 +146,7 @@ export default function App() {
  useEffect(()=>{localStorage.setItem('arak_display_mode',theme==='spring'?'light':'dark');},[theme]);
  useEffect(()=>{if(view==='unit'&&scope&&!scope.entities.some(e=>e.id===selected)){setSelected('');setView('home');}},[scope,selected,view]);
  const navigate=(next:string)=>{setView(next);setAdministrationOpen(false);setSidebar(false);};
- const openUnit=(entity:Entity)=>{setSelected(entity.id);navigate('unit');};
+ const openUnit=(entity:Entity)=>{setSelected(entity.id);navigate(entity.id==='national-projects'&&office?'projects':'unit');};
  const report=(task?:WorkspaceTask)=>{setReportContext({unitId:task?.unitId||selected,taskId:task?.id||''});navigate('reports');};
  const logout=async()=>{sessionEpoch.current++;await fetch('/api/auth/logout',{method:'POST'}).catch(()=>{});setUser(null);setScope(null);setSelected('');setReportContext({unitId:'',taskId:''});navigate('home');};
  if(sessionLoading)return <div dir="rtl" className="grid min-h-screen place-items-center bg-slate-950 text-slate-300" role="status">جارٍ التحقق من الجلسة…</div>;
@@ -161,9 +164,10 @@ export default function App() {
  <div className="lg:mr-72"><header className={`sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4 ${t.headerBg}`}><button aria-label="فتح القائمة" onClick={()=>setSidebar(true)} className="p-2 lg:hidden"><Menu/></button><div className="min-w-0"><p className="truncate text-sm font-bold">{current&&view==='unit'?current.name:office?'مكتب الرئيس التنفيذي':'مساحة العمل المخصصة'}</p><p className="mt-1 text-[11px] text-slate-400">{new Date().toLocaleDateString('ar-SA',{timeZone:'Asia/Riyadh',weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p></div><div className="flex shrink-0 items-center gap-2"><button aria-label="تحديث الصلاحيات والبيانات" onClick={()=>load().catch(e=>setError(e.message))} className="rounded-xl border border-white/10 p-3 text-slate-400"><RefreshCw size={17}/></button></div></header>
  {administrationOpen&&office&&<section id="ceo-administration" aria-labelledby="ceo-administration-title" className="mx-auto max-w-[1600px] space-y-6 p-4 sm:p-6 xl:p-9"><header className={`rounded-2xl border p-6 ${t.border} ${t.panelBg}`}><p className={`text-xs font-bold ${t.text}`}>وضع إدارة المنصة</p><div className="mt-3 flex flex-wrap justify-between gap-3"><h1 id="ceo-administration-title" className="text-2xl font-black">إدارة المنصة</h1><button onClick={()=>setAdministrationOpen(false)} className="rounded-xl border border-slate-500/30 px-4 py-2 text-sm">العودة للمكتب التنفيذي</button></div><p className="mt-3 text-sm leading-7 text-slate-400">إدارة المستخدمين والمحتوى وسياسة التسجيل والجهات والوكلاء. أغلق وضع الآدمن للعودة إلى المكتب التنفيذي؛ لا تظهر أدوات الإدارة في قائمة العمل اليومية.</p></header>{error&&<p role="alert" className="text-rose-400">{error}</p>}{scope?<PlatformAdministration entities={scope.entities}/>:<p role="status">جارٍ تحميل الجهات والصلاحيات…</p>}</section>}
  <main hidden={administrationOpen&&office} className="mx-auto max-w-[1600px] p-4 sm:p-6 xl:p-9">{error&&<p role="alert" className="mb-5 rounded-xl border border-rose-400/30 p-4 text-rose-300">{error}</p>}{!scope?<p role="status" className="p-8 text-slate-400">جارٍ تحميل الجهات والصلاحيات…</p>:<>
- {view==='dashboard'&&office&&<ExecutiveDashboard showExecutiveProfile={user.role==='ceo'} onTasks={()=>navigate('tasks')} userKey={user.email} onReports={()=>report()} onOpen={(_root,id)=>{const e=scope.entities.find(e=>e.id===id);if(e)openUnit(e);}}/>}
+ {view==='dashboard'&&office&&<ExecutiveDashboard showExecutiveProfile={user.role==='ceo'} onTasks={()=>navigate('tasks')} userKey={user.email} onReports={()=>report()} onProjects={()=>navigate('projects')} onOpen={(_root,id)=>{const e=scope.entities.find(e=>e.id===id);if(e)openUnit(e);}}/>}
  {(view==='home'||(!office&&view==='dashboard'))&&<ScopeHome scope={scope} open={openUnit} tasks={()=>navigate('tasks')}/>}
  {view==='unit'&&current&&<><div className="mb-4 flex flex-wrap justify-between gap-3"><button onClick={()=>navigate('home')} className="text-xs text-slate-400">جميع مساحات العمل</button><button onClick={()=>report()} className="rounded-xl border border-emerald-500/30 px-4 py-2 text-sm text-emerald-400">إرسال تقرير {current.name}</button></div><UnitWorkspace key={`${user.email}:${current.id}`} unit={current} userKey={user.email}/></>}
+ {view==='projects'&&office&&<ProjectReportsWorkspace entities={scope.entities} onBack={()=>navigate('dashboard')} onUnit={()=>{setSelected('national-projects');navigate('unit');}}/>}
  {view==='tasks'&&<WorkspaceTasksView onReport={report}/>}
  {view==='reports'&&<PerformanceReportsView key={`${reportContext.unitId}:${reportContext.taskId}`} initialUnitId={reportContext.unitId} initialTaskId={reportContext.taskId}/>}
 
