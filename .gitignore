@@ -32,3 +32,9 @@ Thumbs.db
 .eslintcache
 # Shared executive records and uploaded reports
 data/executive/
+
+# Cloudflare local state and secrets
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example

@@ -1,0 +1,24 @@
+import crypto from 'node:crypto';
+import { type ExecutiveState, type Action, type Grant, emptyRecord, hasPermission, resolveEntity, dimensions } from '../lib/executiveModel';
+import { parseSnapshot } from '../lib/unitWorkspace';
+export class MemoryExecutiveStore {
+ protected state:ExecutiveState;
+ readonly persistent:boolean = true;
+ constructor(state:ExecutiveState={units:{},objectives:[],grants:{},audit:[]}) { this.state=structuredClone(state); }
+ read(){return structuredClone(this.state);}
+ update(fn:(state:ExecutiveState)=>void){const next=this.read();fn(next);this.state=next;return this.read();}
+ can(actor:{email:string;role:string},unitId:string,action:Action){return !(!['ceo','admin'].includes(actor.role)&&action!=='read'&&(this.state.platformSettings?.closedUnits?.includes(unitId)||this.state.platformSettings?.entityPolicies?.[unitId]?.mode==='readonly'))&&!!resolveEntity(unitId)&&hasPermission(actor.email,actor.role,this.state.grants,unitId,action);}
+ audit(s:ExecutiveState,actor:string,action:string,unitId?:string){s.audit.unshift({id:crypto.randomUUID(),at:new Date().toISOString(),actor,action,unitId});s.audit=s.audit.slice(0,5000);}
+ saveDraft(actor:{email:string;role:string},unitId:string,input:any,expected:number,source:string){
+  if(!this.can(actor,unitId,'edit')&&!this.can(actor,unitId,'upload'))throw Object.assign(new Error('لا تملك صلاحية رفع بيانات لهذه الجهة.'),{status:403});
+  if(!input || !Array.isArray(input.metrics) || input.metrics.length>10 || input.metrics.some((m:any)=>!m || typeof m.label!=='string' || typeof m.value!=='number' || !Number.isFinite(m.value)))throw Object.assign(Error('المؤشرات غير صالحة.'),{status:400});
+  const snapshot=parseSnapshot(input,source) as any;
+  snapshot.metrics=snapshot.metrics.map((m:any,i:number)=>{const raw=input.metrics[i]||{};return {...m,dimension:dimensions.some(d=>d[0]===raw.dimension)?raw.dimension:undefined,definition:typeof raw.definition==='string'?raw.definition.slice(0,300):undefined,objectiveId:this.state.objectives.some(o=>o.id===raw.objectiveId)?raw.objectiveId:undefined};});
+  this.update(s=>{const r=s.units[unitId]||emptyRecord();if(r.version!==expected)throw Object.assign(new Error('تغيرت بيانات الجهة. حدّث الصفحة قبل الحفظ.'),{status:409});if(r.pending)r.history.unshift(r.pending);r.history=r.history.slice(0,100);r.pending={id:crypto.randomUUID(),snapshot,state:'draft',createdAt:new Date().toISOString(),author:actor.email};r.version++;s.units[unitId]=r;this.audit(s,actor.email,'رفع مسودة',unitId);});
+ }
+ document(data:{name:string;mimeType:string;data:string}):{id:string;name:string;mimeType:string}{throw Error('Document storage is not configured');}
+ bytes(id:string):Buffer|Promise<Buffer>{throw Error('Document storage is not configured');}
+ removeDocument(id:string):void {}
+ discardDocument(id:string):void {}
+}
+export function validateGrant(input:any):Grant {const allowed=['read','upload','edit','review','approve','direct'];if(!input||!Array.isArray(input.units)||!Array.isArray(input.actions)||input.units.some((v:any)=>typeof v!=='string'||!resolveEntity(v))||input.actions.some((v:any)=>!allowed.includes(v)))throw Object.assign(new Error('صلاحيات غير صالحة.'),{status:400});const unitActions:Record<string,Action[]>={};if(input.unitActions!==undefined){if(!input.unitActions||typeof input.unitActions!=='object'||Array.isArray(input.unitActions))throw Error('صلاحيات الجهة غير صالحة.');for(const [id,list] of Object.entries(input.unitActions)){if(!resolveEntity(id)||!Array.isArray(list)||list.some(a=>!allowed.includes(a)))throw Error('صلاحيات الجهة غير صالحة.');unitActions[id]=[...new Set(list)] as Action[];}}return {units:[...new Set(input.units)] as string[],actions:[...new Set(input.actions)] as Action[],...(input.unitActions?{unitActions}:{})};}

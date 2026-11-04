@@ -1,0 +1,8 @@
+# Local development only: copy to .dev.vars (git-ignored).
+# Generate a random secret with: node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+SESSION_SECRET=
+# JSON object: office email -> {"password":"a unique long password","role":"ceo","name":"..."}
+# Keep passwords out of source control. Set runtime secrets with wrangler secret put.
+ARAAK_AUTH_USERS={}
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash

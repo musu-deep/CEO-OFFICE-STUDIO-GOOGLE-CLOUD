@@ -3,7 +3,7 @@ import { CheckSquare, Plus, Clock3 } from 'lucide-react';
 import type { Entity } from '../lib/executiveModel';
 import type { WorkspaceTask } from '../server/scopedWorkspace';
 const field='w-full rounded-xl border border-white/15 bg-slate-900 p-3 text-sm text-white';
-export type WorkspaceState={tasks:WorkspaceTask[];entities:Entity[];manage:boolean};
+export type WorkspaceState={tasks:WorkspaceTask[];entities:Entity[];manage:boolean;canProjectReporting?:boolean};
 export async function workspaceRequest(path='',body?:unknown){const r=await fetch(`/api/workspace${path}`,{headers:{'Content-Type':'application/json'},...(body!==undefined?{method:'POST',body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok)throw Error(d.error||'تعذر تحميل مساحة العمل.');return d;}
 export default function WorkspaceTasksView({onReport}:{onReport:(task:WorkspaceTask)=>void}) {
  const [state,setState]=useState<WorkspaceState|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[adding,setAdding]=useState(false),[filter,setFilter]=useState('all'),[recipients,setRecipients]=useState<{email:string;name:string}[]>([]);

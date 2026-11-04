@@ -1,12 +1,17 @@
+import { unitOperationAllowed } from './platformAdministration';
 import { validateServiceCompany } from '../lib/executiveModel';
 import { assignedTask } from './scopedWorkspace';
 import express, { Router } from 'express';
 import crypto from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
 import { executiveStore, actorOf } from './executiveRoutes';
 import { attachmentTypes, maxAttachmentBytes, type PerformanceReport } from '../lib/performanceReports';
 
+// Linear validation avoids recursive-regexp stack overflow on legitimate 4 MiB files.
+function validBase64(value:string){
+ if(value.length%4!==0)return false;
+ const padding=value.endsWith('==')?2:value.endsWith('=')?1:0;
+ return !/[^A-Za-z0-9+/]/.test(value.slice(0,value.length-padding));
+}
 export function createPerformanceReportRouter() {
   const router = Router();
   router.use(express.json({ limit: '29mb' }));
@@ -15,19 +20,20 @@ export function createPerformanceReportRouter() {
   const visible = (req: any, report: PerformanceReport) => isOffice(req) || (report.author === actorOf(req).email && (executiveStore.can(actorOf(req), report.unitId, 'read') || (!!report.taskId && !!assignedTask(actorOf(req).email,report.taskId,report.unitId))));
   router.get('/', (req, res) => res.json({ reports: (executiveStore.read().reports || []).filter(r => visible(req, r)) }));
   router.post('/', (req, res) => {
-    if (process.env.NODE_ENV === 'production' && !process.env.EXECUTIVE_DATA_DIR) return res.status(503).json({ error: 'يجب تفعيل التخزين الدائم لدى مشرف المنصة قبل استقبال التقارير والمرفقات.' });
+    if (!executiveStore.persistent) return res.status(503).json({ error: 'يجب تفعيل التخزين الدائم لدى مشرف المنصة قبل استقبال التقارير والمرفقات.' });
     const actor = actorOf(req), body = req.body || {};
-    if (typeof body.unitId !== 'string' || (!executiveStore.can(actor, body.unitId, 'upload') && !(typeof body.taskId==='string' && assignedTask(actor.email,body.taskId,body.unitId)))) return res.status(403).json({ error: 'لا تملك صلاحية إرسال تقرير لهذه الجهة.' });
+    if (typeof body.unitId !== 'string' || !unitOperationAllowed(req,body.unitId,'reports') || (!executiveStore.can(actor, body.unitId, 'upload') && !(typeof body.taskId==='string' && assignedTask(actor.email,body.taskId,body.unitId)))) return res.status(403).json({ error: 'لا تملك صلاحية إرسال تقرير لهذه الجهة.' });
     if (body.taskId !== undefined && (typeof body.taskId !== 'string' || (!isOffice(req) && !assignedTask(actor.email,body.taskId,body.unitId)))) return res.status(403).json({error:'التكليف خارج نطاق حسابك.'});
     const text = (v: unknown, max: number) => typeof v === 'string' && !!v.trim() && v.length <= max;
     if (!text(body.title, 200) || !text(body.period, 100) || !text(body.summary, 10000) || !Array.isArray(body.attachments) || body.attachments.length > 5) return res.status(400).json({ error: 'أكمل عنوان التقرير وفترته وملخصه. الحد الأقصى خمسة مرفقات.' });
+    if(body.attachments.length&&!unitOperationAllowed(req,body.unitId,'uploads'))return res.status(403).json({error:'رفع المرفقات غير متاح لهذه الجهة.'});
     const saved: string[] = [];
     try {
       const companyId=validateServiceCompany(body.unitId,body.companyId);
       const validated = body.attachments.map((a: any) => {
         const ext = typeof a?.name === 'string' ? a.name.split('.').pop()?.toLowerCase() : '';
         const mimeType = attachmentTypes[ext || ''];
-        if (!mimeType || !text(a.name, 200) || /[\x00-\x1f/\\]/.test(a.name) || typeof a.data !== 'string' || a.data.length > 5592408 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(a.data)) throw Error('مرفق غير صالح. استخدم PDF أو Word أو Excel أو صورة أو TXT أو CSV بحد أقصى 4 ميغابايت لكل ملف.');
+        if (!mimeType || !text(a.name, 200) || /[\x00-\x1f/\\]/.test(a.name) || typeof a.data !== 'string' || a.data.length > 5592408 || !validBase64(a.data)) throw Error('مرفق غير صالح. استخدم PDF أو Word أو Excel أو صورة أو TXT أو CSV بحد أقصى 4 ميغابايت لكل ملف.');
         const bytes = Buffer.from(a.data, 'base64');
         if (!bytes.length || bytes.length > maxAttachmentBytes) throw Error('حجم المرفق غير صالح.');
         return { name: a.name, mimeType, data: a.data, size: bytes.length };
@@ -37,18 +43,20 @@ export function createPerformanceReportRouter() {
       executiveStore.update(s => { (s.reports ||= []).unshift(report); executiveStore.audit(s, actor.email, `إرسال تقرير أداء ${report.id}`, report.unitId); });
       res.status(201).json({ report });
     } catch (e: any) {
-      for (const id of saved) fs.rmSync(path.join(executiveStore.dir, 'documents', id), { force: true });
+      for (const id of saved) executiveStore.discardDocument(id);
       res.status(400).json({ error: e.message || 'تعذر حفظ التقرير.' });
     }
   });
-  router.get('/:id/attachments/:docId', (req, res) => {
+  router.get('/:id/attachments/:docId', async (req, res, next) => {
+    try {
     const report = (executiveStore.read().reports || []).find(r => r.id === req.params.id);
     if (!report || !visible(req, report)) return res.status(404).json({ error: 'التقرير غير متاح.' });
     const doc = report.attachments.find(d => d.id === req.params.docId);
     if (!doc) return res.status(404).json({ error: 'المرفق غير موجود.' });
     res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(doc.name)}`);
-    res.send(executiveStore.bytes(doc.id));
+    res.send(await executiveStore.bytes(doc.id));
+    } catch(error) { next(error); }
   });
   router.post('/:id/review', (req, res) => {
     if (!isOffice(req)) return res.status(403).json({ error: 'المراجعة متاحة لمكتب الرئيس التنفيذي فقط.' });

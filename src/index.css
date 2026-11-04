@@ -8,7 +8,7 @@
 /* Genuine daylight mode: components historically used dark utility colors.
    These scoped overrides preserve accent colors while converting structural surfaces. */
 [data-theme="spring"] {
-  color: #0f172a;
+  color: #10161b;
 }
 
 [data-theme="spring"] main [class*="bg-[#0"],
@@ -23,16 +23,16 @@
 [data-theme="spring"] main .text-slate-100,
 [data-theme="spring"] main .text-slate-200,
 [data-theme="spring"] main .text-slate-300 {
-  color: #0f172a !important;
+  color: #10161b !important;
 }
 
 [data-theme="spring"] main .text-slate-400 {
-  color: #475569 !important;
+  color: #29333b !important;
 }
 
 [data-theme="spring"] main .text-slate-500,
 [data-theme="spring"] main .text-slate-600 {
-  color: #64748b !important;
+  color: #29333b !important;
 }
 
 [data-theme="spring"] main [class*="border-white"],
@@ -46,18 +46,18 @@
 }
 
 [data-theme="spring"] header {
-  color: #0f172a;
+  color: #10161b;
 }
 
 [data-theme="spring"] header .text-white,
 [data-theme="spring"] header .text-slate-200,
 [data-theme="spring"] header .text-slate-300 {
-  color: #0f172a !important;
+  color: #10161b !important;
 }
 
 [data-theme="spring"] header .text-slate-400,
 [data-theme="spring"] header .text-slate-500 {
-  color: #64748b !important;
+  color: #29333b !important;
 }
 
 /* Unified Araak interface colour ruler
@@ -487,3 +487,6 @@ input, select, textarea {
   font-size: 1rem;
   line-height: 1.6;
 }
+/* Day mode: readable body text and secondary labels across the workspace. */
+[data-theme="spring"] .text-slate-400,[data-theme="spring"] .text-slate-500,[data-theme="spring"] .text-slate-300{color:#303b45}
+
