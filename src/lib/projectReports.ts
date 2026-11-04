@@ -1,7 +1,7 @@
 export type ProjectPayload={data:Record<string,any>;snapshot:{at:string;by:string;s:Record<string,any>};source:{name:string;at:string;by:string;sha256?:string}};
 export type ProjectReport=ProjectPayload&{id:string;unitId:string;name:string;version:number;state:'reference'|'draft'|'submitted'|'reviewed'|'approved'|'returned';contentHash:string;submittedBy?:string;reviewedBy?:string;events:{at:string;actor:string;action:string;note:string;hash:string}[]};
 export const projectStates={reference:'نسخة مرجعية — غير معتمدة',draft:'مسودة',submitted:'بانتظار المراجعة',reviewed:'تمت المراجعة',approved:'معتمد في المنصة',returned:'معاد للتصحيح'};
-export const dataSections=['project','activities','overallProgress','types','boq','ipcs','unitProgress','qtyTables','schedule3','catalog','quotes'] as const;
+export const dataSections=['project','activities','overallProgress','types','boq','ipcs','unitProgress','qtyTables','schedule3','catalog','quotes','sitePlan','targetGroups'] as const;
 export const snapshotSections=['wos','contr','cqt','sup','tasks','nipc','links','grns','mirs','audit','pos','catp','prices'] as const;
 export function projectInsights(report:ProjectPayload){
  const d=report.data,p=d.project||{},ipc=(d.ipcs||[]).at(-1),activities=d.activities||[];

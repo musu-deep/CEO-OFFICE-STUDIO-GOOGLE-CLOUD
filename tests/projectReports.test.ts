@@ -27,7 +27,7 @@ test('authenticated project isolation, version conflicts, separate reviewer, app
   assert.equal((await req('/api/project-reports')).status,401);assert.equal((await req('/api/project-reports/farasan-reference')).status,401);
   const ceo=(await req('/api/auth/login',{email:'ceo@test.example',password:'test'})).cookie,admin=(await req('/api/auth/login',{email:'admin@test.example',password:'test'})).cookie,head=(await req('/api/auth/login',{email:'head@test.example',password:'test'})).cookie;
   assert.equal((await req('/api/project-reports',undefined,head)).data.projects.length,0);assert.equal((await req('/api/project-reports/farasan-reference',undefined,head)).status,403);
-  const reference=(await req('/api/project-reports/farasan-reference',undefined,ceo)).data.report;assert.equal(reference.state,'reference');assert.equal(store.read().projectReports,undefined);
+  const fetched=(await req('/api/project-reports/farasan-reference',undefined,ceo)).data;assert.equal(fetched.presentation.sitePlan.buildings.length,24);assert.equal(fetched.presentation.targetGroups.length,3);const reference=fetched.report;assert.equal(reference.state,'reference');assert.equal(store.read().projectReports,undefined);
   const action=(a:string,v:number,c=ceo,extra:any={})=>req('/api/project-reports/farasan-reference/action',{action:a,version:v,...extra},c);
   assert.equal((await action('save',0)).status,200);assert.equal(store.read().projectReports![0].version,1);
   assert.equal((await action('submit',0)).status,409);assert.equal((await action('submit',1)).status,200);
