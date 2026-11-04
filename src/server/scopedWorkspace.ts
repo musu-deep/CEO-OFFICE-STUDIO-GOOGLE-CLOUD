@@ -15,7 +15,7 @@ export function createScopedWorkspaceRouter(recipients:()=>{email:string;name:st
   const actor=actorOf(req),s=executiveStore.read();
   const tasks=Object.entries(s.units).flatMap(([unitId,r])=>r.directives.filter(d=>office(req)||d.assigneeEmail===actor.email).map(d=>({...d,unitId,unitName:resolveEntity(unitId)?.name||unitId})));
   const list=entities().filter(e=>executiveStore.can(actor,e.id,'read')||executiveStore.can(actor,e.id,'upload')||executiveStore.can(actor,e.id,'edit'));
-  res.json({tasks,entities:list.map(e=>({...e,children:undefined})),manage:office(req),canProjectReporting:list.some(e=>executiveStore.can(actor,e.id,'read')&&['edit','upload','review','approve'].some(a=>executiveStore.can(actor,e.id,a as any)))});
+  res.json({tasks,entities:list.map(e=>({...e,children:undefined})),manage:office(req),canProjectReporting:actor.role!=='ceo'&&list.some(e=>executiveStore.can(actor,e.id,'read')&&['edit','upload','review','approve'].some(a=>executiveStore.can(actor,e.id,a as any)))});
  }));
  router.get('/recipients',handle((req:any,res:any)=>{if(!office(req))return res.status(403).json({error:'غير مصرح.'});res.json({recipients:recipients()});}));
  router.post('/tasks',handle((req:any,res:any)=>{

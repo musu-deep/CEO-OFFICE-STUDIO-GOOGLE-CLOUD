@@ -31,9 +31,15 @@ test('scoped authoring, attachment access, independent review, frozen publicatio
   const {engineer,reviewer,ceo,other}=cookies;
   assert.equal((await req('/api/project-reports/input-schema',undefined,reviewer)).status,200);
   assert.equal((await req('/api/workspace',undefined,engineer)).data.canProjectReporting,true);
+  assert.equal((await req('/api/workspace',undefined,ceo)).data.canProjectReporting,false);
+  assert.equal((await req('/api/project-reports',undefined,ceo)).data.canCreate,false);
   const payload=blankProjectInput('مشروع أ') as any;Object.assign(payload.data.project,{periodFrom:'2026-11-01',periodTo:'2026-11-30'});payload.data.boq=[{code:'CONC',ar:'الخرسانة',unit:'م³',comparisonKey:'concrete',contractValue:1000,certifiedValue:400}];
+  assert.equal((await req('/api/project-reports',{payload,unitId:'national-projects'},ceo)).status,403);
   const made=await req('/api/project-reports',{payload,unitId:'national-projects'},engineer);assert.equal(made.status,201);let p=made.data.report;
   const url='/api/project-reports/'+p.id;
+  const capability=(await req(url+'?mode=edit',undefined,ceo)).data;assert.equal(capability.canAuthor,false);assert.ok(!capability.permissions.includes('edit'));assert.ok(!capability.permissions.includes('upload'));
+  for(const action of ['save','revision','submit'])assert.equal((await req(url+'/action',{action,version:p.version,payload},ceo)).status,403);
+  assert.equal((await req(url+'/attachments',{version:p.version,file:{name:'test.pdf',mimeType:'application/pdf',data:Buffer.from('%PDF').toString('base64')}},ceo)).status,403);
   assert.equal((await req(url,undefined,ceo)).status,404);assert.equal((await req(url+'?mode=edit',undefined,other)).status,403);
   assert.equal((await req('/api/project-reports',{payload,unitId:'national-projects'},reviewer)).status,403);
   const attached=await req(url+'/attachments',{version:p.version,file:{name:'قياس.pdf',mimeType:'application/pdf',data:Buffer.from('%PDF-test').toString('base64')}},engineer);assert.equal(attached.status,201);p=attached.data.report;const f=p.attachments[0];
